@@ -1,0 +1,15 @@
+server:
+  port: 10088
+  servlet:
+    context-path: /user
+spring:
+  application:
+    name: userService
+  profiles:
+    active: dev
+  cloud:
+    nacos:
+      server-addr: 110.41.182.125:8848
+      config:
+        file-extension: yaml # 配置文件名后缀
+        shared-configs: # 共享配置

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yixuan.yh.admin.mapper.AuditMapper">
+
+
+    <select id="selectByCond" resultType="com.yixuan.yh.admin.entity.Audit">
+        select id, admin_id, request_method, request_path, request_body, created_time from audit
+        <where>
+            <if test="id != null">
+                id = #{id}
+            </if>
+            <if test="adminId != null">
+                and admin_id = #{adminId}
+            </if>
+            <if test="requestMethod != null and requestMethod != ''">
+                and request_method = #{requestMethod}
+            </if>
+            <if test="requestPath != null and requestPath != ''">
+                and request_path = #{requestPath}
+            </if>
+            <if test="createdTime != null and createdTime != ''">
+                and created_time = #{createdTime}
+            </if>
+        </where>
+    </select>
+</mapper>

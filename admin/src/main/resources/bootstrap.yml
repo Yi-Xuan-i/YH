@@ -1,0 +1,15 @@
+server:
+  port: 10087
+  servlet:
+    context-path: /admin
+spring:
+  application:
+    name: adminService
+  profiles:
+    active: dev
+  cloud:
+    nacos:
+      server-addr: 110.41.182.125:8848
+      config:
+        file-extension: yaml # 配置文件名后缀
+        shared-configs: # 共享配置

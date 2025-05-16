@@ -1,0 +1,3 @@
+jwt:
+  sign-key: yxyyxhyh
+  expire: 66666666
