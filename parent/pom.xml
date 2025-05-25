@@ -25,6 +25,7 @@
         <mybatis.version>3.0.3</mybatis.version>
         <mybatisplus.version>3.5.5</mybatisplus.version>
         <druid.version>1.2.20</druid.version>
+        <redission.version>3.13.6</redission.version>
         <lombok.version>1.18.30</lombok.version>
         <jwt.version>0.9.1</jwt.version>
         <jaxb.version>2.3.1</jaxb.version>
@@ -83,6 +84,12 @@
                 <groupId>com.alibaba</groupId>
                 <artifactId>druid-spring-boot-3-starter</artifactId>
                 <version>${druid.version}</version>
+            </dependency>
+            <!-- Redisson -->
+            <dependency>
+                <groupId>org.redisson</groupId>
+                <artifactId>redisson</artifactId>
+                <version>${redission.version}</version>
             </dependency>
             <!-- jwt -->
             <dependency>
