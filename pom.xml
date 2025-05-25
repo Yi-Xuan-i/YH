@@ -14,5 +14,8 @@
         <module>admin</module>
         <module>user</module>
         <module>video</module>
+        <module>video-processor</module>
+        <module>product</module>
+        <module>order</module>
     </modules>
 </project>
