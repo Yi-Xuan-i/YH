@@ -1,14 +1,13 @@
 package com.yixuan.yh.video.controller;
 
 import com.yixuan.yh.commom.response.Result;
+import com.yixuan.yh.video.request.PostVideoRequest;
 import com.yixuan.yh.video.service.VideoService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedReader;
@@ -45,7 +44,8 @@ public class VideoController {
     }
 
     @PostMapping
-    public Result<String> postVideo(MultipartFile video) throws IOException {
-        return Result.success(videoService.postVideo(video));
+    public Result<Void> postVideo(@ModelAttribute PostVideoRequest postVideoRequest) throws IOException, InterruptedException {
+        videoService.postVideo(postVideoRequest);
+        return Result.success();
     }
 }

@@ -31,6 +31,12 @@ spring:
       max-file-size: 5000MB
       max-request-size: 7000MB
 #      enabled: false
+  rabbitmq:
+    host: 47.121.24.225
+    port: 5672
+    virtual-host: /
+    username: guest
+    password: guest
 
 mybatis:
   configuration:
@@ -63,4 +69,3 @@ mt:
   bucket-name: video
   username: mt
   password: mt
-

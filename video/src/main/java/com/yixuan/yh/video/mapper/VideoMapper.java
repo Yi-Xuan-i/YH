@@ -18,7 +18,7 @@ public interface VideoMapper {
             "LIMIT 5;")
     List<String> selectRandom();
 
-    @Insert("insert into video (id, url) value (#{id}, #{url})")
+    @Insert("insert into video (id, url, cover_url, description) value (#{id}, #{url}, #{coverUrl}, #{description})")
     void insert(Video video);
 
     @Select("select url from video where id = #{id}")

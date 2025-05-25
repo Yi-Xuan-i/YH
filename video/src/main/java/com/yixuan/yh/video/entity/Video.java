@@ -8,5 +8,7 @@ import java.time.LocalDateTime;
 public class Video {
     Long id;
     String url;
+    String coverUrl;
+    String description;
     LocalDateTime createdTime;
 }

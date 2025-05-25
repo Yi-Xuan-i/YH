@@ -1,0 +1,23 @@
+package com.yixuan.yh.video.config;
+
+import org.redisson.Redisson;
+import org.redisson.api.RedissonClient;
+import org.redisson.config.Config;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class RedisConfig {
+    @Bean
+    public RedissonClient redissonClient() {
+        // 配置类
+        Config config = new Config();
+        config.useSingleServer()
+                .setAddress("redis://47.121.24.225:6379")
+                .setPassword("qq2434462503")
+                .setConnectionPoolSize(6)
+                .setConnectionMinimumIdleSize(2);
+
+        return Redisson.create(config);
+    }
+}
