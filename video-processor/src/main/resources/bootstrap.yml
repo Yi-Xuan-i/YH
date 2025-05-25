@@ -1,0 +1,21 @@
+server:
+  port: 10091
+  servlet:
+    context-path: /video-processor
+  tomcat:
+    basedir: D:\Java\YH\video\src\main\resources
+    threads:
+      max: 5
+      min-spare: 2
+    max-connections: 50
+spring:
+  application:
+    name: videoProcessorService
+  profiles:
+    active: dev
+  cloud:
+    nacos:
+      server-addr: 110.41.182.125:8848
+      config:
+        file-extension: yaml # 配置文件名后缀
+        shared-configs: # 共享配置
