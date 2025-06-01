@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yixuan.yh.product.mapper.multi.ProductMultiMapper">
+
+
+    <select id="selectProductDetail" resultType="com.yixuan.yh.product.response.ProductDetailResponse">
+        SELECT p.product_id,
+               p.title,
+               p.description,
+               JSON_ARRAYAGG(
+                       JSON_OBJECT(
+                               'sku_id', sku.sku_id,
+                               'price', sku.price,
+                               'stock', sku.stock,
+                               'specs', sku.specs
+                       )
+               ) AS skus
+        FROM product p
+                 JOIN (SELECT ps.product_id,
+                              ps.sku_id,
+                              ps.price,
+                              ps.stock,
+                              JSON_ARRAYAGG(
+                                      JSON_OBJECT(
+                                              'key_name', k.key_name,
+                                              'value_name', v.value_name
+                                      )
+                              ) AS specs
+                       FROM product_sku ps
+                                JOIN sku_spec ss ON ps.sku_id = ss.sku_id
+                                JOIN spec_key k ON ss.key_id = k.key_id
+                                JOIN spec_value v ON ss.value_id = v.value_id
+                       WHERE ps.product_id = #{productId}
+                       GROUP BY ps.sku_id) AS sku
+                      ON p.product_id = sku.product_id
+        WHERE p.product_id = #{productId}
+        GROUP BY p.product_id;
+    </select>
+</mapper>
