@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yixuan.yh.product.mapper.SkuSpecMapper">
+
+
+    <insert id="insertBatch1">
+        insert into sku_spec (sku_id, key_id, value_id) values
+            <foreach collection="skuIdList" item="skuId" separator=",">
+                (#{skuId}, #{keyId}, #{valueId})
+            </foreach>
+    </insert>
+
+    <insert id="insertBatch2">
+        insert into sku_spec (sku_id, key_id, value_id) values
+        <foreach collection="skuList" item="sku" index="idx" separator=",">
+            <foreach collection="sku" item="spec" separator=",">
+                (#{skuIdList[${idx}]}, #{spec.keyId}, #{spec.valueId})
+            </foreach>
+        </foreach>
+    </insert>
+
+    <select id="selectKeyValueBatch" resultType="com.yixuan.yh.product.model.entity.SkuSpec">
+        select key_id, value_id from sku_spec where sku_id in
+        <foreach collection="skuIdList" item="skuId" open="(" close=")" separator=",">
+            #{skuId}
+        </foreach>
+    </select>
+
+    <delete id="deleteBatch">
+        delete from sku_spec where sku_id in
+        <foreach collection="skuIdList" item="skuId" open="(" close=")" separator=",">
+            #{skuId}
+        </foreach>
+    </delete>
+</mapper>

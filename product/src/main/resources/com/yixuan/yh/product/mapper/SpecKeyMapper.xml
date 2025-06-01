@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yixuan.yh.product.mapper.SpecKeyMapper">
+
+
+    <delete id="deleteBatch">
+        delete from spec_key where key_id in
+            <foreach collection="keyIdList" item="keyId" open="(" close=")" separator=",">
+                #{keyId}
+            </foreach>
+    </delete>
+</mapper>

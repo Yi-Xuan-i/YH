@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yixuan.yh.product.mapper.multi.SkuMapper">
+    <!-- 批量查询规格信息 -->
+    <select id="selectSpecsBySkuIds" resultType="com.yixuan.yh.product.model.multi.SkuSpecInfo">
+        SELECT
+        ss.sku_id,
+        k.key_name AS specKey,
+        k.key_id AS specKeyId,
+        v.value_name AS specValue,
+        v.value_id AS specValueId
+        FROM sku_spec ss
+        JOIN spec_key k ON ss.key_id = k.key_id
+        JOIN spec_value v ON ss.value_id = v.value_id
+        WHERE ss.sku_id IN
+        <foreach item="skuId" collection="skuIdList" open="(" separator="," close=")">
+            #{skuId}
+        </foreach>
+    </select>
+
+</mapper>
