@@ -45,7 +45,7 @@ public class AdminInit implements ApplicationRunner {
             admin.setId(snowflakeUtils.nextId());
             admin.setName("admin");
 //            String randomPassword = UUID.randomUUID().toString();
-            String randomPassword = "123";
+            String randomPassword = "admin";
             admin.setEncodedPassword(passwordEncoder.encode(randomPassword));
             adminMapper.insert(admin);
 
