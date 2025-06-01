@@ -9,7 +9,7 @@ server:
     max-connections: 50
 spring:
   application:
-    name: videoService
+    name: liveService
   profiles:
     active: dev
   cloud:

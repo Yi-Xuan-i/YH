@@ -26,6 +26,10 @@ spring:
       test-while-idle: true
       validation-query: select 1
       time-between-eviction-runs-millis: 20000
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 10MB
 
 mybatis:
   configuration:
@@ -36,21 +40,21 @@ logging:
   level:
     org.springframework.jdbc.support.JdbcTransactionManager: debug
 
-seata:
-  registry:
-    type: nacos
-    nacos:
-      server-addr: 110.41.182.125:8848
-      namespace: ""
-      group: DEFAULT_GROUP
-      application: seataServer
-      username: nacos
-      password: nacos
-  data-source-proxy-mode: AT
-  tx-service-group: yx # 事务组名称
-  service:
-    vgroup-mapping: # 事务组与tc集群的映射关系
-      yx: "default"
+#seata:
+#  registry:
+#    type: nacos
+#    nacos:
+#      server-addr: 110.41.182.125:8848
+#      namespace: ""
+#      group: DEFAULT_GROUP
+#      application: seataServer
+#      username: nacos
+#      password: nacos
+#  data-source-proxy-mode: AT
+#  tx-service-group: yx # 事务组名称
+#  service:
+#    vgroup-mapping: # 事务组与tc集群的映射关系
+#      yx: "default"
 jwt:
   expire: 66666666
   sign-key: yxyyxhyh

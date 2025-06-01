@@ -69,7 +69,7 @@ seata:
 mt:
   console-url: http://47.121.24.225:19998
   core-url: http://47.121.24.225:19999
-  bucket-name: video
+  bucket-name: product
   username: mt
   password: mt
 

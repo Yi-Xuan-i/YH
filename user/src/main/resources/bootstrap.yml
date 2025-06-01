@@ -2,6 +2,18 @@ server:
   port: 10088
   servlet:
     context-path: /user
+  ssl:
+    enabled: false
+    key-store-type: PKCS12
+    key-store: classpath:keystore.p12
+    key-store-password: yixuan
+    key-alias: mydomain
+  tomcat:
+    threads:
+      max: 5
+      min-spare: 2
+    max-connections: 50
+
 spring:
   application:
     name: userService

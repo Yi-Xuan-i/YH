@@ -2,6 +2,11 @@ server:
   port: 10087
   servlet:
     context-path: /admin
+  tomcat:
+    threads:
+      max: 5
+      min-spare: 2
+    max-connections: 50
 spring:
   application:
     name: adminService

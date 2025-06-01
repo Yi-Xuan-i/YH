@@ -69,3 +69,7 @@ mt:
   bucket-name: video
   username: mt
   password: mt
+
+
+jwt:
+  sign-key: yxyyxhyh

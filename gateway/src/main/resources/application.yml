@@ -1,3 +1,10 @@
 jwt:
   sign-key: yxyyxhyh
   expire: 66666666
+
+logging:
+  level:
+    reactor:
+      netty: DEBUG
+    io:
+      netty: DEBUG
