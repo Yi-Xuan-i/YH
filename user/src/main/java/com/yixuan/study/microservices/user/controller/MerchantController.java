@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/merchant")
+@RequestMapping("/me/merchant")
 public class MerchantController {
 
     @Autowired

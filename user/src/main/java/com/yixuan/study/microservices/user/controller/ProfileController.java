@@ -13,7 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/profile")
+@RequestMapping("/me/profile")
 public class ProfileController {
 
     @Autowired

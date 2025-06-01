@@ -6,9 +6,11 @@ import com.yixuan.yh.commom.response.Result;
 import com.yixuan.yh.commom.utils.UserContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequestMapping("/me")
 public class HomeIndexController {
 
     @Autowired

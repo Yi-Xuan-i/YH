@@ -8,6 +8,9 @@ server:
       min-spare: 2
     max-connections: 50
 spring:
+  mvc:
+    servlet:
+      path: /api
   application:
     name: adminService
   profiles:

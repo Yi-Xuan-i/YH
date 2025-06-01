@@ -1,5 +1,5 @@
 server:
-  port: 10091
+  port: 10092
   servlet:
     context-path: /video-processor
   tomcat:
@@ -9,6 +9,9 @@ server:
       min-spare: 2
     max-connections: 50
 spring:
+  mvc:
+    servlet:
+      path: /api
   application:
     name: videoProcessorService
   profiles:

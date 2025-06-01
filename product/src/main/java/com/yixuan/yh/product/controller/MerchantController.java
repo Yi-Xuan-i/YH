@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/merchant")
+@RequestMapping("/me/merchant")
 public class MerchantController {
 
     @Autowired

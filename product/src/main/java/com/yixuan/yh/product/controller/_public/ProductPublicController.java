@@ -1,4 +1,4 @@
-package com.yixuan.yh.product.controller;
+package com.yixuan.yh.product.controller._public;
 
 import com.yixuan.yh.commom.response.Result;
 import com.yixuan.yh.product.response.ProductDetailResponse;
@@ -7,12 +7,14 @@ import com.yixuan.yh.product.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 @RestController
-public class ProductController {
+@RequestMapping("/public")
+public class ProductPublicController {
 
     @Autowired
     private ProductService productService;

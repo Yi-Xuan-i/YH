@@ -1,4 +1,4 @@
-package com.yixuan.study.microservices.user.controller;
+package com.yixuan.study.microservices.user.controller._public;
 
 import com.yixuan.study.microservices.user.request.LoginRequest;
 import com.yixuan.study.microservices.user.request.RegisterRequest;
@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "Auth")
 @RestController
-@RequestMapping("/auth")
-public class AuthController {
+@RequestMapping("/public/auth")
+public class AuthPublicController {
 
     @Autowired
     private AuthService authService;

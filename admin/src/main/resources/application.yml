@@ -22,6 +22,10 @@ spring:
     password: wisdom123456789
     driver-class-name: com.mysql.cj.jdbc.Driver
     type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      test-while-idle: true
+      validation-query: select 1
+      time-between-eviction-runs-millis: 20000
 
 mybatis:
   configuration:

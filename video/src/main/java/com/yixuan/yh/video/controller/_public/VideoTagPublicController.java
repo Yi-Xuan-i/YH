@@ -1,4 +1,4 @@
-package com.yixuan.yh.video.controller;
+package com.yixuan.yh.video.controller._public;
 
 import com.yixuan.yh.commom.response.Result;
 import com.yixuan.yh.video.response.GetSimpleVideoTagResponse;
@@ -13,8 +13,8 @@ import java.util.List;
 
 @Tag(name = "Video-Tag")
 @RestController
-@RequestMapping("/tag")
-public class VideoTagController {
+@RequestMapping("/public/tag")
+public class VideoTagPublicController {
 
     @Autowired
     private VideoTagService videoTagService;

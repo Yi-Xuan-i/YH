@@ -1,5 +1,5 @@
 server:
-  port: 10092
+  port: 10093
   servlet:
     context-path: /live
   tomcat:
@@ -8,6 +8,9 @@ server:
       min-spare: 2
     max-connections: 50
 spring:
+  mvc:
+    servlet:
+      path: /api
   application:
     name: liveService
   profiles:

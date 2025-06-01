@@ -9,6 +9,9 @@ server:
     max-connections: 50
 
 spring:
+  mvc:
+    servlet:
+      path: /api
   application:
     name: orderService
   profiles:
