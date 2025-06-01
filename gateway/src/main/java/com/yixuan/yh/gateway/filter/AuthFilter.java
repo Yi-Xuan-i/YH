@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
+import org.springframework.core.Ordered;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -22,7 +23,7 @@ import java.nio.charset.StandardCharsets;
 
 @Component
 @Slf4j
-public class AuthFilter implements GlobalFilter {
+public class AuthFilter implements GlobalFilter, Ordered {
 
     private final AntPathMatcher antPathMatcher = new AntPathMatcher();
     @Autowired
@@ -36,6 +37,20 @@ public class AuthFilter implements GlobalFilter {
         ServerHttpResponse response = exchange.getResponse();
         HttpHeaders requestHeaders = request.getHeaders();
         HttpHeaders responseHeaders = response.getHeaders();
+
+        // 拦截 WebSocket 握手请求
+        if (exchange.getRequest().getHeaders().containsKey("Upgrade")) {
+            String token = exchange.getRequest().getQueryParams().getFirst("token");
+            Claims claims;
+            if ((claims = parseToken(token)) == null) {
+                exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                return exchange.getResponse().setComplete();
+            }
+            Long id = (Long) claims.get("id");
+            exchange = exchange.mutate().
+                    request(builder -> builder.header("id", id.toString())).build();
+            return chain.filter(exchange);
+        }
 
         if (isExcludedPath(request.getPath().value())) {
             return chain.filter(exchange);
@@ -82,5 +97,10 @@ public class AuthFilter implements GlobalFilter {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    @Override
+    public int getOrder() {
+        return 0;
     }
 }
