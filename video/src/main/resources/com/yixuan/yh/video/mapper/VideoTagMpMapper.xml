@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yixuan.yh.video.mapper.VideoTagMpMapper">
+
+    <insert id="insertBatch">
+        insert into video_tag_mp (video_id, tag_id) values
+            <foreach collection="allTagList" item="tag_id" separator=",">
+                (#{video_id}, #{tag_id})
+            </foreach>
+    </insert>
+</mapper>
