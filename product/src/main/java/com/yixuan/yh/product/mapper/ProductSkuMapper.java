@@ -22,4 +22,6 @@ public interface ProductSkuMapper {
     void deleteByProductId(Long productId);
 
     void deleteBatch(List<Long> skuIdList);
+
+    void update(List<ProductSku> productSkuList);
 }
