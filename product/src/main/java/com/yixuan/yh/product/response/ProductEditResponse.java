@@ -1,8 +1,8 @@
 package com.yixuan.yh.product.response;
 
+import com.yixuan.yh.product.model.entity.ProductCarousel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -13,7 +13,7 @@ public class ProductEditResponse {
     private String coverUrl;
     private String description;
     private BigDecimal price;
-    private List<String> carouselFileList;
+    private List<ProductCarousel> carouselFileList;
     private List<SkuDetailDTO> productSkuList;
 
 //    @Data

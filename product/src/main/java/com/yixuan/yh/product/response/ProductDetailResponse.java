@@ -12,6 +12,7 @@ public class ProductDetailResponse {
     private String title;
     private String description;
     private List<Sku> skus;
+    private List<String> carousels;
 
     @Data
     @AllArgsConstructor

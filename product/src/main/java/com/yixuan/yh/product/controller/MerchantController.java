@@ -2,6 +2,7 @@ package com.yixuan.yh.product.controller;
 
 import com.yixuan.yh.commom.response.Result;
 import com.yixuan.yh.commom.utils.UserContext;
+import com.yixuan.yh.product.request.PostCarouseRequest;
 import com.yixuan.yh.product.request.PostSkuSpecRequest;
 import com.yixuan.yh.product.request.PutProductBasicInfoRequest;
 import com.yixuan.yh.product.request.PutSkuRequest;
@@ -53,6 +54,12 @@ public class MerchantController {
     @PostMapping("/sku/spec")
     public Result<Void> postSkuSpec(@RequestBody PostSkuSpecRequest postSkuSpecRequest) {
         merchantService.postSkuSpec(postSkuSpecRequest);
+        return Result.success();
+    }
+
+    @PostMapping("/carousel/{productId}")
+    public Result<Void> postCarousel(@PathVariable Long productId, @ModelAttribute PostCarouseRequest postCarouseRequest) throws IOException {
+        merchantService.postCarousel(UserContext.getUser(), productId, postCarouseRequest);
         return Result.success();
     }
 

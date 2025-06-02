@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yixuan.yh.product.mapper.ProductCarouselMapper">
+
+
+<!--    <insert id="insert">-->
+<!--        insert into product_carouse (id, url, product_id) values-->
+<!--            <foreach collection="productCarouseList" item="productCarousel" separator=",">-->
+<!--                (#{productCarousel.id}, #{productCarousel.url}, #{productCarousel.productId})-->
+<!--            </foreach>-->
+<!--    </insert>-->
+</mapper>

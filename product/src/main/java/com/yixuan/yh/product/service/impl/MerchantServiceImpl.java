@@ -6,9 +6,11 @@ import com.yixuan.yh.product.mapper.*;
 import com.yixuan.yh.product.mapper.multi.SkuMapper;
 import com.yixuan.yh.product.mapstruct.MerchantMapStruct;
 import com.yixuan.yh.product.model.entity.Product;
+import com.yixuan.yh.product.model.entity.ProductCarousel;
 import com.yixuan.yh.product.model.entity.ProductSku;
 import com.yixuan.yh.product.model.entity.SkuSpec;
 import com.yixuan.yh.product.model.multi.SkuSpecInfo;
+import com.yixuan.yh.product.request.PostCarouseRequest;
 import com.yixuan.yh.product.request.PostSkuSpecRequest;
 import com.yixuan.yh.product.request.PutProductBasicInfoRequest;
 import com.yixuan.yh.product.request.PutSkuRequest;
@@ -47,6 +49,8 @@ public class MerchantServiceImpl implements MerchantService {
     private MTClient mtClient;
     @Autowired
     private SnowflakeUtils snowflakeUtils;
+    @Autowired
+    private ProductCarouselMapper productCarouselMapper;
 
     @Override
     public List<ProductManageItemResponse> getMerchantProduct(Long user) {
@@ -63,6 +67,7 @@ public class MerchantServiceImpl implements MerchantService {
         productEditResponse.setDescription(product.getDescription());
         productEditResponse.setCoverUrl(product.getCoverUrl());
         // 商品轮播图
+        productEditResponse.setCarouselFileList(productCarouselMapper.selectByProductId(productId));
 
         // 商品SKU
         List<ProductSku> skuList = productSkuMapper.selectByProductId(productId);
@@ -196,5 +201,20 @@ public class MerchantServiceImpl implements MerchantService {
         }
 
         productSkuMapper.update(productSkuList);
+    }
+
+    @Override
+    public void postCarousel(Long userId, Long productId, PostCarouseRequest postCarouseRequest) throws IOException {
+        // 鉴权
+        if (!productMapper.selectMerchantIdByProductId(productId).equals(userId)) {
+            throw new BadRequestException("你没有权限！");
+        }
+
+        ProductCarousel productCarousel = new ProductCarousel();
+        productCarousel.setId(snowflakeUtils.nextId());
+        productCarousel.setUrl(mtClient.upload(postCarouseRequest.getCarouselFile()));
+        productCarousel.setProductId(productId);
+
+        productCarouselMapper.insert(productCarousel);
     }
 }

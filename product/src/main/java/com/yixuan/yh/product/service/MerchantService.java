@@ -1,5 +1,6 @@
 package com.yixuan.yh.product.service;
 
+import com.yixuan.yh.product.request.PostCarouseRequest;
 import com.yixuan.yh.product.request.PostSkuSpecRequest;
 import com.yixuan.yh.product.request.PutProductBasicInfoRequest;
 import com.yixuan.yh.product.request.PutSkuRequest;
@@ -24,4 +25,6 @@ public interface MerchantService {
     void postMerchantProduct(Long merchantId, PutProductBasicInfoRequest putProductBasicInfoRequest) throws IOException;
 
     void putSku(Long userId, PutSkuRequest putSkuRequest) throws BadRequestException;
+
+    void postCarousel(Long userId, Long productId, PostCarouseRequest postCarouseRequest) throws IOException;
 }

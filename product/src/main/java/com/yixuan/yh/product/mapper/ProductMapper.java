@@ -38,4 +38,7 @@ public interface ProductMapper {
 
     @Insert("insert into product (product_id, merchant_id, title, cover_url, description, price) values(#{productId}, #{merchantId}, #{title}, #{coverUrl}, #{description}, #{price})")
     void insertBasicInfo(Product product);
+
+    @Select("select merchant_id from product where product_id = #{productId}")
+    Long selectMerchantIdByProductId(Long productId);
 }

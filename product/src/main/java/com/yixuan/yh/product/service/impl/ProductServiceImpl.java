@@ -1,5 +1,6 @@
 package com.yixuan.yh.product.service.impl;
 
+import com.yixuan.yh.product.mapper.ProductCarouselMapper;
 import com.yixuan.yh.product.mapper.ProductMapper;
 import com.yixuan.yh.product.mapper.ProductSkuMapper;
 import com.yixuan.yh.product.mapper.multi.SkuMapper;
@@ -27,6 +28,8 @@ public class ProductServiceImpl implements ProductService {
     private ProductSkuMapper productSkuMapper;
     @Autowired
     private SkuMapper skuMapper;
+    @Autowired
+    private ProductCarouselMapper productCarouselMapper;
 
     @Override
     public List<ProductSummaryResponse> getProducts() {
@@ -41,6 +44,9 @@ public class ProductServiceImpl implements ProductService {
         productDetailResponse.setProductId(productId);
         productDetailResponse.setTitle(product.getTitle());
         productDetailResponse.setDescription(product.getDescription());
+
+        // 查询商品轮播图
+        productDetailResponse.setCarousels(productCarouselMapper.selectUrlByProductId(productId));
 
         // 查询商品SKU
         List<ProductSku> productSkuList = productSkuMapper.selectByProductId(productId);
