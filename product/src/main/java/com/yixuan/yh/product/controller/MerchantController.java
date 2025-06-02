@@ -4,9 +4,11 @@ import com.yixuan.yh.commom.response.Result;
 import com.yixuan.yh.commom.utils.UserContext;
 import com.yixuan.yh.product.request.PostSkuSpecRequest;
 import com.yixuan.yh.product.request.PutProductBasicInfoRequest;
+import com.yixuan.yh.product.request.PutSkuRequest;
 import com.yixuan.yh.product.response.ProductEditResponse;
 import com.yixuan.yh.product.response.ProductManageItemResponse;
 import com.yixuan.yh.product.service.MerchantService;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -51,6 +53,12 @@ public class MerchantController {
     @PostMapping("/sku/spec")
     public Result<Void> postSkuSpec(@RequestBody PostSkuSpecRequest postSkuSpecRequest) {
         merchantService.postSkuSpec(postSkuSpecRequest);
+        return Result.success();
+    }
+
+    @PutMapping("/sku")
+    public Result<Void> putSku(@RequestBody PutSkuRequest putSkuRequest) throws BadRequestException {
+        merchantService.putSku(UserContext.getUser(), putSkuRequest);
         return Result.success();
     }
 

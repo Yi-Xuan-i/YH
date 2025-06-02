@@ -11,9 +11,11 @@ import com.yixuan.yh.product.model.entity.SkuSpec;
 import com.yixuan.yh.product.model.multi.SkuSpecInfo;
 import com.yixuan.yh.product.request.PostSkuSpecRequest;
 import com.yixuan.yh.product.request.PutProductBasicInfoRequest;
+import com.yixuan.yh.product.request.PutSkuRequest;
 import com.yixuan.yh.product.response.ProductEditResponse;
 import com.yixuan.yh.product.response.ProductManageItemResponse;
 import com.yixuan.yh.product.service.MerchantService;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -177,5 +179,22 @@ public class MerchantServiceImpl implements MerchantService {
             product.setCoverUrl(mtClient.upload(putProductBasicInfoRequest.getCover()));
         }
         productMapper.insertBasicInfo(product);
+    }
+
+    @Override
+    public void putSku(Long userId, PutSkuRequest putSkuRequest) throws BadRequestException {
+        // 鉴权
+        List<Long> skuIdList = putSkuRequest.getChangeSkuList().stream().map(PutSkuRequest.PutSku::getSkuId).toList();
+        List<Long> merchantIdList;
+        if ((merchantIdList = skuMapper.selectMerchantIdBySkuIds(skuIdList)).size() > 1 || !merchantIdList.get(0).equals(userId)) {
+            throw new BadRequestException("你没有权限！");
+        }
+
+        List<ProductSku> productSkuList = new ArrayList<>(putSkuRequest.getChangeSkuList().size());
+        for (PutSkuRequest.PutSku putSku : putSkuRequest.getChangeSkuList()) {
+            productSkuList.add(MerchantMapStruct.INSTANCE.putSkuRequestToProductSku(putSku));
+        }
+
+        productSkuMapper.update(productSkuList);
     }
 }

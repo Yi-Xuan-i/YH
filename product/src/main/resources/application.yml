@@ -17,7 +17,7 @@ spring:
             group-id: DEFAULT_GROUP
             rule-type: flow
   datasource:
-    url: jdbc:mysql://110.41.182.125/new_yh
+    url: jdbc:mysql://110.41.182.125/new_yh?allowMultiQueries=true
     username: root
     password: wisdom123456789
     driver-class-name: com.mysql.cj.jdbc.Driver

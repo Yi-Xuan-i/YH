@@ -8,5 +8,7 @@ import java.util.List;
 @Mapper
 public interface SkuMapper {
 
+     List<Long> selectMerchantIdBySkuIds(List<Long> skuIdList);
+
      List<SkuSpecInfo> selectSpecsBySkuIds(List<Long> skuIdList);
 }

@@ -10,6 +10,13 @@
             (#{skuId}, #{productId})
         </foreach>
     </insert>
+
+    <update id="update">
+        <foreach collection="productSkuList" item="productSku" separator=";">
+            update product_sku set price = #{productSku.price}, stock = #{productSku.stock} where sku_id = #{productSku.skuId}
+        </foreach>
+    </update>
+
     <delete id="deleteBatch">
         delete from product_sku where sku_id in
             <foreach collection="skuIdList" item="skuId" open="(" close=")" separator=",">
