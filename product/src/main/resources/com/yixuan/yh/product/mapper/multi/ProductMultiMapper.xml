@@ -38,4 +38,10 @@
         WHERE p.product_id = #{productId}
         GROUP BY p.product_id;
     </select>
+    <select id="selectPartOfCartItem" resultType="com.yixuan.yh.product.model.multi.ProductPartOfCartItem">
+        select product_id, product.merchant_id, name as merchantName, title, cover_url from product join merchant on product.merchant_id = merchant.merchant_id where product_id in
+        <foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+            #{productId}
+        </foreach>
+    </select>
 </mapper>

@@ -23,4 +23,9 @@ public class CartController {
         cartService.postCartItem(UserContext.getUser(), postCartItemRequest);
         return Result.success();
     }
+
+    @GetMapping
+    public Result<List<CartItemResponse>> getCartItem() {
+        return Result.success(cartService.getCartItem(UserContext.getUser()));
+    }
 }

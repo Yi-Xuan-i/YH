@@ -23,4 +23,11 @@
                 #{skuId}
             </foreach>
     </delete>
+
+    <select id="selectPartOfCartItem" resultType="com.yixuan.yh.product.model.entity.ProductSku">
+        select sku_id, price, stock from product_sku where sku_id in
+            <foreach collection="skuIdList" item="skuId" open="(" close=")" separator=",">
+                #{skuId}
+            </foreach>
+    </select>
 </mapper>

@@ -27,4 +27,6 @@ public interface ProductSkuMapper {
 
     @Select("select product_id from product_sku where sku_id = #{skuId}")
     Long selectProductIdBySkuId(Long skuId);
+
+    List<ProductSku> selectPartOfCartItem(List<Long> skuIdList);
 }
