@@ -9,6 +9,7 @@ import java.util.List;
 @Data
 public class ProductDetailResponse {
     private Long productId;
+    private Long merchantId;
     private String title;
     private String description;
     private List<Sku> skus;

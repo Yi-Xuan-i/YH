@@ -42,6 +42,7 @@ public class ProductServiceImpl implements ProductService {
         Product product = productMapper.selectPartOfDetail(productId);
         ProductDetailResponse productDetailResponse = new ProductDetailResponse();
         productDetailResponse.setProductId(productId);
+        productDetailResponse.setMerchantId(product.getMerchantId());
         productDetailResponse.setTitle(product.getTitle());
         productDetailResponse.setDescription(product.getDescription());
 
