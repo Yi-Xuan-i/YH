@@ -10,7 +10,7 @@ import com.yixuan.yh.product.model.entity.ProductCarousel;
 import com.yixuan.yh.product.model.entity.ProductSku;
 import com.yixuan.yh.product.model.entity.SkuSpec;
 import com.yixuan.yh.product.model.multi.SkuSpecInfo;
-import com.yixuan.yh.product.request.PostCarouseRequest;
+import com.yixuan.yh.product.request.PostCarouselRequest;
 import com.yixuan.yh.product.request.PostSkuSpecRequest;
 import com.yixuan.yh.product.request.PutProductBasicInfoRequest;
 import com.yixuan.yh.product.request.PutSkuRequest;
@@ -204,7 +204,7 @@ public class MerchantServiceImpl implements MerchantService {
     }
 
     @Override
-    public void postCarousel(Long userId, Long productId, PostCarouseRequest postCarouseRequest) throws IOException {
+    public void postCarousel(Long userId, Long productId, PostCarouselRequest postCarouselRequest) throws IOException {
         // 鉴权
         if (!productMapper.selectMerchantIdByProductId(productId).equals(userId)) {
             throw new BadRequestException("你没有权限！");
@@ -212,9 +212,23 @@ public class MerchantServiceImpl implements MerchantService {
 
         ProductCarousel productCarousel = new ProductCarousel();
         productCarousel.setId(snowflakeUtils.nextId());
-        productCarousel.setUrl(mtClient.upload(postCarouseRequest.getCarouselFile()));
+        productCarousel.setUrl(mtClient.upload(postCarouselRequest.getCarouselFile()));
         productCarousel.setProductId(productId);
 
         productCarouselMapper.insert(productCarousel);
+    }
+
+    @Override
+    public void deleteCarousel(Long userId, Long productId, Long carouselId) throws BadRequestException {
+        // 先检查是否该轮播图真的属于该商品（可以无需判断该轮播图是否真的属于该商品，只需用户有轮播图所属商品的操作权限即可，但这里为前端起到兜底作用）,
+        if (!productCarouselMapper.selectProductIdByCarouselId(carouselId).equals(productId)) {
+            throw new BadRequestException("你没有权限！");
+        }
+        // 鉴权
+        if (!productMapper.selectMerchantIdByProductId(productId).equals(userId)) {
+            throw new BadRequestException("你没有权限！");
+        }
+
+        productCarouselMapper.delete(carouselId);
     }
 }

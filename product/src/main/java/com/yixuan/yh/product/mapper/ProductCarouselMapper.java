@@ -2,6 +2,7 @@ package com.yixuan.yh.product.mapper;
 
 import com.yixuan.yh.product.model.entity.Product;
 import com.yixuan.yh.product.model.entity.ProductCarousel;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -18,4 +19,10 @@ public interface ProductCarouselMapper {
 
     @Select("select url from product_carousel where product_id = #{productId}")
     List<String> selectUrlByProductId(Long productId);
+
+    @Select("select product_id from product_carousel where id = #{carouselId}")
+    Long selectProductIdByCarouselId(Long carouselId);
+
+    @Delete("delete from product_carousel where id = #{carouselId}")
+    void delete(Long carouselId);
 }
