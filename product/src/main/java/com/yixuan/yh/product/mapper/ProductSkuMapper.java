@@ -24,4 +24,7 @@ public interface ProductSkuMapper {
     void deleteBatch(List<Long> skuIdList);
 
     void update(List<ProductSku> productSkuList);
+
+    @Select("select product_id from product_sku where sku_id = #{skuId}")
+    Long selectProductIdBySkuId(Long skuId);
 }
