@@ -6,15 +6,17 @@
         <groupId>com.yixuan.yh</groupId>
         <artifactId>parent</artifactId>
         <version>0.0.1-SNAPSHOT</version>
-        <relativePath>../parent/pom.xml</relativePath>
+        <relativePath>../../parent/pom.xml</relativePath>
     </parent>
-    <artifactId>product-main</artifactId>
+    <artifactId>product-feign</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>pom</packaging>
 
-    <modules>
-        <module>product-pojo</module>
-        <module>product-core</module>
-        <module>product-feign</module>
-    </modules>
+    <dependencies>
+        <dependency>
+            <groupId>com.yixuan.yh</groupId>
+            <artifactId>common</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+
 </project>
