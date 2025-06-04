@@ -1,11 +1,11 @@
 package com.yixuan.yh.product.service;
 
-import com.yixuan.yh.product.request.PostCarouselRequest;
-import com.yixuan.yh.product.request.PostSkuSpecRequest;
-import com.yixuan.yh.product.request.PutProductBasicInfoRequest;
-import com.yixuan.yh.product.request.PutSkuRequest;
-import com.yixuan.yh.product.response.ProductEditResponse;
-import com.yixuan.yh.product.response.ProductManageItemResponse;
+import com.yixuan.yh.product.pojo.request.PostCarouselRequest;
+import com.yixuan.yh.product.pojo.request.PostSkuSpecRequest;
+import com.yixuan.yh.product.pojo.request.PutProductBasicInfoRequest;
+import com.yixuan.yh.product.pojo.request.PutSkuRequest;
+import com.yixuan.yh.product.pojo.response.ProductEditResponse;
+import com.yixuan.yh.product.pojo.response.ProductManageItemResponse;
 import org.apache.coyote.BadRequestException;
 
 import java.io.IOException;

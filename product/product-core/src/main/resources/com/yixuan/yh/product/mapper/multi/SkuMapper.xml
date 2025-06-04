@@ -15,7 +15,7 @@
     </select>
 
     <!-- 批量查询规格信息 -->
-    <select id="selectSpecsBySkuIds" resultType="com.yixuan.yh.product.model.multi.SkuSpecInfo">
+    <select id="selectSpecsBySkuIds" resultType="com.yixuan.yh.product.pojo.model.multi.SkuSpecInfo">
         SELECT
         ss.sku_id,
         k.key_name AS specKey,

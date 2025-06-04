@@ -1,4 +1,4 @@
-package com.yixuan.yh.product.response;
+package com.yixuan.yh.product.pojo.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

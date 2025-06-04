@@ -1,9 +1,8 @@
 package com.yixuan.yh.product.mapper;
 
-import com.yixuan.yh.product.model.entity.Product;
-import com.yixuan.yh.product.response.ProductManageItemResponse;
-import com.yixuan.yh.product.response.ProductDetailResponse;
-import com.yixuan.yh.product.response.ProductSummaryResponse;
+import com.yixuan.yh.product.pojo.model.entity.Product;
+import com.yixuan.yh.product.pojo.response.ProductManageItemResponse;
+import com.yixuan.yh.product.pojo.response.ProductSummaryResponse;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;

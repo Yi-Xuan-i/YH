@@ -2,12 +2,12 @@ package com.yixuan.yh.product.controller;
 
 import com.yixuan.yh.commom.response.Result;
 import com.yixuan.yh.commom.utils.UserContext;
-import com.yixuan.yh.product.request.PostCarouselRequest;
-import com.yixuan.yh.product.request.PostSkuSpecRequest;
-import com.yixuan.yh.product.request.PutProductBasicInfoRequest;
-import com.yixuan.yh.product.request.PutSkuRequest;
-import com.yixuan.yh.product.response.ProductEditResponse;
-import com.yixuan.yh.product.response.ProductManageItemResponse;
+import com.yixuan.yh.product.pojo.request.PostCarouselRequest;
+import com.yixuan.yh.product.pojo.request.PostSkuSpecRequest;
+import com.yixuan.yh.product.pojo.request.PutProductBasicInfoRequest;
+import com.yixuan.yh.product.pojo.request.PutSkuRequest;
+import com.yixuan.yh.product.pojo.response.ProductEditResponse;
+import com.yixuan.yh.product.pojo.response.ProductManageItemResponse;
 import com.yixuan.yh.product.service.MerchantService;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;

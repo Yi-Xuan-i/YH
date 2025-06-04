@@ -1,6 +1,6 @@
-package com.yixuan.yh.product.response;
+package com.yixuan.yh.product.pojo.response;
 
-import com.yixuan.yh.product.model.entity.Product;
+import com.yixuan.yh.product.pojo.model.entity.Product;
 import lombok.Data;
 
 import java.math.BigDecimal;

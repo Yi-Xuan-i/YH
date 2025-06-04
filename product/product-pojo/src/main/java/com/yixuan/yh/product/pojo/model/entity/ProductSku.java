@@ -1,4 +1,4 @@
-package com.yixuan.yh.product.model.entity;
+package com.yixuan.yh.product.pojo.model.entity;
 
 import lombok.Data;
 import lombok.experimental.Accessors;

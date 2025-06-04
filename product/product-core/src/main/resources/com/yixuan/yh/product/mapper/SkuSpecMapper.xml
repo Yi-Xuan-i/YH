@@ -21,7 +21,7 @@
         </foreach>
     </insert>
 
-    <select id="selectKeyValueBatch" resultType="com.yixuan.yh.product.model.entity.SkuSpec">
+    <select id="selectKeyValueBatch" resultType="com.yixuan.yh.product.pojo.model.entity.SkuSpec">
         select key_id, value_id from sku_spec where sku_id in
         <foreach collection="skuIdList" item="skuId" open="(" close=")" separator=",">
             #{skuId}

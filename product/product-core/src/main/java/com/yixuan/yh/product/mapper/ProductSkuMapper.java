@@ -1,6 +1,6 @@
 package com.yixuan.yh.product.mapper;
 
-import com.yixuan.yh.product.model.entity.ProductSku;
+import com.yixuan.yh.product.pojo.model.entity.ProductSku;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;

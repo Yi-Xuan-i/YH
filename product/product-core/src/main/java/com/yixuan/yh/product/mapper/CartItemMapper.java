@@ -1,6 +1,6 @@
 package com.yixuan.yh.product.mapper;
 
-import com.yixuan.yh.product.model.entity.CartItem;
+import com.yixuan.yh.product.pojo.model.entity.CartItem;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;

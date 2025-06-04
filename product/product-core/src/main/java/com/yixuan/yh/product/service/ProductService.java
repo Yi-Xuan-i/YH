@@ -1,7 +1,7 @@
 package com.yixuan.yh.product.service;
 
-import com.yixuan.yh.product.response.ProductDetailResponse;
-import com.yixuan.yh.product.response.ProductSummaryResponse;
+import com.yixuan.yh.product.pojo.response.ProductDetailResponse;
+import com.yixuan.yh.product.pojo.response.ProductSummaryResponse;
 
 import java.util.List;
 

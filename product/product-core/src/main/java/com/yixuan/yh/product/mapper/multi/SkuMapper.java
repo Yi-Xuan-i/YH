@@ -1,6 +1,6 @@
 package com.yixuan.yh.product.mapper.multi;
 
-import com.yixuan.yh.product.model.multi.SkuSpecInfo;
+import com.yixuan.yh.product.pojo.model.multi.SkuSpecInfo;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;

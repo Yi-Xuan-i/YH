@@ -1,4 +1,4 @@
-package com.yixuan.yh.product.model.multi;
+package com.yixuan.yh.product.pojo.model.multi;
 
 import lombok.Data;
 

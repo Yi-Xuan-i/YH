@@ -1,7 +1,7 @@
 package com.yixuan.yh.product.service;
 
-import com.yixuan.yh.product.request.PostCartItemRequest;
-import com.yixuan.yh.product.response.CartItemResponse;
+import com.yixuan.yh.product.pojo.request.PostCartItemRequest;
+import com.yixuan.yh.product.pojo.response.CartItemResponse;
 import org.apache.coyote.BadRequestException;
 
 import java.util.List;

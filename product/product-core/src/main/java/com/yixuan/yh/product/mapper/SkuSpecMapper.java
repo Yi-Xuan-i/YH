@@ -1,7 +1,7 @@
 package com.yixuan.yh.product.mapper;
 
-import com.yixuan.yh.product.model.entity.SkuSpec;
-import com.yixuan.yh.product.request.PostSkuSpecRequest;
+import com.yixuan.yh.product.pojo.model.entity.SkuSpec;
+import com.yixuan.yh.product.pojo.request.PostSkuSpecRequest;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;

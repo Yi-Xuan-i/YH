@@ -1,8 +1,7 @@
 package com.yixuan.yh.product.mapper.multi;
 
-import com.yixuan.yh.product.model.entity.Product;
-import com.yixuan.yh.product.model.multi.ProductPartOfCartItem;
-import com.yixuan.yh.product.response.ProductDetailResponse;
+import com.yixuan.yh.product.pojo.model.multi.ProductPartOfCartItem;
+import com.yixuan.yh.product.pojo.response.ProductDetailResponse;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;

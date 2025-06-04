@@ -1,6 +1,6 @@
-package com.yixuan.yh.product.response;
+package com.yixuan.yh.product.pojo.response;
 
-import com.yixuan.yh.product.model.entity.ProductCarousel;
+import com.yixuan.yh.product.pojo.model.entity.ProductCarousel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

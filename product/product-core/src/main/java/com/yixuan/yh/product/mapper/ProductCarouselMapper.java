@@ -1,7 +1,6 @@
 package com.yixuan.yh.product.mapper;
 
-import com.yixuan.yh.product.model.entity.Product;
-import com.yixuan.yh.product.model.entity.ProductCarousel;
+import com.yixuan.yh.product.pojo.model.entity.ProductCarousel;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;

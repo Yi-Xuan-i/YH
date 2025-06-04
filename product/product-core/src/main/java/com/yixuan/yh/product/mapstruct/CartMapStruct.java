@@ -1,8 +1,8 @@
 package com.yixuan.yh.product.mapstruct;
 
-import com.yixuan.yh.product.model.entity.CartItem;
-import com.yixuan.yh.product.request.PostCartItemRequest;
-import com.yixuan.yh.product.response.CartItemResponse;
+import com.yixuan.yh.product.pojo.model.entity.CartItem;
+import com.yixuan.yh.product.pojo.request.PostCartItemRequest;
+import com.yixuan.yh.product.pojo.response.CartItemResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
