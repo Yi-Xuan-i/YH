@@ -40,6 +40,9 @@ public class ProductServiceImpl implements ProductService {
     public ProductDetailResponse getDetailProducts(Long productId) {
         // 查询商品基础信息
         Product product = productMapper.selectPartOfDetail(productId);
+        if (product == null) {
+            return null;
+        }
         ProductDetailResponse productDetailResponse = new ProductDetailResponse();
         productDetailResponse.setProductId(productId);
         productDetailResponse.setMerchantId(product.getMerchantId());
