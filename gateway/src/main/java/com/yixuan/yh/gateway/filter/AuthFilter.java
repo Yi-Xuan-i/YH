@@ -38,6 +38,10 @@ public class AuthFilter implements GlobalFilter, Ordered {
         HttpHeaders requestHeaders = request.getHeaders();
         HttpHeaders responseHeaders = response.getHeaders();
 
+        if (isExcludedPath(request.getPath().value())) {
+            return chain.filter(exchange);
+        }
+
         // 拦截 WebSocket 握手请求
         if (exchange.getRequest().getHeaders().containsKey("Upgrade")) {
             String token = exchange.getRequest().getQueryParams().getFirst("token");
@@ -49,10 +53,6 @@ public class AuthFilter implements GlobalFilter, Ordered {
             Long id = (Long) claims.get("id");
             exchange = exchange.mutate().
                     request(builder -> builder.header("id", id.toString())).build();
-            return chain.filter(exchange);
-        }
-
-        if (isExcludedPath(request.getPath().value())) {
             return chain.filter(exchange);
         }
 
