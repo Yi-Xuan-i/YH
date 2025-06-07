@@ -21,8 +21,8 @@ public interface ProductMapper {
             "LIMIT 5;")
     List<ProductSummaryResponse> selectList();
 
-    @Select("select product_id, title, description, price, stock, status, sales_volume, rating, created_at, updated_at from product")
-    List<ProductManageItemResponse> selectMerchantProducts(Long user);
+    @Select("select product_id, title, description, price, stock, status, sales_volume, rating, created_at, updated_at from product where merchant_id = #{userId}")
+    List<ProductManageItemResponse> selectMerchantProducts(Long userId);
 
     @Select("select title, cover_url, description, price from product where product_id = #{productId}")
     Product selectEditBasicData(Long productId);
@@ -40,4 +40,7 @@ public interface ProductMapper {
 
     @Select("select merchant_id from product where product_id = #{productId}")
     Long selectMerchantIdByProductId(Long productId);
+
+    @Select("select merchant_id, title from product where product_id = #{productId}")
+    Product selectPartOfOrder(Long productId);
 }
