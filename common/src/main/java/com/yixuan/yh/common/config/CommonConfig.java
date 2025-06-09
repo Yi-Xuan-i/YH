@@ -1,6 +1,6 @@
-package com.yixuan.yh.commom.config;
+package com.yixuan.yh.common.config;
 
-import com.yixuan.yh.commom.interceptor.UserIdentifierInterceptor;
+import com.yixuan.yh.common.interceptor.UserIdentifierInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;

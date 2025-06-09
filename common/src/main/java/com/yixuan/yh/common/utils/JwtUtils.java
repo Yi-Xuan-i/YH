@@ -1,4 +1,4 @@
-package com.yixuan.yh.commom.utils;
+package com.yixuan.yh.common.utils;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

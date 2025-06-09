@@ -1,6 +1,6 @@
-package com.yixuan.yh.commom.exception;
+package com.yixuan.yh.common.exception;
 
-import com.yixuan.yh.commom.response.Result;
+import com.yixuan.yh.common.response.Result;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;

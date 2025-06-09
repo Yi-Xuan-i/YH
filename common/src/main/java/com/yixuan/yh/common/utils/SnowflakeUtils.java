@@ -1,4 +1,4 @@
-package com.yixuan.yh.commom.utils;
+package com.yixuan.yh.common.utils;
 
 import jakarta.annotation.PostConstruct;
 import org.springframework.boot.context.properties.ConfigurationProperties;

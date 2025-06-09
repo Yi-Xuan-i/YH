@@ -1,6 +1,6 @@
-package com.yixuan.yh.commom.interceptor;
+package com.yixuan.yh.common.interceptor;
 
-import com.yixuan.yh.commom.utils.UserContext;
+import com.yixuan.yh.common.utils.UserContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;

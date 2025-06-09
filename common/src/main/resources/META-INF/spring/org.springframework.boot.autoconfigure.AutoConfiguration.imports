@@ -1,4 +1,4 @@
-com.yixuan.yh.commom.config.CommonConfig
-com.yixuan.yh.commom.utils.JwtUtils
-com.yixuan.yh.commom.utils.SnowflakeUtils
-com.yixuan.yh.commom.exception.GlobalExceptionHandler
+com.yixuan.yh.common.config.CommonConfig
+com.yixuan.yh.common.utils.JwtUtils
+com.yixuan.yh.common.utils.SnowflakeUtils
+com.yixuan.yh.common.exception.GlobalExceptionHandler
