@@ -6,14 +6,12 @@
         <groupId>com.yixuan.yh</groupId>
         <artifactId>parent</artifactId>
         <version>0.0.1-SNAPSHOT</version>
-        <relativePath>../parent</relativePath>
+        <relativePath>../../parent</relativePath>
     </parent>
-    <artifactId>order-main</artifactId>
+    <artifactId>order-pojo</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
-    <modules>
-        <module>order-core</module>
-        <module>order-pojo</module>
-        <module>order-feign</module>
-    </modules>
+    <dependencies>
+    </dependencies>
+
 </project>

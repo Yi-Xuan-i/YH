@@ -1,0 +1,78 @@
+spring:
+  cloud:
+    openfeign:
+      httpclient:
+        enabled: true # 开启 Feign 对 httpClient 的支持
+#    loadbalancer:
+#      nacos:
+#        enabled: true
+    sentinel:
+      transport:
+        dashboard: localhost:8080
+      datasource:
+        flow:
+          nacos:
+            server-addr: 110.41.182.125:8848
+            data-id: rule
+            group-id: DEFAULT_GROUP
+            rule-type: flow
+  datasource:
+    url: jdbc:mysql://110.41.182.125/new_yh
+    username: root
+    password: wisdom123456789
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      test-while-idle: true
+      validation-query: select 1
+      time-between-eviction-runs-millis: 20000
+  servlet:
+    multipart:
+      max-file-size: 5000MB
+      max-request-size: 7000MB
+#      enabled: false
+  rabbitmq:
+    host: 47.121.24.225
+    port: 5672
+    virtual-host: /
+    username: guest
+    password: guest
+
+mybatis:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    map-underscore-to-camel-case: true # 开启驼峰命名自动映射
+
+logging:
+  level:
+    org.springframework.jdbc.support.JdbcTransactionManager: debug
+
+seata:
+  registry:
+    type: nacos
+    nacos:
+      server-addr: 110.41.182.125:8848
+      namespace: ""
+      group: DEFAULT_GROUP
+      application: seataServer
+      username: nacos
+      password: nacos
+  data-source-proxy-mode: AT
+  tx-service-group: yx # 事务组名称
+  service:
+    vgroup-mapping: # 事务组与tc集群的映射关系
+      yx: "default"
+
+mt:
+  console-url: http://47.121.24.225:19998
+  core-url: http://47.121.24.225:19999
+  bucket-name: video
+  username: mt
+  password: mt
+
+alipay:
+  url: https://openapi-sandbox.dl.alipaydev.com/gateway.do
+  appId: 9021000134650768
+  appPrivateKey: MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQCNb6v+bp2bQ4D9TJWzMW1YR2ntwem2gPumlco2pyeqp8EsA5TePIyjtNsYxVHtFGMW/LSEkg3uaFntP1Ht7p27hAb6NjbnuqsEjbnaKDst9Ad7S42jQDMOsAf5INRYK29zAIt6NlmJWWXU+0OEK5FfwVrusrZcwG5txShkbIaBgY3gatjDM2z+/il1uvlwQ2F0jAuupjKD1tm2D9Aqa3eIdOyoVw4+2EP/C2A70UDgaOjWR/Y4oqYWMHRz2FTCneyfhEtDd3qnfu2UousK1+UvvfSrPwEachthZQPhIW9ETPJjUL2dCcOyBceIW0ILgtGYd61al0grfBc6DLcDMkrrAgMBAAECggEBAIFAY0px5gAE0XUprsiCS+3X3VsU0bMh7lePHauSWDKheWvynfH2HYRhe7QIZtUkw2U3bPSV0Ltli4C/U+z/GhBKGGJCdyyPr0fLCOPvzh0xnEC1i+t7eO1cOv0VXlhw4TmUbuIxluNo2iGnuUyo0AJU3fezQ+pBROl1unMDpmvkEDmsxdS9VKX+NzX92778DvWAj1LIaYjxQHqCMad3ie7lL0GxchRu6AwBf2TC5zSseCOzHhG9JUMmrKKVeOSMh5aRHvv7q38CtB9NUAgH3y7jJRxGtbGv/lN8v7vllzrv+8UQ7oUD9LBvyA0dlVwM7G8UfE1ihFl0ceeLij8+eqECgYEAxOYoQMTZozMB/vD6tyG0m3e2mOswMNQ27qmLvQGv3oO9Pg4aoxAVgR9f7O2wusIH2BfvuT569EE+30fqUYM3H62GfVogkpeWMawq249E/HSlz/EnH7uN6tVO8zcTj/LdVw11YKyvyeTVY4e4xljJ9+TI+6bWAfrMhojnDMbX5tsCgYEAt+O3f01gMJDLE+BB/CAp8sXR0wbK/mbZX47f6iJy1RXNSeSjVuR3iagS+s7Ou5f3ffRdJW8ofVyk85wbgxDfYJ9JZBskcdzWXKgYHGLArcZOA56hfdWlHJ4lNV22IWppGjNHK5YlZssoGs2jVO9T+dvBazaLeRlJ1zqL/dK8wTECgYEAiet18rhwgmJuWXfPBowziFr4qnDDltBvkgls+n2+BS1eV6NlgSb5CTNC7CEqlAbpm7JYlvdvBLzXH2uudF5nNGdGN3P0MPrBmBWzB4x5lCTZKKkQ8Kddp0q3PKItr7080Yd52rfbgp4p4sfk4/q5rkyxg6S/by+QKASpY0e9X9UCgYAK6X9tFXlcyGrUnh0sSfhTSLvfyupm2FGT4xWUfkDUNjv9Y4zxzhLt30RpD7ai2Sy9k6+nVgZQEhxTvHLBf1HSGQGw6A9slk8+Jldv78hBR6A/hL1Oi0wF+7h3hz0UlIzyGhLiGkHT7MBPft5vXthb3leG9jCmmgKQvA+sm0HKMQKBgQCylNHtjQdD0UhCDNkkS+9Kp6s/WiSEs6PZJMFP9hiLwJN32+saSTKJJeVi0ghQ85V8VEyF08HdV6Se0phtMwTybEMM1Tjo7bis1f7FriC2uOjrE5+stGbe8o6/fO0SapiB4XwEqt5JSt4ePORPLWTdOP0q5xiG6CUUc3NKoBVn4A==
+  alipayPublicKey: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkNJw54L6PJpv+++S1Yz32KLuPgcGoel+H/7YYFX9/fD8Q3vroe55oCvonp3pwvTsOty7j38qaTxCpj7fCv1ueX88PklK4x/BZdNO9UO2wwPxA7Gvj6oUU0oD1YsJQ6R4i8e5ShYNnaW6d1l1aoTH05uhLZPPUo98YCY9Bfj4hCbU1Xt0eNHjBIOjbt8TOXLJp6JHvsVH4jSodnctaj3wpU9m5J6bhP8gelDo5areV5As/tIbE52hMTfQYWSm8noFGBpvyRDKho6IVCnZ4sgdcc6mqPTshwFzDHOHEdq5r74RWYJChU+TcoG0pl2XTVLJCGwget1coJZ1RJHZzukUAwIDAQAB
+  notifyUrl: http://47.121.24.225:10086
