@@ -37,4 +37,8 @@ public class Result<E> {
     public static <E> Result<E> error(String msg) {
         return new Result<E>(0, msg, null);
     }
+
+    public boolean isError() {
+        return code.equals(0);
+    }
 }

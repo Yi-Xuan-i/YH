@@ -106,7 +106,7 @@
 <!--            <groupId>com.alibaba.csp</groupId>-->
 <!--            <artifactId>sentinel-datasource-nacos</artifactId>-->
 <!--        </dependency>-->
-<!--        &lt;!&ndash; seata &ndash;&gt;-->
+        <!-- seata -->
 <!--        <dependency>-->
 <!--            <groupId>com.alibaba.cloud</groupId>-->
 <!--            <artifactId>spring-cloud-starter-alibaba-seata</artifactId>-->
