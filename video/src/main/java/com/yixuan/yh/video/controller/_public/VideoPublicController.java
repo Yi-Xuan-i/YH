@@ -1,6 +1,7 @@
 package com.yixuan.yh.video.controller._public;
 
 import com.yixuan.yh.commom.response.Result;
+import com.yixuan.yh.video.response.VideoMainResponse;
 import com.yixuan.yh.video.service.VideoService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -38,7 +39,7 @@ public class VideoPublicController {
     }
 
     @GetMapping("/list")
-    public Result<List<String>> getVideos() {
+    public Result<List<VideoMainResponse>> getVideos() {
         return Result.success(videoService.getVideos());
     }
 }

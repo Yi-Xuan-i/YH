@@ -8,8 +8,10 @@ import com.yixuan.yh.video.entity.VideoTag;
 import com.yixuan.yh.video.mapper.VideoMapper;
 import com.yixuan.yh.video.mapper.VideoTagMapper;
 import com.yixuan.yh.video.mapper.VideoTagMpMapper;
+import com.yixuan.yh.video.mapper.multi.VideoMultiMapper;
 import com.yixuan.yh.video.mq.VideoPostMessage;
 import com.yixuan.yh.video.request.PostVideoRequest;
+import com.yixuan.yh.video.response.VideoMainResponse;
 import com.yixuan.yh.video.service.VideoService;
 import org.apache.coyote.BadRequestException;
 import org.redisson.api.RLock;
@@ -47,20 +49,23 @@ public class VideoServiceImpl implements VideoService {
 
     @Autowired
     private MTClient mtClient;
+    @Autowired
+    private VideoMultiMapper videoMultiMapper;
 
     @Override
-    public List<String> getVideos() {
-        return videoMapper.selectRandom();
+    public List<VideoMainResponse> getVideos() {
+         return videoMultiMapper.selectMainRandom();
     }
 
     @Override
     @Transactional
-    public void postVideo(PostVideoRequest postVideoRequest) throws IOException, InterruptedException {
+    public void postVideo(Long userId, PostVideoRequest postVideoRequest) throws IOException, InterruptedException {
 
         String videoUrl = mtClient.upload(postVideoRequest.getVideo());
         String coverUrl = mtClient.upload(postVideoRequest.getCover());
         Video video = new Video();
         video.setId(snowflakeUtils.nextId());
+        video.setCreatorId(userId);
         video.setUrl(videoUrl);
         video.setCoverUrl(coverUrl);
         video.setDescription(postVideoRequest.getDescription());
