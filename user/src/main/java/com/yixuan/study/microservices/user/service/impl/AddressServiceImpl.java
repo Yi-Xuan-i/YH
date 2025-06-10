@@ -6,7 +6,7 @@ import com.yixuan.study.microservices.user.mapstruct.AddressMapstruct;
 import com.yixuan.study.microservices.user.request.AddressResponse;
 import com.yixuan.study.microservices.user.request.PutAddressRequest;
 import com.yixuan.study.microservices.user.service.AddressService;
-import com.yixuan.yh.commom.utils.SnowflakeUtils;
+import com.yixuan.yh.common.utils.SnowflakeUtils;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
