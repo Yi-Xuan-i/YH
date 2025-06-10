@@ -27,6 +27,6 @@ public interface AddressMapper {
     @Delete("delete from user_address where address_id = #{addressId}")
     void delete(Long addressId);
 
-    @Select("select address_id, is_default, receiver_name, receiver_phone, province, city, district, detail_address from user_address order by is_default desc limit 1")
+    @Select("select address_id, is_default, receiver_name, receiver_phone, province, city, district, detail_address from user_address where user_id = #{userId} order by is_default desc limit 1")
     UserAddress selectDefaultAddress(Long userId);
 }
