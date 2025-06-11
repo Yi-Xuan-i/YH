@@ -10,6 +10,7 @@
     </parent>
     <artifactId>order-main</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
 
     <modules>
         <module>order-core</module>
