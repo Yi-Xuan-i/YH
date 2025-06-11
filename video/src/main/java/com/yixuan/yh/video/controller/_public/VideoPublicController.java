@@ -1,6 +1,6 @@
 package com.yixuan.yh.video.controller._public;
 
-import com.yixuan.yh.commom.response.Result;
+import com.yixuan.yh.common.response.Result;
 import com.yixuan.yh.video.response.VideoMainResponse;
 import com.yixuan.yh.video.service.VideoService;
 import io.swagger.v3.oas.annotations.tags.Tag;

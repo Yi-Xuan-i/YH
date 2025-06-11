@@ -1,7 +1,7 @@
 package com.yixuan.yh.video.controller;
 
-import com.yixuan.yh.commom.response.Result;
-import com.yixuan.yh.commom.utils.UserContext;
+import com.yixuan.yh.common.response.Result;
+import com.yixuan.yh.common.utils.UserContext;
 import com.yixuan.yh.video.request.PostVideoRequest;
 import com.yixuan.yh.video.service.VideoService;
 import io.swagger.v3.oas.annotations.tags.Tag;

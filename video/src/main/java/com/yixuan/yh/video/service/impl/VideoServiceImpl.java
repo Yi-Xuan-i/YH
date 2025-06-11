@@ -1,7 +1,7 @@
 package com.yixuan.yh.video.service.impl;
 
 import com.yixuan.mt.client.MTClient;
-import com.yixuan.yh.commom.utils.SnowflakeUtils;
+import com.yixuan.yh.common.utils.SnowflakeUtils;
 import com.yixuan.yh.video.constant.RabbitMQConstant;
 import com.yixuan.yh.video.entity.Video;
 import com.yixuan.yh.video.entity.VideoTag;
