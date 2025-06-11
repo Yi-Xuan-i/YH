@@ -4,7 +4,7 @@ import com.yixuan.yh.admin.entity.Admin;
 import com.yixuan.yh.admin.mapper.AdminMapper;
 import com.yixuan.yh.admin.mapper.AdminPermissionMapper;
 import com.yixuan.yh.admin.mapper.PermissionMapper;
-import com.yixuan.yh.commom.utils.SnowflakeUtils;
+import com.yixuan.yh.common.utils.SnowflakeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;

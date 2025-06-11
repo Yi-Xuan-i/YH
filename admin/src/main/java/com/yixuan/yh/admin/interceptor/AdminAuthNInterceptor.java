@@ -1,7 +1,7 @@
 package com.yixuan.yh.admin.interceptor;
 
-import com.yixuan.yh.commom.utils.JwtUtils;
-import com.yixuan.yh.commom.utils.UserContext;
+import com.yixuan.yh.common.utils.JwtUtils;
+import com.yixuan.yh.common.utils.UserContext;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

@@ -1,7 +1,7 @@
 package com.yixuan.yh.admin.utils;
 
 import com.yixuan.yh.admin.service.PermissionService;
-import com.yixuan.yh.commom.utils.UserContext;
+import com.yixuan.yh.common.utils.UserContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

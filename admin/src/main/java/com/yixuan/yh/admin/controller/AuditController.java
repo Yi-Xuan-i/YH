@@ -3,7 +3,7 @@ package com.yixuan.yh.admin.controller;
 import com.yixuan.yh.admin.annotations.RequiresPermission;
 import com.yixuan.yh.admin.entity.Audit;
 import com.yixuan.yh.admin.service.AuditService;
-import com.yixuan.yh.commom.response.Result;
+import com.yixuan.yh.common.response.Result;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

@@ -4,7 +4,7 @@ import com.yixuan.yh.admin.entity.Admin;
 import com.yixuan.yh.admin.mapper.AdminMapper;
 import com.yixuan.yh.admin.request.LoginRequest;
 import com.yixuan.yh.admin.service.AuthService;
-import com.yixuan.yh.commom.utils.JwtUtils;
+import com.yixuan.yh.common.utils.JwtUtils;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;

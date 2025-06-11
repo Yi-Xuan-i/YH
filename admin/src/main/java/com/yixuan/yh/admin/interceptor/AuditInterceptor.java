@@ -2,7 +2,7 @@ package com.yixuan.yh.admin.interceptor;
 
 import com.yixuan.yh.admin.entity.Audit;
 import com.yixuan.yh.admin.service.AuditService;
-import com.yixuan.yh.commom.utils.UserContext;
+import com.yixuan.yh.common.utils.UserContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;

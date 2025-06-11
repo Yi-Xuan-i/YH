@@ -2,7 +2,7 @@ package com.yixuan.yh.admin.controller;
 
 import com.yixuan.yh.admin.request.LoginRequest;
 import com.yixuan.yh.admin.service.AuthService;
-import com.yixuan.yh.commom.response.Result;
+import com.yixuan.yh.common.response.Result;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.coyote.BadRequestException;

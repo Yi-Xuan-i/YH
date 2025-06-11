@@ -1,8 +1,8 @@
 package com.yixuan.yh.admin.controller;
 
 import com.yixuan.yh.admin.service.PermissionService;
-import com.yixuan.yh.commom.response.Result;
-import com.yixuan.yh.commom.utils.UserContext;
+import com.yixuan.yh.common.response.Result;
+import com.yixuan.yh.common.utils.UserContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

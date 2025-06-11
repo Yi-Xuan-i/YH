@@ -8,7 +8,7 @@ import com.yixuan.yh.admin.request.PostAccountRequest;
 import com.yixuan.yh.admin.request.PutAccountRequest;
 import com.yixuan.yh.admin.response.AccountResponse;
 import com.yixuan.yh.admin.service.AccountService;
-import com.yixuan.yh.commom.utils.SnowflakeUtils;
+import com.yixuan.yh.common.utils.SnowflakeUtils;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
