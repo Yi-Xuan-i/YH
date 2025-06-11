@@ -21,3 +21,6 @@ spring:
       config:
         file-extension: yaml # 配置文件名后缀
         shared-configs: # 共享配置
+#      discovery:
+#        ip: 10.96.51.199
+#        network-interface: wireless_32768
