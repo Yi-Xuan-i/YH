@@ -30,4 +30,7 @@ public interface UserMapper {
 
     @Update("update user set name = #{profileRequest.name}, bio = #{profileRequest.bio} where id = #{userId}")
     void update(Long userId, ProfileRequest profileRequest);
+
+    @Select("select name from user where id = #{id}")
+    String selectNameById(String id);
 }
