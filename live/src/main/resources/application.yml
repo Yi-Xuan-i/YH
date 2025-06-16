@@ -46,7 +46,7 @@ spring:
 #    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 #    map-underscore-to-camel-case: true # 开启驼峰命名自动映射
 mybatis-plus:
-  type-aliases-package: com.yixuan.yh.order.pojo
+  type-aliases-package: com.yixuan.yh.live.pojo
   mapper-locations: "classpath*:/com/yixuan/yh/**/mapper/*.xml"
   configuration:
     map-underscore-to-camel-case: true

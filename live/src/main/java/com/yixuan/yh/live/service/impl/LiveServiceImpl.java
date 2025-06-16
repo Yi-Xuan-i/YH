@@ -21,6 +21,7 @@ import org.springframework.data.elasticsearch.core.document.Document;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.data.elasticsearch.core.query.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -46,6 +47,7 @@ public class LiveServiceImpl implements LiveService {
     private UserPrivateClient userPrivateClient;
 
     @Override
+    @Transactional
     public Long postStartLive(Long userId, StartLiveRequest startLiveRequest) {
 
         Long roomId = snowflakeUtils.nextId();
@@ -55,6 +57,7 @@ public class LiveServiceImpl implements LiveService {
         live.setAnchorId(userId);
         liveMapper.insert(live);
 
+        // 这个改放到 publish 更好
         LiveDocument liveDocument = new LiveDocument();
         liveDocument.setRoomId(roomId);
         liveDocument.setAnchorId(userId);
@@ -102,7 +105,6 @@ public class LiveServiceImpl implements LiveService {
 
     @Override
     public List<GetLiveResponse> getLivesByQuery(String query) {
-        // 1. 构建条件
         Criteria titleCriteria = new Criteria("title").contains(query);
         Criteria statusCriteria = new Criteria("status").is(LiveDocument.LiveStatus.LIVING.getCode());
         Criteria combinedCriteria = titleCriteria.and(statusCriteria);
