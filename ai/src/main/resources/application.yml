@@ -1,0 +1,100 @@
+spring:
+  cloud:
+    openfeign:
+      httpclient:
+        enabled: true # 开启 Feign 对 httpClient 的支持
+    #    loadbalancer:
+    #      nacos:
+    #        enabled: true
+    sentinel:
+      transport:
+        dashboard: localhost:8080
+      datasource:
+        flow:
+          nacos:
+            server-addr: 110.41.182.125:8848
+            data-id: rule
+            group-id: DEFAULT_GROUP
+            rule-type: flow
+  r2dbc:
+    url: r2dbc:mysql://110.41.182.125:3306/new_yh
+    username: root
+    password: wisdom123456789
+    pool:
+      enabled: true
+      initial-size: 1
+      max-size: 5
+#  datasource:
+#    url: jdbc:mysql://110.41.182.125/new_yh
+#    username: root
+#    password: wisdom123456789
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    type: com.alibaba.druid.pool.DruidDataSource
+#    druid:
+#      test-while-idle: true
+#      validation-query: select 1
+#      time-between-eviction-runs-millis: 20000
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 10MB
+
+  ai:
+    openai:
+      api-key: b09d15b8-25ef-44e1-99d4-8e367939dd95
+      base-url: https://ark.cn-beijing.volces.com/api/v3/
+      chat:
+        options:
+          model: deepseek-r1-250528
+          temperature: 0.8
+        completions-path: /chat/completions
+
+#mybatis:
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#    map-underscore-to-camel-case: true # 开启驼峰命名自动映射
+
+#mybatis-plus:
+#  type-aliases-package: com.yixuan.yh.ai.pojo
+#  mapper-locations: "classpath*:/com/yixuan/yh/**/mapper/*.xml"
+#  configuration:
+#    map-underscore-to-camel-case: true
+#    cache-enabled: false
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#  global-config:
+#    db-config:
+#      id-type: assign_id # id 为雪花算法生成
+#      update-strategy: not_null
+
+logging:
+  level:
+#    reactor: debug
+#    org.springframework.web.reactive: debug
+    org.springframework.r2dbc: debug
+    org.springframework.r2dbc.core.DefaultDatabaseClient: trace
+
+#seata:
+#  registry:
+#    type: nacos
+#    nacos:
+#      server-addr: 110.41.182.125:8848
+#      namespace: ""
+#      group: DEFAULT_GROUP
+#      application: seataServer
+#      username: nacos
+#      password: nacos
+#  data-source-proxy-mode: AT
+#  tx-service-group: yx # 事务组名称
+#  service:
+#    vgroup-mapping: # 事务组与tc集群的映射关系
+#      yx: "default"
+jwt:
+  expire: 66666666
+  sign-key: yxyyxhyh
+
+mt:
+  console-url: http://47.121.24.225:19998
+  core-url: http://47.121.24.225:19999
+  bucket-name: ai
+  username: mt
+  password: mt
