@@ -18,5 +18,6 @@
         <module>product</module>
         <module>order</module>
         <module>live</module>
+        <module>ai</module>
     </modules>
 </project>
