@@ -3,9 +3,9 @@ spring:
     openfeign:
       httpclient:
         enabled: true # 开启 Feign 对 httpClient 的支持
-#    loadbalancer:
-#      nacos:
-#        enabled: true
+    #    loadbalancer:
+    #      nacos:
+    #        enabled: true
     sentinel:
       transport:
         dashboard: localhost:8080
@@ -30,7 +30,7 @@ spring:
     multipart:
       max-file-size: 5000MB
       max-request-size: 7000MB
-#      enabled: false
+  #      enabled: false
   rabbitmq:
     host: 47.121.24.225
     port: 5672
@@ -38,10 +38,21 @@ spring:
     username: guest
     password: guest
 
-mybatis:
+#mybatis:
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#    map-underscore-to-camel-case: true # 开启驼峰命名自动映射
+
+mybatis-plus:
+  type-aliases-package: com.yixuan.yh.order.pojo
+  mapper-locations: "classpath*:/com/yixuan/yh/**/mapper/*.xml"
   configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-    map-underscore-to-camel-case: true # 开启驼峰命名自动映射
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+  global-config:
+    db-config:
+      id-type: assign_id # id 为雪花算法生成
+      update-strategy: not_null
 
 logging:
   level:
