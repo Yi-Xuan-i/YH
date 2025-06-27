@@ -39,7 +39,6 @@ public class LiveProductServiceImpl implements LiveProductService {
         liveProduct.setImageUrl(mtClient.upload(postLiveProductRequest.getImage()));
 
         liveProductMapper.insert(liveProduct);
-
         messagingTemplate.convertAndSend("/topic/room." + postLiveProductRequest.getRoomId(), new LiveMessage(LiveMessage.MessageType.PRODUCT, liveProduct.getId()));
 
         return new PostLiveProductResponse(liveProduct.getId(), liveProduct.getImageUrl());

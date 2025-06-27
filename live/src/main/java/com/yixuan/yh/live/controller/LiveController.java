@@ -5,10 +5,9 @@ import com.yixuan.yh.common.utils.UserContext;
 import com.yixuan.yh.live.request.StartLiveRequest;
 import com.yixuan.yh.live.service.LiveService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/me")
@@ -18,7 +17,7 @@ public class LiveController {
     LiveService liveService;
 
     @PostMapping("/start")
-    public Result<Long> postStartLive(@RequestBody StartLiveRequest startLiveRequest) {
+    public Result<Long> postStartLive(@ModelAttribute StartLiveRequest startLiveRequest) throws IOException {
         return Result.success(liveService.postStartLive(UserContext.getUser(), startLiveRequest));
     }
 

@@ -1,5 +1,6 @@
 package com.yixuan.yh.live.service.impl;
 
+import com.yixuan.mt.client.MTClient;
 import com.yixuan.yh.common.utils.JwtUtils;
 import com.yixuan.yh.common.utils.SnowflakeUtils;
 import com.yixuan.yh.live.document.LiveDocument;
@@ -23,6 +24,7 @@ import org.springframework.data.elasticsearch.core.query.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -40,6 +42,8 @@ public class LiveServiceImpl implements LiveService {
     @Autowired
     private SnowflakeUtils snowflakeUtils;
     @Autowired
+    private MTClient mtClient;
+    @Autowired
     private ElasticsearchTemplate elasticsearchTemplate;
     @Autowired
     private ElasticsearchOperations elasticsearchOperations;
@@ -48,7 +52,7 @@ public class LiveServiceImpl implements LiveService {
 
     @Override
     @Transactional
-    public Long postStartLive(Long userId, StartLiveRequest startLiveRequest) {
+    public Long postStartLive(Long userId, StartLiveRequest startLiveRequest) throws IOException {
 
         Long roomId = snowflakeUtils.nextId();
 
@@ -63,6 +67,7 @@ public class LiveServiceImpl implements LiveService {
         liveDocument.setAnchorId(userId);
         liveDocument.setAnchorName(userPrivateClient.getName(userId).getData());
         liveDocument.setTitle(startLiveRequest.getTitle());
+        liveDocument.setCoverUrl(mtClient.upload(startLiveRequest.getCoverFile()));
         liveDocument.setStatus(LiveDocument.LiveStatus.LIVING.getCode());
         liveDocument.setCreatedTime(LocalDateTime.now());
         liveRepository.save(liveDocument);

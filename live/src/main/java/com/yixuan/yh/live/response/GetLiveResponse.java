@@ -10,5 +10,6 @@ public class GetLiveResponse {
     Long anchorId;
     String anchorName;
     String title;
+    String coverUrl;
     LocalDateTime createdTime;
 }

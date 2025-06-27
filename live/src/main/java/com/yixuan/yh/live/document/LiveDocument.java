@@ -23,6 +23,10 @@ public class LiveDocument {
     @Field(type = FieldType.Text, analyzer = "ik_max_word", searchAnalyzer = "ik_max_word")
     private String title;
 
+
+    @Field(type = FieldType.Keyword, index = false)
+    private String coverUrl;
+
     @Field(type = FieldType.Byte)
     private Byte status;
 

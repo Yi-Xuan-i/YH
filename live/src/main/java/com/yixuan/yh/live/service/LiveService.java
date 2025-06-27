@@ -4,10 +4,11 @@ import com.yixuan.yh.live.request.StartLiveRequest;
 import com.yixuan.yh.live.response.GetLiveResponse;
 import org.apache.coyote.BadRequestException;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface LiveService {
-    Long postStartLive(Long userId, StartLiveRequest startLiveRequest);
+    Long postStartLive(Long userId, StartLiveRequest startLiveRequest) throws IOException;
 
     void publishCallback(Long roomId, String clientId, String token) throws BadRequestException;
 
