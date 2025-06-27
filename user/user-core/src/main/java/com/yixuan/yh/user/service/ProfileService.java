@@ -15,4 +15,6 @@ public interface ProfileService {
     String postAvatar(Long userId, MultipartFile avatar) throws IOException;
 
     void putProfile(Long userId, ProfileRequest profileRequest);
+
+    String randomAvatar(Long userId) throws IOException;
 }

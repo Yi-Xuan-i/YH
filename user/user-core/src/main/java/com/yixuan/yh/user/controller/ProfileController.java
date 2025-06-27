@@ -34,6 +34,11 @@ public class ProfileController {
         return Result.success(profileService.postAvatar(UserContext.getUser(), avatar));
     }
 
+    @PutMapping("/random-avatar")
+    public Result<String> randomAvatar() throws IOException {
+        return Result.success(profileService.randomAvatar(UserContext.getUser()));
+    }
+
     @PutMapping
     public Result<Void> putProfile(@RequestBody ProfileRequest profileRequest) {
         profileService.putProfile(UserContext.getUser(), profileRequest);

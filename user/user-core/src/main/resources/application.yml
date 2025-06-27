@@ -31,10 +31,22 @@ spring:
       max-file-size: 5MB
       max-request-size: 10MB
 
-mybatis:
+#mybatis:
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#    map-underscore-to-camel-case: true # 开启驼峰命名自动映射
+
+mybatis-plus:
+  type-aliases-package: com.yixuan.yh.user.pojo
+  mapper-locations: "classpath*:/com/yixuan/yh/**/mapper/*.xml"
   configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-    map-underscore-to-camel-case: true # 开启驼峰命名自动映射
+  global-config:
+    db-config:
+      id-type: assign_id # id 为雪花算法生成
+      update-strategy: not_null
 
 logging:
   level:
