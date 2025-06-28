@@ -1,7 +1,7 @@
 package com.yixuan.yh.product.service.impl;
 
 import com.yixuan.mt.client.MTClient;
-import com.yixuan.yh.commom.utils.SnowflakeUtils;
+import com.yixuan.yh.common.utils.SnowflakeUtils;
 import com.yixuan.yh.product.mapper.*;
 import com.yixuan.yh.product.mapper.multi.SkuMapper;
 import com.yixuan.yh.product.mapstruct.MerchantMapStruct;
@@ -204,7 +204,7 @@ public class MerchantServiceImpl implements MerchantService {
     }
 
     @Override
-    public void postCarousel(Long userId, Long productId, PostCarouselRequest postCarouselRequest) throws IOException {
+    public Long postCarousel(Long userId, Long productId, PostCarouselRequest postCarouselRequest) throws IOException {
         // 鉴权
         if (!productMapper.selectMerchantIdByProductId(productId).equals(userId)) {
             throw new BadRequestException("你没有权限！");
@@ -216,6 +216,8 @@ public class MerchantServiceImpl implements MerchantService {
         productCarousel.setProductId(productId);
 
         productCarouselMapper.insert(productCarousel);
+
+        return productCarousel.getId();
     }
 
     @Override

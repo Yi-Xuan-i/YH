@@ -1,7 +1,7 @@
 package com.yixuan.yh.product.controller;
 
-import com.yixuan.yh.commom.response.Result;
-import com.yixuan.yh.commom.utils.UserContext;
+import com.yixuan.yh.common.response.Result;
+import com.yixuan.yh.common.utils.UserContext;
 import com.yixuan.yh.product.pojo.request.PostCartItemRequest;
 import com.yixuan.yh.product.pojo.response.CartItemResponse;
 import com.yixuan.yh.product.service.CartService;

@@ -26,7 +26,7 @@ public interface MerchantService {
 
     void putSku(Long userId, PutSkuRequest putSkuRequest) throws BadRequestException;
 
-    void postCarousel(Long userId, Long productId, PostCarouselRequest postCarouselRequest) throws IOException;
+    Long postCarousel(Long userId, Long productId, PostCarouselRequest postCarouselRequest) throws IOException;
 
     void deleteCarousel(Long userId, Long productId, Long carouselId) throws BadRequestException;
 }

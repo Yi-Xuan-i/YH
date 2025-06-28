@@ -4,6 +4,7 @@ import com.yixuan.yh.product.pojo.model.entity.ProductSku;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
@@ -29,4 +30,13 @@ public interface ProductSkuMapper {
     Long selectProductIdBySkuId(Long skuId);
 
     List<ProductSku> selectPartOfCartItem(List<Long> skuIdList);
+
+    @Select("select price from product_sku where sku_id = #{skuId}")
+    ProductSku selectPriceBySkuId(Long skuId);
+
+    @Select("select stock from product_sku where sku_id = #{skuId}")
+    Integer selectStockBySkuId(Long skuId);
+
+    @Update("update product_sku set stock = stock + #{quantity} where sku_id = #{skuId}")
+    void updateStock(Long skuId, Integer quantity);
 }

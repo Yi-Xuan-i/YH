@@ -1,7 +1,7 @@
 package com.yixuan.yh.product.controller;
 
-import com.yixuan.yh.commom.response.Result;
-import com.yixuan.yh.commom.utils.UserContext;
+import com.yixuan.yh.common.response.Result;
+import com.yixuan.yh.common.utils.UserContext;
 import com.yixuan.yh.product.pojo.request.PostCarouselRequest;
 import com.yixuan.yh.product.pojo.request.PostSkuSpecRequest;
 import com.yixuan.yh.product.pojo.request.PutProductBasicInfoRequest;
@@ -58,9 +58,8 @@ public class MerchantController {
     }
 
     @PostMapping("/carousel/{productId}")
-    public Result<Void> postCarousel(@PathVariable Long productId, @ModelAttribute PostCarouselRequest postCarouselRequest) throws IOException {
-        merchantService.postCarousel(UserContext.getUser(), productId, postCarouselRequest);
-        return Result.success();
+    public Result<Long> postCarousel(@PathVariable Long productId, @ModelAttribute PostCarouselRequest postCarouselRequest) throws IOException {
+        return Result.success(merchantService.postCarousel(UserContext.getUser(), productId, postCarouselRequest));
     }
 
     @DeleteMapping("/carousel/{productId}/{carouselId}")

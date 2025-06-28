@@ -1,6 +1,6 @@
 package com.yixuan.yh.product.service.impl;
 
-import com.yixuan.yh.commom.utils.SnowflakeUtils;
+import com.yixuan.yh.common.utils.SnowflakeUtils;
 import com.yixuan.yh.product.mapper.CartItemMapper;
 import com.yixuan.yh.product.mapper.ProductMapper;
 import com.yixuan.yh.product.mapper.ProductSkuMapper;
@@ -53,6 +53,9 @@ public class CartServiceImpl implements CartService {
     @Override
     public List<CartItemResponse> getCartItem(Long userId) {
         List<CartItem> cartItemList = cartItemMapper.selectByUserId(userId);
+        if (cartItemList.isEmpty()) {
+            return null;
+        }
 
         // 数据转换
         List<CartItemResponse> cartItemResponseList = new ArrayList<>(cartItemList.size());

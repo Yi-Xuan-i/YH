@@ -1,6 +1,6 @@
 package com.yixuan.yh.product.controller._public;
 
-import com.yixuan.yh.commom.response.Result;
+import com.yixuan.yh.common.response.Result;
 import com.yixuan.yh.product.pojo.response.ProductDetailResponse;
 import com.yixuan.yh.product.pojo.response.ProductSummaryResponse;
 import com.yixuan.yh.product.service.ProductService;

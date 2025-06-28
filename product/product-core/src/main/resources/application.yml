@@ -26,6 +26,11 @@ spring:
       test-while-idle: true
       validation-query: select 1
       time-between-eviction-runs-millis: 20000
+  data:
+    redis:
+      host: 47.121.24.225
+      port: 6379
+      password: qq2434462503
   servlet:
     multipart:
       max-file-size: 5000MB
