@@ -24,6 +24,13 @@ spring:
       enabled: true
       initial-size: 1
       max-size: 5
+      validation-query: SELECT 1
+      max-idle-time: 30000
+  data:
+    redis:
+      host: 47.121.24.225
+      port: 6379
+      password: qq2434462503
 #  datasource:
 #    url: jdbc:mysql://110.41.182.125/new_yh
 #    username: root
@@ -48,6 +55,15 @@ spring:
           model: deepseek-r1-250528
           temperature: 0.8
         completions-path: /chat/completions
+    mcp:
+      client:
+        type: ASYNC
+        sse:
+          connections:
+            server1:
+              url: http://127.0.0.1:11111/
+        toolcallback:
+          enabled: true
 
 #mybatis:
 #  configuration:
