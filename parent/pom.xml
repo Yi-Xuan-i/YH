@@ -19,7 +19,7 @@
     <!--版本属性-->
     <properties>
         <springcloud.version>2023.0.0</springcloud.version>
-        <springcloudalibaba.version>2022.0.0.0-RC1</springcloudalibaba.version>
+        <springcloudalibaba.version>2023.0.3.3</springcloudalibaba.version>
         <mysql.version>8.2.0</mysql.version>
         <springmybatis.version>3.0.3</springmybatis.version>
         <mybatis.version>3.0.3</mybatis.version>

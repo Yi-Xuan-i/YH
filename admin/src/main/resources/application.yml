@@ -1,5 +1,26 @@
+server:
+  port: 10087
+  servlet:
+    context-path: /admin
+  tomcat:
+    threads:
+      max: 5
+      min-spare: 2
+    max-connections: 50
+
 spring:
+  mvc:
+    servlet:
+      path: /api
+  application:
+    name: adminService
+  profiles:
+    active: dev
   cloud:
+    nacos:
+      username: nacos
+      password: nacos
+      server-addr: 106.13.105.230:8848
     openfeign:
       httpclient:
         enabled: true # 开启 Feign 对 httpClient 的支持
@@ -53,5 +74,5 @@ seata:
       yx: "default"
 
 jwt:
-  expire: 20210314
+  expire: 6666666666
   sign-key: yxyyxhyh

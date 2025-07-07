@@ -1,5 +1,26 @@
+server:
+  port: 10091
+  servlet:
+    context-path: /video
+  tomcat:
+    threads:
+      max: 5
+      min-spare: 2
+    max-connections: 50
+
 spring:
+  mvc:
+    servlet:
+      path: /api
+  application:
+    name: videoService
+  profiles:
+    active: dev
   cloud:
+    nacos:
+      username: nacos
+      password: nacos
+      server-addr: 106.13.105.230:8848
     openfeign:
       httpclient:
         enabled: true # 开启 Feign 对 httpClient 的支持
@@ -32,7 +53,7 @@ spring:
       max-request-size: 7000MB
 #      enabled: false
   rabbitmq:
-    host: 47.121.24.225
+    host: 106.13.105.230
     port: 5672
     virtual-host: /
     username: guest
@@ -51,7 +72,7 @@ seata:
   registry:
     type: nacos
     nacos:
-      server-addr: 110.41.182.125:8848
+      server-addr: 106.13.105.230:8848
       namespace: ""
       group: DEFAULT_GROUP
       application: seataServer
@@ -64,8 +85,8 @@ seata:
       yx: "default"
 
 mt:
-  console-url: http://47.121.24.225:19998
-  core-url: http://47.121.24.225:19999
+  console-url: http://127.0.0.1:19998
+  core-url: http://127.0.0.1:19999
   bucket-name: video
   username: mt
   password: mt
