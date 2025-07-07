@@ -108,3 +108,5 @@ pie
 3. 支持**多语言**国际化版本
 
 ---
+- 前端：https://gitee.com/YXXHYH/yh-fe
+- 管理后台：https://gitee.com/YXXHYH/yh-admin-fe
