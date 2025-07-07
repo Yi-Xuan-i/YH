@@ -1,0 +1,25 @@
+package com.yixuan.yh.video.controller._private;
+
+import com.yixuan.yh.common.response.Result;
+import com.yixuan.yh.video.pojo.request.VideoLikeBatchRequest;
+import com.yixuan.yh.video.service.InteractionService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/private/interaction")
+public class InteractionPrivateController {
+
+    @Autowired
+    private InteractionService interactionService;
+
+    @PostMapping("/like-batch")
+    public Result<Void> likeBatch(@RequestBody VideoLikeBatchRequest videoLikeBatchRequest) {
+        interactionService.likeBatch(videoLikeBatchRequest);
+        return Result.success();
+    }
+
+}

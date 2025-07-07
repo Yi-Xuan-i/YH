@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yixuan.yh.video.mapper.VideoUserLikeMapper">
+
+
+    <insert id="insertBatch">
+        insert into video_user_like (id, user_id, video_id, status) values
+            <foreach collection="videoUserLikeList" item="videoUserLike" separator=",">
+                (#{videoUserLike.id}, #{videoUserLike.userId}, #{videoUserLike.videoId}, #{videoUserLike.status})
+            </foreach>
+        on duplicate key update
+            status = values(status)
+
+    </insert>
+</mapper>
