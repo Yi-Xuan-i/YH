@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yixuan.yh.video.mapper.VideoTagMapper">
+    <insert id="insertBatch">
+        insert into video_tag (id, name) values
+            <foreach collection="videoTagList" item="item" separator=",">
+                (#{item.id}, #{item.name})
+            </foreach>
+    </insert>
+
+    <select id="selectNameByIds" resultType="java.lang.String">
+        select name from video_tag where id in
+            <foreach collection="idList" open="(" close=")" separator="," item="id">
+                #{id}
+            </foreach>
+    </select>
+
+    <select id="selectSimplyByNames" resultType="com.yixuan.yh.video.pojo.entity.VideoTag">
+        select id, name from video_tag where name in
+        <foreach collection="addedNewTagList" open="(" close=")" separator="," item="name">
+            #{name}
+        </foreach>
+    </select>
+
+</mapper>
