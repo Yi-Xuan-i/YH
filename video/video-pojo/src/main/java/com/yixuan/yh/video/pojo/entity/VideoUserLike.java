@@ -18,7 +18,14 @@ public class VideoUserLike {
         LIKE(1),
         UNLIKE(-1);
 
-        Status(int i) {
+        private final int value;
+
+        Status(int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return value;
         }
     }
 }

@@ -38,7 +38,7 @@ spring:
             group-id: DEFAULT_GROUP
             rule-type: flow
   datasource:
-    url: jdbc:mysql://110.41.182.125/new_yh
+    url: jdbc:mysql://110.41.182.125/new_yh?allowMultiQueries=true
     username: root
     password: wisdom123456789
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -47,6 +47,11 @@ spring:
       test-while-idle: true
       validation-query: select 1
       time-between-eviction-runs-millis: 20000
+  data:
+    redis:
+      host: 110.41.182.125
+      port: 6379
+      password: qq2434462503
   servlet:
     multipart:
       max-file-size: 5000MB

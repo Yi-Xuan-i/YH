@@ -5,6 +5,13 @@
 <mapper namespace="com.yixuan.yh.video.mapper.VideoUserLikeMapper">
 
 
+    <insert id="insert">
+        insert into video_user_like (id, user_id, video_id, status) values
+            (#{id}, #{userId}, #{videoId}, #{status})
+        on duplicate key update
+            status = values(status)
+    </insert>
+
     <insert id="insertBatch">
         insert into video_user_like (id, user_id, video_id, status) values
             <foreach collection="videoUserLikeList" item="videoUserLike" separator=",">

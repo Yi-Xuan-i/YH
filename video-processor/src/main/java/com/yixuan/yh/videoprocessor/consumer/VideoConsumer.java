@@ -55,7 +55,7 @@ public class VideoConsumer {
     @RabbitListener(queuesToDeclare = @Queue(name = "video.like.queue"), containerFactory = "batchContainerFactory")
     public void handleVideoLikeMessage(List<VideoLikeMessage> videoLikeMessageList) {
         // 计算视频需要增加或减少的点赞数（并转换点赞记录对象）
-        List<VideoLikeBatchRequest.LikeRecord> likeRecordList = new ArrayList<>(videoLikeMessageList.size());
+//        List<VideoLikeBatchRequest.LikeRecord> likeRecordList = new ArrayList<>(videoLikeMessageList.size());
         Map<Long, Long> videoLikeNumberMap = new HashMap<>();
         for (VideoLikeMessage videoLikeMessage : videoLikeMessageList) {
             if (!videoLikeNumberMap.containsKey(videoLikeMessage.getVideoId())) {
@@ -63,12 +63,12 @@ public class VideoConsumer {
             }
             videoLikeNumberMap.replace(videoLikeMessage.getVideoId(), videoLikeNumberMap.get(videoLikeMessage.getVideoId()) + videoLikeMessage.getStatus().getValue());
 
-            VideoLikeBatchRequest.LikeRecord likeRecord = new VideoLikeBatchRequest.LikeRecord();
-            likeRecord.setUserId(videoLikeMessage.getUserId());
-            likeRecord.setVideoId(videoLikeMessage.getVideoId());
-            likeRecord.setStatus(VideoLikeBatchRequest.LikeRecord.Status.valueOf(videoLikeMessage.getStatus().name()));
+//            VideoLikeBatchRequest.LikeRecord likeRecord = new VideoLikeBatchRequest.LikeRecord();
+//            likeRecord.setUserId(videoLikeMessage.getUserId());
+//            likeRecord.setVideoId(videoLikeMessage.getVideoId());
+//            likeRecord.setStatus(VideoLikeBatchRequest.LikeRecord.Status.valueOf(videoLikeMessage.getStatus().name()));
 
-            likeRecordList.add(likeRecord);
+//            likeRecordList.add(likeRecord);
         }
         // 构建点赞数对象
         List<VideoLikeBatchRequest.LikeIncr> likeIncrList = new ArrayList<>(videoLikeMessageList.size());
@@ -81,7 +81,7 @@ public class VideoConsumer {
         }
         // 构建完整对象
         VideoLikeBatchRequest videoLikeBatchRequest = new VideoLikeBatchRequest();
-        videoLikeBatchRequest.setLikeRecordList(likeRecordList);
+//        videoLikeBatchRequest.setLikeRecordList(likeRecordList);
         videoLikeBatchRequest.setLikeIncrList(likeIncrList);
         // 发起请求
         if (videoPrivateClient.likeBatch(videoLikeBatchRequest).isError()) {

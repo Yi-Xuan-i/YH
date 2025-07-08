@@ -20,7 +20,7 @@ public class InteractionController {
     }
 
     @DeleteMapping("/like/{videoId}")
-    public Result<Void> unlike(@PathVariable Long videoId) {
+    public Result<Void> unlike(@PathVariable Long videoId) throws Exception {
         interactionService.unlike(UserContext.getUser(), videoId);
         return Result.success();
     }
