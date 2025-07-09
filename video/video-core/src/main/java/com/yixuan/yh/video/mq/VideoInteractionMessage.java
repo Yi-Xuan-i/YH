@@ -1,4 +1,4 @@
-package com.yixuan.yh.video.pojo.entity;
+package com.yixuan.yh.video.mq;
 
 import com.yixuan.yh.video.pojo._enum.InteractionStatus;
 import lombok.AllArgsConstructor;
@@ -8,8 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class VideoUserLike {
-    Long id;
+public class VideoInteractionMessage {
     Long userId;
     Long videoId;
     InteractionStatus status;

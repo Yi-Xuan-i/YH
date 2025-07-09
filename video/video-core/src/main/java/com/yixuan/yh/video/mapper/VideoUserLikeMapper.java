@@ -12,6 +12,6 @@ public interface VideoUserLikeMapper {
 
     void insertBatch(List<VideoUserLike> videoUserLikeList);
 
-    @Select("select count(*) from video_user_like where user_id = #{userId} and video_id = #{videoId} and status = 'LIKE'")
+    @Select("select count(*) from video_user_like where user_id = #{userId} and video_id = #{videoId} and status = 'FRONT'")
     boolean isLike(Long userId, Long videoId);
 }

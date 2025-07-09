@@ -1,26 +1,26 @@
 package com.yixuan.yh.video.cache;
 
 import com.yixuan.yh.video.constant.RedisConstant;
-import com.yixuan.yh.video.mapper.VideoUserLikeMapper;
+import com.yixuan.yh.video.mapper.VideoUserFavoriteMapper;
 import com.yixuan.yh.video.pojo._enum.InteractionStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
-public class VideoUserLikeCache {
+public class VideoUserFavoriteCache {
 
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
     @Autowired
-    private VideoUserLikeMapper videoUserLikeMapper;
+    private VideoUserFavoriteMapper videoUserFavoriteMapper;
 
-    public boolean isLike(Long userId, Long videoId, InteractionStatus legalStatus) {
-        String key = RedisConstant.VIDEO_USER_LIKE_KEY_PREFIX + userId;
+    public boolean isFavorite(Long userId, Long videoId, InteractionStatus legalStatus) {
+        String key = RedisConstant.VIDEO_USER_FAVORITE_KEY_PREFIX + userId;
         String strResult = (String) stringRedisTemplate.opsForHash().get(key, videoId.toString());
         int result;
         if (strResult == null) {
-            result = videoUserLikeMapper.isLike(userId, videoId) ? 1 : 0;
+            result = videoUserFavoriteMapper.isFavorite(userId, videoId) ? 1 : 0;
             // 如果当前操作不合法才进行缓存，因为如果合法后续修改点赞状态会进行缓存
             if (!((result == 1 && legalStatus.equals(InteractionStatus.FRONT)) || (result == 0 && legalStatus.equals(InteractionStatus.BACK)))) {
                 stringRedisTemplate.opsForHash().put(key, videoId.toString(), String.valueOf(result));

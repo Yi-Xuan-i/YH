@@ -16,7 +16,10 @@ public class RedisConfig {
                 .setAddress("redis://110.41.182.125:6379")
                 .setPassword("qq2434462503")
                 .setConnectionPoolSize(6)
-                .setConnectionMinimumIdleSize(2);
+                .setConnectionMinimumIdleSize(2)
+                .setPingConnectionInterval(30000)
+                .setTimeout(5000)
+                .setIdleConnectionTimeout(60000);
 
         return Redisson.create(config);
     }

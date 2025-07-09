@@ -12,6 +12,7 @@ import com.yixuan.yh.video.mapper.multi.VideoMultiMapper;
 import com.yixuan.yh.video.mq.VideoPostMessage;
 import com.yixuan.yh.video.pojo.request.PostVideoRequest;
 import com.yixuan.yh.video.pojo.response.VideoMainResponse;
+import com.yixuan.yh.video.pojo.response.VideoMainWithInteractionResponse;
 import com.yixuan.yh.video.service.VideoService;
 import org.apache.coyote.BadRequestException;
 import org.redisson.api.RLock;
@@ -55,6 +56,11 @@ public class VideoServiceImpl implements VideoService {
     @Override
     public List<VideoMainResponse> getVideos() {
          return videoMultiMapper.selectMainRandom();
+    }
+
+    @Override
+    public List<VideoMainWithInteractionResponse> getVideosWithInteractionStatus(Long userId) {
+        return videoMultiMapper.selectMainWithInteractionStatusRandom(userId);
     }
 
     @Override

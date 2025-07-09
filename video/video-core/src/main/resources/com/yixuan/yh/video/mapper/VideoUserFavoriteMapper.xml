@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yixuan.yh.video.mapper.VideoUserFavoriteMapper">
+
+    <insert id="insert">
+        insert into video_user_favorite (id, user_id, video_id, status) values
+            (#{id}, #{userId}, #{videoId}, #{status})
+        on duplicate key update
+            status = values(status)
+    </insert>
+</mapper>

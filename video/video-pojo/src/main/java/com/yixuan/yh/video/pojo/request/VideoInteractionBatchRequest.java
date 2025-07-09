@@ -9,13 +9,13 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class VideoLikeBatchRequest {
+public class VideoInteractionBatchRequest {
 
-    List<LikeRecord> likeRecordList;
-    List<LikeIncr> likeIncrList;
+    List<Record> interactionRecordList;
+    List<Incr> interactionIncrList;
 
     @Data
-    public static class LikeRecord {
+    public static class Record {
         Long userId;
         Long videoId;
         Status status;
@@ -30,7 +30,7 @@ public class VideoLikeBatchRequest {
     }
 
     @Data
-    public static class LikeIncr {
+    public static class Incr {
         Long videoId;
         Long incrNumber;
     }

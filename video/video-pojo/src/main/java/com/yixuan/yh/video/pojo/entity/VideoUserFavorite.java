@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class VideoUserLike {
+public class VideoUserFavorite {
     Long id;
     Long userId;
     Long videoId;

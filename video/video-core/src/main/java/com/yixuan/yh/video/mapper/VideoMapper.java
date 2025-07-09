@@ -1,7 +1,7 @@
 package com.yixuan.yh.video.mapper;
 
 import com.yixuan.yh.video.pojo.entity.Video;
-import com.yixuan.yh.video.pojo.request.VideoLikeBatchRequest;
+import com.yixuan.yh.video.pojo.request.VideoInteractionBatchRequest;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -16,5 +16,7 @@ public interface VideoMapper {
     @Select("select url from video where id = #{id}")
     String selectVideoUrlById(Long id);
 
-    void updateBatch(List<VideoLikeBatchRequest.LikeIncr> likeIncrList);
+    void updateLikeBatch(List<VideoInteractionBatchRequest.Incr> likeIncrList);
+
+    void updateFavoriteBatch(List<VideoInteractionBatchRequest.Incr> favoriteIncrList);
 }

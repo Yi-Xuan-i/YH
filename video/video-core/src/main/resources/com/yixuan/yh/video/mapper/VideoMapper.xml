@@ -4,9 +4,14 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yixuan.yh.video.mapper.VideoMapper">
 
-    <update id="updateBatch">
+    <update id="updateLikeBatch">
         <foreach collection="likeIncrList" item="likeIncr" separator=";">
             update video set likes = likes + #{likeIncr.incrNumber} where id = #{likeIncr.videoId}
+        </foreach>
+    </update>
+    <update id="updateFavoriteBatch">
+        <foreach collection="favoriteIncrList" item="favoriteIncr" separator=";">
+            update video set favorites = favorites + #{favoriteIncr.incrNumber} where id = #{favoriteIncr.videoId}
         </foreach>
     </update>
 

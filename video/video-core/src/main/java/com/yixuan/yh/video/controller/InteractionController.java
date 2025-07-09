@@ -25,4 +25,16 @@ public class InteractionController {
         return Result.success();
     }
 
+    @PostMapping("/favorite/{videoId}")
+    public Result<Void> favorite(@PathVariable Long videoId) throws Exception {
+        interactionService.favorite(UserContext.getUser(), videoId);
+        return Result.success();
+    }
+
+    @DeleteMapping("/favorite/{videoId}")
+    public Result<Void> unfavorite(@PathVariable Long videoId) throws Exception {
+        interactionService.unfavorite(UserContext.getUser(), videoId);
+        return Result.success();
+    }
+
 }
