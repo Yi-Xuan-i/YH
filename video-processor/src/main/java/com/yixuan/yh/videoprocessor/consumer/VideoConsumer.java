@@ -2,8 +2,8 @@ package com.yixuan.yh.videoprocessor.consumer;
 
 import com.yixuan.yh.common.response.Result;
 import com.yixuan.yh.video.feign.VideoPrivateClient;
-import com.yixuan.yh.video.pojo.request.VideoLikeBatchRequest;
-import com.yixuan.yh.videoprocessor.mq.VideoLikeMessage;
+import com.yixuan.yh.video.pojo.request.VideoInteractionBatchRequest;
+import com.yixuan.yh.videoprocessor.mq.VideoInteractionMessage;
 import com.yixuan.yh.videoprocessor.mq.VideoPostMessage;
 import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -52,39 +52,43 @@ public class VideoConsumer {
 
     }
 
-    @RabbitListener(queuesToDeclare = @Queue(name = "video.like.queue"), containerFactory = "batchContainerFactory")
-    public void handleVideoLikeMessage(List<VideoLikeMessage> videoLikeMessageList) {
+    private VideoInteractionBatchRequest createInteractionBatchRequest(List<VideoInteractionMessage> videoInteractionMessageList) {
         // 计算视频需要增加或减少的点赞数（并转换点赞记录对象）
-//        List<VideoLikeBatchRequest.LikeRecord> likeRecordList = new ArrayList<>(videoLikeMessageList.size());
-        Map<Long, Long> videoLikeNumberMap = new HashMap<>();
-        for (VideoLikeMessage videoLikeMessage : videoLikeMessageList) {
-            if (!videoLikeNumberMap.containsKey(videoLikeMessage.getVideoId())) {
-                videoLikeNumberMap.put(videoLikeMessage.getVideoId(), 0L);
+        Map<Long, Long> videoInteractionNumberMap = new HashMap<>();
+        for (VideoInteractionMessage videoInteractionMessage : videoInteractionMessageList) {
+            if (!videoInteractionNumberMap.containsKey(videoInteractionMessage.getVideoId())) {
+                videoInteractionNumberMap.put(videoInteractionMessage.getVideoId(), 0L);
             }
-            videoLikeNumberMap.replace(videoLikeMessage.getVideoId(), videoLikeNumberMap.get(videoLikeMessage.getVideoId()) + videoLikeMessage.getStatus().getValue());
-
-//            VideoLikeBatchRequest.LikeRecord likeRecord = new VideoLikeBatchRequest.LikeRecord();
-//            likeRecord.setUserId(videoLikeMessage.getUserId());
-//            likeRecord.setVideoId(videoLikeMessage.getVideoId());
-//            likeRecord.setStatus(VideoLikeBatchRequest.LikeRecord.Status.valueOf(videoLikeMessage.getStatus().name()));
-
-//            likeRecordList.add(likeRecord);
+            videoInteractionNumberMap.replace(videoInteractionMessage.getVideoId(), videoInteractionNumberMap.get(videoInteractionMessage.getVideoId()) + videoInteractionMessage.getStatus().getValue());
         }
         // 构建点赞数对象
-        List<VideoLikeBatchRequest.LikeIncr> likeIncrList = new ArrayList<>(videoLikeMessageList.size());
-        for (Map.Entry<Long, Long> entry : videoLikeNumberMap.entrySet()) {
-            VideoLikeBatchRequest.LikeIncr likeIncr = new VideoLikeBatchRequest.LikeIncr();
-            likeIncr.setVideoId(entry.getKey());
-            likeIncr.setIncrNumber(entry.getValue());
+        List<VideoInteractionBatchRequest.Incr> incrList = new ArrayList<>(videoInteractionMessageList.size());
+        for (Map.Entry<Long, Long> entry : videoInteractionNumberMap.entrySet()) {
+            VideoInteractionBatchRequest.Incr incr = new VideoInteractionBatchRequest.Incr();
+            incr.setVideoId(entry.getKey());
+            incr.setIncrNumber(entry.getValue());
 
-            likeIncrList.add(likeIncr);
+            incrList.add(incr);
         }
         // 构建完整对象
-        VideoLikeBatchRequest videoLikeBatchRequest = new VideoLikeBatchRequest();
-//        videoLikeBatchRequest.setLikeRecordList(likeRecordList);
-        videoLikeBatchRequest.setLikeIncrList(likeIncrList);
+        VideoInteractionBatchRequest videoInteractionBatchRequest = new VideoInteractionBatchRequest();
+        videoInteractionBatchRequest.setInteractionIncrList(incrList);
+
+        return videoInteractionBatchRequest;
+    }
+
+    @RabbitListener(queuesToDeclare = @Queue(name = "video.like.queue"), containerFactory = "batchContainerFactory")
+    public void handleVideoLikeMessage(List<VideoInteractionMessage> videoInteractionMessageList) {
         // 发起请求
-        if (videoPrivateClient.likeBatch(videoLikeBatchRequest).isError()) {
+        if (videoPrivateClient.likeBatch(createInteractionBatchRequest(videoInteractionMessageList)).isError()) {
+            throw new RuntimeException();
+        }
+    }
+
+    @RabbitListener(queuesToDeclare = @Queue(name = "video.favorite.queue"), containerFactory = "batchContainerFactory")
+    public void handleVideoFavoriteMessage(List<VideoInteractionMessage> videoInteractionMessageList) {
+        // 发起请求
+        if (videoPrivateClient.favoriteBatch(createInteractionBatchRequest(videoInteractionMessageList)).isError()) {
             throw new RuntimeException();
         }
     }

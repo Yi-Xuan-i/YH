@@ -7,15 +7,15 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class VideoLikeMessage {
+public class VideoInteractionMessage {
 
     Long userId;
     Long videoId;
     Status status;
 
     public enum Status {
-        LIKE(1),
-        UNLIKE(-1);
+        FRONT(1),
+        BACK(-1);
 
         private final int value;
 
