@@ -12,6 +12,7 @@ import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,8 +27,11 @@ public class AuthServiceImpl implements AuthService {
     private JwtUtils jwtUtils;
     @Autowired
     private SnowflakeUtils snowflakeUtils;
+    @Autowired
+    private UserPreferencesServiceImpl userPreferencesServiceImpl;
 
     @Override
+    @Transactional
     public void register(RegisterRequest registerRequest) throws BadRequestException {
         /* 手机号唯一性检测 */
         if (userMapper.selectIsPhoneNumberExist(registerRequest.getPhoneNumber())) {
@@ -39,6 +43,9 @@ public class AuthServiceImpl implements AuthService {
         user.setName("路人甲");
         user.setEncodedPassword(passwordEncoder.encode(registerRequest.getPassword()));
         userMapper.insertToRegister(user);
+
+        // 初始化用户偏好向量
+        userPreferencesServiceImpl.initUserPreferences(user.getId());
     }
 
     @Override
