@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.List;
 
 public interface LiveProductService {
-    PostLiveProductResponse postLiveProduct(PostLiveProductRequest postLiveProductRequest) throws IOException;
+    PostLiveProductResponse postLiveProduct(Long userId, PostLiveProductRequest postLiveProductRequest) throws IOException;
 
     List<GetLiveProductResponse> getRoomLiveProduct(Long roomId);
 

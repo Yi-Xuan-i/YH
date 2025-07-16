@@ -1,6 +1,7 @@
 package com.yixuan.yh.live.controller;
 
 import com.yixuan.yh.common.response.Result;
+import com.yixuan.yh.common.utils.UserContext;
 import com.yixuan.yh.live.request.PostLiveProductRequest;
 import com.yixuan.yh.live.response.GetLiveProductResponse;
 import com.yixuan.yh.live.response.PostLiveProductResponse;
@@ -20,7 +21,7 @@ public class LiveProductController {
 
     @PostMapping
     public Result<PostLiveProductResponse> postLiveProduct(@ModelAttribute PostLiveProductRequest postLiveProductRequest) throws IOException {
-        return Result.success(liveProductService.postLiveProduct(postLiveProductRequest));
+        return Result.success(liveProductService.postLiveProduct(UserContext.getUser(), postLiveProductRequest));
     }
 
     @GetMapping("/room/{roomId}")

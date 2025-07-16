@@ -20,7 +20,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         // 使用RabbitMQ作为外部Broker
         registry.enableStompBrokerRelay("/topic")
-                .setRelayHost("47.121.24.225")
+                .setRelayHost("106.13.105.230")
                 .setRelayPort(61613) // RabbitMQ STOMP端口
                 .setSystemLogin("guest")
                 .setSystemPasscode("guest")
