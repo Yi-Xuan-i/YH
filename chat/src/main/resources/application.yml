@@ -1,0 +1,113 @@
+server:
+  port: 10093
+  servlet:
+    context-path: /chat
+  tomcat:
+    threads:
+      max: 5
+      min-spare: 2
+    max-connections: 50
+
+spring:
+  mvc:
+    servlet:
+      path: /api
+  application:
+    name: chatService
+  profiles:
+    active: dev
+  cloud:
+    nacos:
+      username: nacos
+      password: nacos
+      server-addr: 106.13.105.230:8848
+    #      discovery:
+    #        ip: 10.96.51.199
+    #        network-interface: wireless_32768
+    openfeign:
+      httpclient:
+        enabled: true # 开启 Feign 对 httpClient 的支持
+#    loadbalancer:
+#      nacos:
+#        enabled: true
+    sentinel:
+      transport:
+        dashboard: localhost:8080
+      datasource:
+        flow:
+          nacos:
+            server-addr: 106.13.105.230:8848
+            data-id: rule
+            group-id: DEFAULT_GROUP
+            rule-type: flow
+  elasticsearch:
+    uris: http://110.41.182.125:9200
+    socket-keep-alive: true
+  datasource:
+    url: jdbc:mysql://110.41.182.125/new_yh
+    username: root
+    password: wisdom123456789
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      test-while-idle: true
+      validation-query: select 1
+      time-between-eviction-runs-millis: 20000
+  servlet:
+    multipart:
+      max-file-size: 5000MB
+      max-request-size: 7000MB
+#      enabled: false
+  rabbitmq:
+    host: 106.13.105.230
+    port: 5672
+    virtual-host: /
+    username: guest
+    password: guest
+
+#mybatis:
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#    map-underscore-to-camel-case: true # 开启驼峰命名自动映射
+mybatis-plus:
+  type-aliases-package: com.yixuan.yh.chat.pojo
+  mapper-locations: "classpath*:/com/yixuan/yh/**/mapper/*.xml"
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: assign_id # id 为雪花算法生成
+      update-strategy: not_null
+
+logging:
+  level:
+    org.springframework.jdbc.support.JdbcTransactionManager: debug
+
+seata:
+  registry:
+    type: nacos
+    nacos:
+      server-addr: 106.13.105.230:8848
+      namespace: ""
+      group: DEFAULT_GROUP
+      application: seataServer
+      username: nacos
+      password: nacos
+  data-source-proxy-mode: AT
+  tx-service-group: yx # 事务组名称
+  service:
+    vgroup-mapping: # 事务组与tc集群的映射关系
+      yx: "default"
+
+mt:
+  console-url: http://127.0.0.1:19998
+  core-url: http://127.0.0.1:19999
+  bucket-name: video
+  username: mt
+  password: mt
+
+
+jwt:
+  sign-key: yxyyxhyh
