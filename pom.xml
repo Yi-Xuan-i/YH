@@ -19,5 +19,6 @@
         <module>order</module>
         <module>live</module>
         <module>ai</module>
+        <module>chat</module>
     </modules>
 </project>
