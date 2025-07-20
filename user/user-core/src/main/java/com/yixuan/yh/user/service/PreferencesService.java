@@ -1,6 +1,6 @@
 package com.yixuan.yh.user.service;
 
-public interface UserPreferencesService {
+public interface PreferencesService {
 
     void initUserPreferences(Long userId);
 

@@ -2,12 +2,13 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.yixuan.yh.user.mapper.UserFollowMapper">
+<mapper namespace="com.yixuan.yh.user.mapper.FollowMapper">
 
     <select id="selectFollowStatusBatch" resultType="java.lang.Boolean">
         select count(*) from user_follow where follower_id = #{followerId} and followee_id in
             <foreach collection="followeeIdList" open="(" close=")" separator="," item="followeeId">
                 #{followeeId}
             </foreach>
+        order by followee_id;
     </select>
 </mapper>

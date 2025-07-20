@@ -1,11 +1,12 @@
 package com.yixuan.yh.user.service.impl;
 
 import com.yixuan.yh.common.utils.SnowflakeUtils;
-import com.yixuan.yh.user.mapper.UserFollowMapper;
-import com.yixuan.yh.user.mapper.UserFriendMapper;
+import com.yixuan.yh.user.mapper.FollowMapper;
+import com.yixuan.yh.user.mapper.FriendMapper;
 import com.yixuan.yh.user.pojo.entity.UserFollow;
 import com.yixuan.yh.user.pojo.entity.UserFriend;
-import com.yixuan.yh.user.service.UserFollowService;
+import com.yixuan.yh.user.pojo.response.UserFriendResponse;
+import com.yixuan.yh.user.service.FollowService;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,14 +16,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-public class UserFollowServiceImpl implements UserFollowService {
+public class FollowServiceImpl implements FollowService {
 
     @Autowired
-    private UserFollowMapper userFollowMapper;
+    private FollowMapper followMapper;
     @Autowired
     private SnowflakeUtils snowflakeUtils;
     @Autowired
-    private UserFriendMapper userFriendMapper;
+    private FriendMapper friendMapper;
 
     @Override
     @Transactional
@@ -39,12 +40,12 @@ public class UserFollowServiceImpl implements UserFollowService {
         userFollow.setCreatedTime(LocalDateTime.now());
 
         // 如果已经插入则忽略
-        if (!userFollowMapper.insertIgnore(userFollow)) {
+        if (!followMapper.insertIgnore(userFollow)) {
             return;
         }
 
         // 查询是否有反向关系
-        if (!userFollowMapper.selectIsRelationExist(followeeId, followerId)) {
+        if (!followMapper.selectIsRelationExist(followeeId, followerId)) {
             return;
         }
 
@@ -54,7 +55,7 @@ public class UserFollowServiceImpl implements UserFollowService {
         userFriend.setUserId(followerId);
         userFriend.setFriendId(followeeId);
         userFriend.setCreatedTime(LocalDateTime.now());
-        userFriendMapper.insertEach(userFriend);
+        friendMapper.insertEach(userFriend);
 
 //        // 保存异步消息
 //        UserNewFriendMessage userNewFriendMessage = new UserNewFriendMessage();
@@ -69,22 +70,28 @@ public class UserFollowServiceImpl implements UserFollowService {
     @Transactional
     public void unfollow(Long followerId, Long followeeId) {
         // 尝试删除关注记录
-        if (!userFollowMapper.deleteByFollowerIdAndFolloweeId(followerId, followeeId)) {
+        if (!followMapper.deleteByFollowerIdAndFolloweeId(followerId, followeeId)) {
             return;
         }
 
         // 查询是否有反向关系
-        if (!userFollowMapper.selectIsRelationExist(followeeId, followerId)) {
+        if (!followMapper.selectIsRelationExist(followeeId, followerId)) {
             return;
         }
 
         // 有反向关系，删除好友记录
-        userFriendMapper.deleteByFollowerIdAndFolloweeId(followerId, followeeId);
+        friendMapper.deleteByFollowerIdAndFolloweeId(followerId, followeeId);
     }
 
     @Override
     public List<Boolean> getFollowStatus(Long followerId, List<Long> followeeIdList) {
-        return userFollowMapper.selectFollowStatusBatch(followerId, followeeIdList);
+        return followMapper.selectFollowStatusBatch(followerId, followeeIdList);
+    }
+
+    @Override
+    public List<UserFriendResponse> getFriends(Long user) {
+//        return FollowMapStruct.INSTANCE.toUserFriendResponse()
+        return null;
     }
 
 

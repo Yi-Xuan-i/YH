@@ -6,7 +6,7 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
-public interface UserFriendMapper {
+public interface FriendMapper {
     @Insert("insert ignore into user_friend (id, user_id, friend_id, created_time) values (#{id}, #{userId}, #{friendId}, #{createdTime}), (#{id}, #{friendId}, #{userId}, #{createdTime})")
     boolean insertEach(UserFriend userFriend);
 

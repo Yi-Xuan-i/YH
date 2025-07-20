@@ -9,7 +9,7 @@ import org.apache.ibatis.annotations.Select;
 import java.util.List;
 
 @Mapper
-public interface UserFollowMapper {
+public interface FollowMapper {
     @Insert("insert ignore user_follow (id, follower_id, followee_id, created_time) values(#{id}, #{followerId}, #{followeeId}, #{createdTime})")
     boolean insertIgnore(UserFollow userFollow);
 

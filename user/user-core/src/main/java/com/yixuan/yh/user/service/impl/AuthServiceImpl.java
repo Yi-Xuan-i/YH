@@ -28,7 +28,7 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     private SnowflakeUtils snowflakeUtils;
     @Autowired
-    private UserPreferencesServiceImpl userPreferencesServiceImpl;
+    private PreferencesServiceImpl preferencesServiceImpl;
 
     @Override
     @Transactional
@@ -45,7 +45,7 @@ public class AuthServiceImpl implements AuthService {
         userMapper.insertToRegister(user);
 
         // 初始化用户偏好向量
-        userPreferencesServiceImpl.initUserPreferences(user.getId());
+        preferencesServiceImpl.initUserPreferences(user.getId());
     }
 
     @Override

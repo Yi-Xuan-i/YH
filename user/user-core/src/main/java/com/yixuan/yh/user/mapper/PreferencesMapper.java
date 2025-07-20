@@ -6,7 +6,7 @@ import org.apache.ibatis.annotations.*;
 import java.util.List;
 
 @Mapper
-public interface UserPreferencesMapper {
+public interface PreferencesMapper {
     @Select("select video_pref_vector from user_preferences where user_id = #{userId}")
     List<byte[]> selectVideoPrefVectorByUserId(Long userId);
 

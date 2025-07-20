@@ -8,6 +8,8 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
+import java.util.List;
+
 @Mapper
 public interface UserMapper {
     @Insert("insert into user (id, phone_number, name, encoded_password) values (#{id}, #{phoneNumber}, #{name}, #{encodedPassword})")
@@ -33,4 +35,6 @@ public interface UserMapper {
 
     @Select("select name from user where id = #{id}")
     String selectNameById(String id);
+
+    List<User> selectUserInfoInList(List<Long> idList);
 }

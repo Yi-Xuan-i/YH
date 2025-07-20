@@ -1,19 +1,19 @@
 package com.yixuan.yh.user.service.impl;
 
 import com.yixuan.yh.common.utils.SnowflakeUtils;
-import com.yixuan.yh.user.mapper.UserPreferencesMapper;
+import com.yixuan.yh.user.mapper.PreferencesMapper;
 import com.yixuan.yh.user.pojo.entity.UserPreferences;
-import com.yixuan.yh.user.service.UserPreferencesService;
+import com.yixuan.yh.user.service.PreferencesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.nio.ByteBuffer;
 
 @Service
-public class UserPreferencesServiceImpl implements UserPreferencesService {
+public class PreferencesServiceImpl implements PreferencesService {
 
     @Autowired
-    private UserPreferencesMapper userPreferencesMapper;
+    private PreferencesMapper preferencesMapper;
     @Autowired
     private SnowflakeUtils snowflakeUtils;
 
@@ -25,12 +25,12 @@ public class UserPreferencesServiceImpl implements UserPreferencesService {
         byte[] vector = new byte[800];
         userPreferences.setVideoPrefVector(vector);
 
-        userPreferencesMapper.insert(userPreferences);
+        preferencesMapper.insert(userPreferences);
     }
 
     @Override
     public float[] getUserVideoPreferences(Long userId) {
-        byte[] preferencesBytes = userPreferencesMapper.selectVideoPrefVectorByUserId(userId).get(0);
+        byte[] preferencesBytes = preferencesMapper.selectVideoPrefVectorByUserId(userId).get(0);
         ByteBuffer buffer = ByteBuffer.wrap(preferencesBytes);
         float[] vector = new float[200];
         for (int i = 0; i < 200; i++) {
