@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yixuan.yh.chat.mapper.ChatMessageMapper">
+    <select id="selectByConversationId" resultType="com.yixuan.yh.chat.entity.ChatMessage">
+        select id, conversation_id, sender_id, content, content_type, created_time
+        from chat_message
+        <where>
+            conversation_id = #{conversationId}
+            <if test="lastMinId != null">
+                and id &lt; #{lastMinId}
+            </if>
+        </where>
+        order by id desc
+        LIMIT 10
+    </select>
+</mapper>

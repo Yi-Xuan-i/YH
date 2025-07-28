@@ -9,5 +9,5 @@ import java.util.List;
 public interface ConversationService {
     List<RecentContactResponse> getRecentContacts(Long userId);
 
-    List<ConversationMessageResponse> getConversationMessages(Long userId, Long conversationId) throws BadRequestException;
+    List<ConversationMessageResponse> getConversationMessages(Long userId, Long conversationId, Long lastMinId) throws BadRequestException;
 }

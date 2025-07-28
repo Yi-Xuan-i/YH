@@ -63,14 +63,14 @@ public class ConversationServiceImpl implements ConversationService {
     }
 
     @Override
-    public List<ConversationMessageResponse> getConversationMessages(Long userId, Long conversationId) throws BadRequestException {
+    public List<ConversationMessageResponse> getConversationMessages(Long userId, Long conversationId, Long lastMinId) throws BadRequestException {
         // 鉴权
         ChatConversation conversation = chatConversationMapper.selectBothIdById(conversationId);
         if (!(userId.equals(conversation.getUser1Id()) || userId.equals(conversation.getUser2Id()))) {
             throw new BadRequestException("你没有权限！");
         }
 
-        List<ChatMessage> chatMessageList = chatMessageMapper.selectByConversationId(conversationId);
+        List<ChatMessage> chatMessageList = chatMessageMapper.selectByConversationId(conversationId, lastMinId);
 
         List<ConversationMessageResponse> conversationMessageResponseList = new ArrayList<>(chatMessageList.size());
         for (ChatMessage chatMessage : chatMessageList) {
