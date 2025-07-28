@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class ChatReceiveMessage {
+    Long conversationId;
     Long senderId;
     String content;
     LocalDateTime sentTime;

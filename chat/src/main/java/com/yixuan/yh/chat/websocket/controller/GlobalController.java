@@ -68,10 +68,10 @@ public class GlobalController {
 
         // 发送消息
         ChatReceiveMessage receiveMessage = new ChatReceiveMessage();
+        receiveMessage.setConversationId(sendMessage.getConversationId());
         receiveMessage.setSenderId(senderId);
         receiveMessage.setContent(sendMessage.getContent());
         receiveMessage.setSentTime(LocalDateTime.now());
-
-        simpMessagingTemplate.convertAndSend("/queue/user" + "-" + receiverId, receiveMessage);
+        simpMessagingTemplate.convertAndSend("/queue/user." + receiverId, receiveMessage);
     }
 }

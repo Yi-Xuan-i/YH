@@ -5,6 +5,7 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -15,18 +16,19 @@ public class UserSubscriptionInterceptor implements ChannelInterceptor {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
 
         if (StompCommand.SUBSCRIBE.equals(accessor.getCommand())) {
-            // 获取用户ID
             Long userId = (Long) accessor.getSessionAttributes().get("id");
             if (userId != null) {
                 String originalDestination = accessor.getDestination();
+                if (originalDestination != null && originalDestination.startsWith("/queue/user")) {
+                    // 修改目标路径
+                    String newDestination = originalDestination + "." + userId;
+                    accessor.setDestination(newDestination);
 
-                // 根据订阅路径决定是否添加用户ID
-                if ("/queue/user".equals(originalDestination)) {
-                    accessor.setDestination(originalDestination + "-" + userId);
+                    // 创建包含新头信息的新消息
+                    return MessageBuilder.createMessage(message.getPayload(), accessor.getMessageHeaders());
                 }
             }
         }
-
         return message;
     }
 }
