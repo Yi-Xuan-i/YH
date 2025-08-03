@@ -55,8 +55,8 @@ public class FavoriteInteraction extends InteractionTemplate {
         videoUserFavorite.setVideoId(videoId);
         videoUserFavorite.setStatus(status);
         videoUserFavoriteMapper.insert(videoUserFavorite);
-        // 保存到Redis
-        stringRedisTemplate.opsForHash().put(RedisConstant.VIDEO_USER_FAVORITE_KEY_PREFIX + userId, videoId.toString(), status.equals(InteractionStatus.FRONT) ? "1" : "0");
+        // 删除缓存
+        stringRedisTemplate.opsForHash().delete(RedisConstant.VIDEO_USER_FAVORITE_KEY_PREFIX + userId, videoId.toString());
     }
 
     @Override
