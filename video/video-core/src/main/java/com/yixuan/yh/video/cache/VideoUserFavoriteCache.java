@@ -15,7 +15,7 @@ public class VideoUserFavoriteCache {
     @Autowired
     private VideoUserFavoriteMapper videoUserFavoriteMapper;
 
-    public boolean isFavorite(Long userId, Long videoId, InteractionStatus legalStatus) {
+    public boolean isFavorite(Long userId, Long videoId) {
         String key = RedisConstant.VIDEO_USER_FAVORITE_KEY_PREFIX + userId;
         String strResult = (String) stringRedisTemplate.opsForHash().get(key, videoId.toString());
         int result;

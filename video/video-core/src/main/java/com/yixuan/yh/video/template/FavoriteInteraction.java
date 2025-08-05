@@ -41,11 +41,9 @@ public class FavoriteInteraction extends InteractionTemplate {
 
     @Override
     protected void tryInteract(Long userId, Long videoId, InteractionStatus status) throws Exception {
-        InteractionStatus legalStatus = status.equals(InteractionStatus.FRONT) ? InteractionStatus.BACK : InteractionStatus.FRONT;
-
         // 判断当前操作是否合法
-        if (!((status.equals(InteractionStatus.FRONT) && !videoUserFavoriteCache.isFavorite(userId, videoId, legalStatus)) ||
-                (status.equals(InteractionStatus.BACK) && videoUserFavoriteCache.isFavorite(userId, videoId, legalStatus)))) {
+        if (!((status.equals(InteractionStatus.FRONT) && !videoUserFavoriteCache.isFavorite(userId, videoId)) ||
+                (status.equals(InteractionStatus.BACK) && videoUserFavoriteCache.isFavorite(userId, videoId)))) {
             throw new Exception("异常操作！");
         }
         // 保存到数据库

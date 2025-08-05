@@ -15,16 +15,13 @@ public class VideoUserLikeCache {
     @Autowired
     private VideoUserLikeMapper videoUserLikeMapper;
 
-    public boolean isLike(Long userId, Long videoId, InteractionStatus legalStatus) {
+    public boolean isLike(Long userId, Long videoId) {
         String key = RedisConstant.VIDEO_USER_LIKE_KEY_PREFIX + userId;
         String strResult = (String) stringRedisTemplate.opsForHash().get(key, videoId.toString());
         int result;
         if (strResult == null) {
             result = videoUserLikeMapper.isLike(userId, videoId) ? 1 : 0;
-            // 如果当前操作不合法才进行缓存，因为如果合法后续修改点赞状态会进行缓存
-            if (!((result == 1 && legalStatus.equals(InteractionStatus.FRONT)) || (result == 0 && legalStatus.equals(InteractionStatus.BACK)))) {
-                stringRedisTemplate.opsForHash().put(key, videoId.toString(), String.valueOf(result));
-            }
+            stringRedisTemplate.opsForHash().put(key, videoId.toString(), String.valueOf(result));
         } else {
             result = Integer.parseInt(strResult);
         }

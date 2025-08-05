@@ -44,8 +44,8 @@ public class LikeInteraction extends InteractionTemplate {
         InteractionStatus legalStatus = status.equals(InteractionStatus.FRONT) ? InteractionStatus.BACK : InteractionStatus.FRONT;
 
         // 判断当前操作是否合法
-        if (!((status.equals(InteractionStatus.FRONT) && !videoUserLikeCache.isLike(userId, videoId, legalStatus)) ||
-                (status.equals(InteractionStatus.BACK) && videoUserLikeCache.isLike(userId, videoId, legalStatus)))) {
+        if (!((status.equals(InteractionStatus.FRONT) && !videoUserLikeCache.isLike(userId, videoId)) ||
+                (status.equals(InteractionStatus.BACK) && videoUserLikeCache.isLike(userId, videoId)))) {
             throw new Exception("异常操作！");
         }
         // 保存到数据库
@@ -55,8 +55,8 @@ public class LikeInteraction extends InteractionTemplate {
         videoUserLike.setVideoId(videoId);
         videoUserLike.setStatus(status);
         videoUserLikeMapper.insert(videoUserLike);
-        // 保存到Redis
-        stringRedisTemplate.opsForHash().put(RedisConstant.VIDEO_USER_LIKE_KEY_PREFIX + userId, videoId.toString(),  status.equals(InteractionStatus.FRONT) ? "1" : "0");
+        // 删除缓存
+        stringRedisTemplate.opsForHash().delete(RedisConstant.VIDEO_USER_LIKE_KEY_PREFIX + userId, videoId.toString());
     }
 
     @Override
