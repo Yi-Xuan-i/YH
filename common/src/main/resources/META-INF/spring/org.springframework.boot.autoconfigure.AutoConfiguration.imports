@@ -1,4 +1,6 @@
 com.yixuan.yh.common.config.CommonConfig
+com.yixuan.yh.common.config.JacksonConfig
 com.yixuan.yh.common.utils.JwtUtils
+com.yixuan.yh.common.utils.MinioUtils
 com.yixuan.yh.common.utils.SnowflakeUtils
 com.yixuan.yh.common.exception.GlobalExceptionHandler
