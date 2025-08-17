@@ -1,5 +1,6 @@
 package com.yixuan.yh.common.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -38,6 +39,7 @@ public class Result<E> {
         return new Result<E>(0, msg, null);
     }
 
+    @JsonIgnore
     public boolean isError() {
         return code.equals(0);
     }
