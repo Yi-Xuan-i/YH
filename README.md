@@ -108,9 +108,9 @@ pie
 3. 支持**多语言**国际化版本
 
 ## 📷 前端页面展示
-<div align="https://gitee.com/YXXHYH/yh-be/raw/master/file/home.png">
+<div align="center">
   <!-- 首页 -->
-  <img src="images/home.png" alt="首页" />
+  <img src="https://gitee.com/YXXHYH/yh-be/raw/master/file/home.png" alt="首页" width="600" />
 </div>
 
 ---
