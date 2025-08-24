@@ -1,6 +1,6 @@
 # <div align="center">YH - 智能短视频平台</div>
 <div align="center">
-![输入图片说明](file/bef26713-3862-4437-b331-dfeede455b04.png)
+<img src="https://gitee.com/YXXHYH/yh-be/raw/master/file/bef26713-3862-4437-b331-dfeede455b04.png" alt="YH-Logo" width="50" height="50" />
 </div>
 
 ## 🌟 项目概述
