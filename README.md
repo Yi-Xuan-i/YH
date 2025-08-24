@@ -110,7 +110,10 @@ pie
 ## 📷 前端页面展示
 <div align="center">
   <!-- 首页 -->
-  <img src="https://gitee.com/YXXHYH/yh-be/raw/master/file/home.png" alt="首页" width="600" />
+  <img src="https://gitee.com/YXXHYH/yh-be/raw/master/file/home.png" alt="首页" width="700" />
+
+  <!-- 直播 -->
+  <img src="https://gitee.com/YXXHYH/yh-be/raw/master/file/live-anchor.png" alt="直播" width="700" />
 </div>
 
 ---
