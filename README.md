@@ -107,6 +107,12 @@ pie
 2. 集成**TinyVue**实现LLM控制Web组件
 3. 支持**多语言**国际化版本
 
+## 📷 前端页面展示
+<div align="https://gitee.com/YXXHYH/yh-be/raw/master/file/home.png">
+  <!-- 首页 -->
+  <img src="images/home.png" alt="首页" />
+</div>
+
 ---
 - 前端：https://gitee.com/YXXHYH/yh-fe
 - 管理后台：https://gitee.com/YXXHYH/yh-admin-fe
