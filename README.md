@@ -1,6 +1,6 @@
 # <div align="center">YH - 智能短视频平台</div>
 <div align="center">
-<img src="https://gitee.com/YXXHYH/yh-be/raw/master/file/bef26713-3862-4437-b331-dfeede455b04.png" alt="YH-Logo" width="50" height="50" />
+<img src="https://gitee.com/YXXHYH/yh-be/raw/master/file/yh.png" alt="YH-Logo" width="50" height="50" />
 </div>
 
 ## 🌟 项目概述
@@ -114,6 +114,18 @@ pie
 
   <!-- 直播 -->
   <img src="https://gitee.com/YXXHYH/yh-be/raw/master/file/live-anchor.png" alt="直播" width="700" />
+
+  <!-- 创作者平台 -->
+  <img src="https://gitee.com/YXXHYH/yh-be/raw/master/file/creator.png" alt="创作者平台" width="700" />
+
+  <!-- AI文字聊天 -->
+  <img src="https://gitee.com/YXXHYH/yh-be/raw/master/file/ai.png" alt="AI文字聊天" width="700" />
+
+  <!-- AI语音聊天 -->
+  <img src="https://gitee.com/YXXHYH/yh-be/raw/master/file/voice-chat.png" alt="AI语音聊天" width="700" />
+
+  <!-- 商品详情 -->
+  <img src="https://gitee.com/YXXHYH/yh-be/raw/master/file/product-detail.png" alt="商品详情" width="700" />  
 </div>
 
 ---
