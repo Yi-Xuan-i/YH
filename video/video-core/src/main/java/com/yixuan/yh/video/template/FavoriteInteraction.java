@@ -6,14 +6,10 @@ import com.yixuan.yh.video.mq.VideoInteractionMessage;
 import com.yixuan.yh.video.pojo._enum.InteractionStatus;
 import com.yixuan.yh.video.cache.VideoUserFavoriteCache;
 import com.yixuan.yh.video.constant.RabbitMQConstant;
-import com.yixuan.yh.video.constant.RedisConstant;
-import com.yixuan.yh.video.pojo.entity.VideoUserFavorite;
 import org.redisson.api.RedissonClient;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
-
-import java.util.concurrent.locks.Lock;
 
 @Component
 public class FavoriteInteraction extends InteractionTemplate {
@@ -35,26 +31,12 @@ public class FavoriteInteraction extends InteractionTemplate {
     }
 
     @Override
-    protected Lock getLock(Long userId) {
-        return redissonClient.getLock(RedisConstant.VIDEO_FAVORITE_LOCK_KEY_PREFIX + userId);
-    }
-
-    @Override
     protected void tryInteract(Long userId, Long videoId, InteractionStatus status) throws Exception {
         // 判断当前操作是否合法
-        if (!((status.equals(InteractionStatus.FRONT) && !videoUserFavoriteCache.isFavorite(userId, videoId)) ||
-                (status.equals(InteractionStatus.BACK) && videoUserFavoriteCache.isFavorite(userId, videoId)))) {
+        if (!((status.equals(InteractionStatus.FRONT) && videoUserFavoriteCache.tryFavorite(userId, videoId)) ||
+                (status.equals(InteractionStatus.BACK) && videoUserFavoriteCache.tryUnFavorite(userId, videoId)))) {
             throw new Exception("异常操作！");
         }
-        // 保存到数据库
-        VideoUserFavorite videoUserFavorite = new VideoUserFavorite();
-        videoUserFavorite.setId(snowflakeUtils.nextId());
-        videoUserFavorite.setUserId(userId);
-        videoUserFavorite.setVideoId(videoId);
-        videoUserFavorite.setStatus(status);
-        videoUserFavoriteMapper.insert(videoUserFavorite);
-        // 删除缓存
-        stringRedisTemplate.opsForHash().delete(RedisConstant.VIDEO_USER_FAVORITE_KEY_PREFIX + userId, videoId.toString());
     }
 
     @Override
