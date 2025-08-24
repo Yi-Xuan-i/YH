@@ -1,6 +1,6 @@
 # <div align="center">YH - 智能短视频平台</div>
 <div align="center">
-<img src="http://47.121.24.225:19999/resource/YH.png" alt="YH-Logo" width="50" height="50" />
+![输入图片说明](.filebef26713-3862-4437-b331-dfeede455b04.png)
 </div>
 
 ## 🌟 项目概述
