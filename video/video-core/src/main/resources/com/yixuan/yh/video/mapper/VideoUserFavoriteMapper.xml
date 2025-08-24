@@ -10,4 +10,14 @@
         on duplicate key update
             status = values(status)
     </insert>
+
+    <insert id="insertBatch">
+        insert into video_user_favorite (id, user_id, video_id, status) values
+        <foreach collection="videoUserFavoriteList" item="videoUserFavorite" separator=",">
+            (#{videoUserFavorite.id}, #{videoUserFavorite.userId}, #{videoUserFavorite.videoId}, #{videoUserFavorite.status})
+        </foreach>
+        on duplicate key update
+        status = values(status)
+
+    </insert>
 </mapper>
