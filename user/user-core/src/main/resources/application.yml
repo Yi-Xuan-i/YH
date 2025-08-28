@@ -50,7 +50,10 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     type: com.alibaba.druid.pool.DruidDataSource
     druid:
+      keep-alive: true
       test-while-idle: true
+      initial-size: 1
+      min-idle: 1
       validation-query: select 1
       time-between-eviction-runs-millis: 20000
   servlet:

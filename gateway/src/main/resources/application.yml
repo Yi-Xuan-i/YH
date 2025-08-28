@@ -15,11 +15,9 @@ spring:
       password: nacos
       server-addr: 106.13.105.230:8848
   config:
-    import: nacos:gateway-dev.yaml?group=DEFAULT_GROUP&refreshEnabled=true
-
-jwt:
-  sign-key: yxyyxhyh
-  expire: 66666666
+    import:
+      - nacos:gateway-dev.yaml?group=DEFAULT_GROUP&refreshEnabled=true
+      - nacos:common-dev.yaml?group=DEFAULT_GROUP&refreshEnabled=true
 
 logging:
   level:

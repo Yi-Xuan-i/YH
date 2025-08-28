@@ -36,16 +36,9 @@ spring:
     #    loadbalancer:
     #      nacos:
     #        enabled: true
-    sentinel:
-      transport:
-        dashboard: localhost:8080
-      datasource:
-        flow:
-          nacos:
-            server-addr: 110.41.182.125:8848
-            data-id: rule
-            group-id: DEFAULT_GROUP
-            rule-type: flow
+  config:
+    import:
+      - nacos:common-dev.yaml?group=DEFAULT_GROUP&refreshEnabled=true
   r2dbc:
     url: r2dbc:mysql://110.41.182.125:3306/new_yh
     username: root
@@ -56,21 +49,6 @@ spring:
       max-size: 5
       validation-query: SELECT 1
       max-idle-time: 30000
-  data:
-    redis:
-      host: 47.121.24.225
-      port: 6379
-      password: qq2434462503
-#  datasource:
-#    url: jdbc:mysql://110.41.182.125/new_yh
-#    username: root
-#    password: wisdom123456789
-#    driver-class-name: com.mysql.cj.jdbc.Driver
-#    type: com.alibaba.druid.pool.DruidDataSource
-#    druid:
-#      test-while-idle: true
-#      validation-query: select 1
-#      time-between-eviction-runs-millis: 20000
   servlet:
     multipart:
       max-file-size: 5MB
@@ -118,29 +96,3 @@ logging:
 #    org.springframework.web.reactive: debug
     org.springframework.r2dbc: debug
     org.springframework.r2dbc.core.DefaultDatabaseClient: trace
-
-#seata:
-#  registry:
-#    type: nacos
-#    nacos:
-#      server-addr: 110.41.182.125:8848
-#      namespace: ""
-#      group: DEFAULT_GROUP
-#      application: seataServer
-#      username: nacos
-#      password: nacos
-#  data-source-proxy-mode: AT
-#  tx-service-group: yx # 事务组名称
-#  service:
-#    vgroup-mapping: # 事务组与tc集群的映射关系
-#      yx: "default"
-jwt:
-  expire: 66666666
-  sign-key: yxyyxhyh
-
-mt:
-  console-url: http://47.121.24.225:19998
-  core-url: http://47.121.24.225:19999
-  bucket-name: ai
-  username: mt
-  password: mt
