@@ -1,6 +1,5 @@
 package com.yixuan.yh.product.service;
 
-import com.yixuan.yh.common.response.Result;
 import com.yixuan.yh.product.pojo.response.PartOfOrderResponse;
 import com.yixuan.yh.product.pojo.response.ProductDetailResponse;
 import com.yixuan.yh.product.pojo.response.ProductSummaryResponse;

@@ -2,7 +2,7 @@ package com.yixuan.yh.product.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yixuan.yh.product.constant.RabbitMQConstant;
-import com.yixuan.yh.product.constant.RedisKeyConstant;
+import com.yixuan.yh.product.constant.RedisConstant;
 import com.yixuan.yh.product.constant.RedisLuaResultConstant;
 import com.yixuan.yh.product.mapper.ProductCarouselMapper;
 import com.yixuan.yh.product.mapper.ProductMapper;
@@ -117,19 +117,22 @@ public class ProductServiceImpl implements ProductService {
         }
 
         // 预占库存
-        String skuStockKey = RedisKeyConstant.SKU_STOCK_KEY_PREFIX + skuId;
+        String skuStockKey = RedisConstant.SKU_STOCK_KEY_PREFIX + skuId;
         Long result = stringRedisTemplate.execute(reserveStockScript, Collections.singletonList(skuStockKey), quantity.toString());
-        if (result == null) {
-            throw new RuntimeException("服务器异常！");
-        }
-        if (result.equals(RedisLuaResultConstant.RESERVE_STOCK_NO_KEY)) {
-            RLock lock = redissonClient.getLock(RedisKeyConstant.SKU_STOCK_LOCK_KEY_PREFIX + skuId);
+        // 对应库存缓存不存在
+        while (result != null && result.equals(RedisLuaResultConstant.RESERVE_STOCK_NO_KEY)) {
+            RLock lock = redissonClient.getLock(RedisConstant.SKU_STOCK_LOCK_KEY_PREFIX + skuId);
             boolean isLock = lock.tryLock(1, TimeUnit.SECONDS);
             if (isLock) {
                 try {
-                    // 从数据库查询库存，并设置到缓存
-                    Integer stock = productSkuMapper.selectStockBySkuId(skuId);
-                    stringRedisTemplate.opsForValue().set(skuStockKey, stock.toString());
+                    // 再次判断缓存是否存在
+                    result = stringRedisTemplate.execute(reserveStockScript, Collections.singletonList(skuStockKey), quantity.toString());
+                    assert result != null;
+                    if (result.equals(RedisLuaResultConstant.RESERVE_STOCK_NO_KEY)) {
+                        // 从数据库查询库存，并设置到缓存
+                        Integer stock = productSkuMapper.selectStockBySkuId(skuId);
+                        stringRedisTemplate.opsForValue().set(skuStockKey, stock.toString());
+                    }
                 } finally {
                     lock.unlock();
                 }
@@ -138,18 +141,18 @@ public class ProductServiceImpl implements ProductService {
             }
             // 重新执行预占库存
             result = stringRedisTemplate.execute(reserveStockScript, Collections.singletonList(skuStockKey), quantity.toString());
-            if (result == null) {
-                throw new RuntimeException("服务器异常！");
-            }
         }
+        // 库存不足
+        assert result != null;
         if (result.equals(RedisLuaResultConstant.RESERVE_STOCK_ERROR)) {
             throw new BadRequestException("库存不足！");
         }
 
+        // 此处可以无需写入本地信息表（因为如果数据库事务回滚了，后续可以在消费前先判断orderId是否存在，存在才去处理）
         try {
             Message message = MessageBuilder
                     .withBody(objectMapper.writeValueAsBytes(new OrderExpirationMessage(orderId, skuId, quantity)))
-                    .setHeader("x-delay", 1000 * 60 * 15)
+                    .setHeader("x-delay", 1000 * 60 * 2)
                     .build();
             rabbitTemplate.convertAndSend(RabbitMQConstant.ORDER_DELAY_EXCHANGE, RabbitMQConstant.ORDER_DELAY_QUEUE_KEY, message);
         } catch (Exception e) {
@@ -169,6 +172,6 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void putReservedStock(Long skuId, Integer quantity) {
-        stringRedisTemplate.opsForValue().increment(RedisKeyConstant.SKU_STOCK_KEY_PREFIX + skuId, quantity);
+        stringRedisTemplate.opsForValue().increment(RedisConstant.SKU_STOCK_KEY_PREFIX + skuId, quantity);
     }
 }
