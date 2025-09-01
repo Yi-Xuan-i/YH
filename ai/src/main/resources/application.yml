@@ -39,39 +39,11 @@ spring:
   config:
     import:
       - nacos:common-dev.yaml?group=DEFAULT_GROUP&refreshEnabled=true
-  r2dbc:
-    url: r2dbc:mysql://110.41.182.125:3306/new_yh
-    username: root
-    password: wisdom123456789
-    pool:
-      enabled: true
-      initial-size: 1
-      max-size: 5
-      validation-query: SELECT 1
-      max-idle-time: 30000
+      - nacos:ai-dev.yaml?group=DEFAULT_GROUP&refreshEnabled=true
   servlet:
     multipart:
       max-file-size: 5MB
       max-request-size: 10MB
-
-  ai:
-    openai:
-      api-key: b09d15b8-25ef-44e1-99d4-8e367939dd95
-      base-url: https://ark.cn-beijing.volces.com/api/v3/
-      chat:
-        options:
-          model: deepseek-r1-250528
-          temperature: 0.8
-        completions-path: /chat/completions
-    mcp:
-      client:
-        type: ASYNC
-        sse:
-          connections:
-            server1:
-              url: http://127.0.0.1:11111/
-        toolcallback:
-          enabled: true
 
 #mybatis:
 #  configuration:

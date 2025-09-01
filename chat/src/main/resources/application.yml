@@ -27,15 +27,13 @@ spring:
   config:
     import:
       - nacos:common-dev.yaml?group=DEFAULT_GROUP&refreshEnabled=true
+      - nacos:chat-dev.yaml?group=DEFAULT_GROUP&refreshEnabled=true
     openfeign:
       httpclient:
         enabled: true # 开启 Feign 对 httpClient 的支持
 #    loadbalancer:
 #      nacos:
 #        enabled: true
-  elasticsearch:
-    uris: http://110.41.182.125:9200
-    socket-keep-alive: true
   servlet:
     multipart:
       max-file-size: 5000MB
