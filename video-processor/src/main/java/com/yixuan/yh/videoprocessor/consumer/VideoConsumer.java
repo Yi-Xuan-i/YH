@@ -1,6 +1,7 @@
 package com.yixuan.yh.videoprocessor.consumer;
 
 import com.yixuan.yh.common.response.Result;
+import com.yixuan.yh.video.feign.InteractionPrivateClient;
 import com.yixuan.yh.video.feign.VideoPrivateClient;
 import com.yixuan.yh.video.pojo.request.VideoInteractionBatchRequest;
 import com.yixuan.yh.videoprocessor.mq.VideoInteractionMessage;
@@ -27,6 +28,8 @@ public class VideoConsumer {
     private RestTemplate restTemplate;
     @Autowired
     private VideoPrivateClient videoPrivateClient;
+    @Autowired
+    private InteractionPrivateClient interactionPrivateClient;
 
     @RabbitListener(queuesToDeclare = @Queue(name = "video.post.queue"))
     public void handleVideoPostMessage(VideoPostMessage videoPostMessage) {
@@ -46,14 +49,17 @@ public class VideoConsumer {
         }
 
         /* 查重成功，则代表视频要变成“上架” */
-        if (result.getData() == null) {
-
+        if (result.isError()) {
+            Result<Void> putVideoStatusResult = videoPrivateClient.putVideoStatusToPublished(videoPostMessage.getVideoId());
+            if (putVideoStatusResult.isError()) {
+                throw new RuntimeException("Video “check duplicate” service error!");
+            }
         }
 
     }
 
     private VideoInteractionBatchRequest createInteractionBatchRequest(List<VideoInteractionMessage> videoInteractionMessageList) {
-        // 计算视频需要增加或减少的点赞数（并转换点赞记录对象）
+        // 计算视频需要增加或减少的点赞数
         Map<Long, Long> videoInteractionNumberMap = new HashMap<>();
         for (VideoInteractionMessage videoInteractionMessage : videoInteractionMessageList) {
             if (!videoInteractionNumberMap.containsKey(videoInteractionMessage.getVideoId())) {
@@ -70,9 +76,20 @@ public class VideoConsumer {
 
             incrList.add(incr);
         }
+        // 构建点赞记录对象
+        List<VideoInteractionBatchRequest.Record> recordList = new ArrayList<>(videoInteractionMessageList.size());
+        for (VideoInteractionMessage videoInteractionMessage :videoInteractionMessageList) {
+            VideoInteractionBatchRequest.Record record = new VideoInteractionBatchRequest.Record();
+            record.setVideoId(videoInteractionMessage.getVideoId());
+            record.setUserId(videoInteractionMessage.getUserId());
+            record.setStatus(videoInteractionMessage.getStatus().getValue() == 1 ? VideoInteractionBatchRequest.Record.Status.LIKE : VideoInteractionBatchRequest.Record.Status.UNLIKE);
+
+            recordList.add(record);
+        }
         // 构建完整对象
         VideoInteractionBatchRequest videoInteractionBatchRequest = new VideoInteractionBatchRequest();
         videoInteractionBatchRequest.setInteractionIncrList(incrList);
+        videoInteractionBatchRequest.setInteractionRecordList(recordList);
 
         return videoInteractionBatchRequest;
     }
@@ -80,7 +97,7 @@ public class VideoConsumer {
     @RabbitListener(queuesToDeclare = @Queue(name = "video.like.queue"), containerFactory = "batchContainerFactory")
     public void handleVideoLikeMessage(List<VideoInteractionMessage> videoInteractionMessageList) {
         // 发起请求
-        if (videoPrivateClient.likeBatch(createInteractionBatchRequest(videoInteractionMessageList)).isError()) {
+        if (interactionPrivateClient.likeBatch(createInteractionBatchRequest(videoInteractionMessageList)).isError()) {
             throw new RuntimeException();
         }
     }
@@ -88,7 +105,7 @@ public class VideoConsumer {
     @RabbitListener(queuesToDeclare = @Queue(name = "video.favorite.queue"), containerFactory = "batchContainerFactory")
     public void handleVideoFavoriteMessage(List<VideoInteractionMessage> videoInteractionMessageList) {
         // 发起请求
-        if (videoPrivateClient.favoriteBatch(createInteractionBatchRequest(videoInteractionMessageList)).isError()) {
+        if (interactionPrivateClient.favoriteBatch(createInteractionBatchRequest(videoInteractionMessageList)).isError()) {
             throw new RuntimeException();
         }
     }
