@@ -25,4 +25,19 @@ public interface VideoMapper {
 
     @Select("select status from video where id = #{id}")
     Video.VideoStatus selectVideoStatusUrlById(Long id);
+
+    @Select("select id, url, cover_url, description, likes, comments, favorites, created_time from video where creator_id = #{userId} and status = 'UPLOADED'")
+    List<Video> selectUploadedVideoByUserId(Long userId);
+
+    @Select("select id, url, cover_url, description, likes, comments, favorites, created_time from video where creator_id = #{userId} and status = 'PUBLISHED'")
+    List<Video> selectPublishedVideoByUserId(Long userId);
+
+    @Select("select id, url, cover_url, description, likes, comments, favorites, created_time from video where creator_id = #{userId} and status = 'PUBLISHED'")
+    List<Video> selectProcessingVideoByUserId(Long userId);
+
+    @Select("select id, url, cover_url, description, likes, comments, favorites, created_time from video where creator_id = #{userId} and status = 'PUBLISHED'")
+    List<Video> selectRejectedVideoByUserId(Long userId);
+
+    @Select("select count(*) from video where id = #{videoId}")
+    boolean selectIsExistById(Long videoId);
 }
