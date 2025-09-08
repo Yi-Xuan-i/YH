@@ -1,7 +1,6 @@
 package com.yixuan.yh.common.exception;
 
 import com.yixuan.yh.common.response.Result;
-import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -16,8 +15,15 @@ import java.util.List;
 public class GlobalExceptionHandler {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(BadRequestException.class)
-    public Result<String> ex(BadRequestException ex) {
+    @ExceptionHandler(YHClientException.class)
+    public Result<String> ex(YHClientException ex) {
+        ex.printStackTrace();
+        return Result.error(ex.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(YHServerException.class)
+    public Result<String> ex(YHServerException ex) {
         ex.printStackTrace();
         return Result.error(ex.getMessage());
     }
