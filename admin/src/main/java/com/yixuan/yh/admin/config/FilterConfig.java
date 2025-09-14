@@ -15,7 +15,7 @@ public class FilterConfig {
     @Bean
     public FilterRegistrationBean<CachingRequestBodyFilter> filterRegistrationBean() {
         FilterRegistrationBean<CachingRequestBodyFilter> filterRegistrationBean = new FilterRegistrationBean<>(cachingRequestBodyFilter);
-        filterRegistrationBean.addUrlPatterns("/api/**");
+        filterRegistrationBean.addUrlPatterns("/*");
         return filterRegistrationBean;
     }
 }

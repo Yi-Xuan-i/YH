@@ -5,7 +5,7 @@
 <mapper namespace="com.yixuan.yh.user.mapper.UserMapper">
 
     <select id="selectUserInfoInList" resultType="com.yixuan.yh.user.pojo.entity.User">
-        select name, avatar_url from user where id in
+        select id, name, avatar_url from user where id in
             <foreach collection="idList" open="(" close=")" separator="," item="id">
                 #{id}
             </foreach>

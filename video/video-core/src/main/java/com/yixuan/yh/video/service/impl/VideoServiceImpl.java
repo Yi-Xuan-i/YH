@@ -6,6 +6,8 @@ import com.yixuan.yh.common.utils.SnowflakeUtils;
 import com.yixuan.yh.user.feign.UserFollowPrivateClient;
 import com.yixuan.yh.user.feign.UserPreferencesPrivateClient;
 import com.yixuan.yh.video.constant.RabbitMQConstant;
+import com.yixuan.yh.video.mapper.VideoUploadTaskMapper;
+import com.yixuan.yh.video.mapstruct.VideoMapStruct;
 import com.yixuan.yh.video.pojo.entity.Video;
 import com.yixuan.yh.video.pojo.entity.VideoTag;
 import com.yixuan.yh.video.mapper.VideoMapper;
@@ -13,9 +15,9 @@ import com.yixuan.yh.video.mapper.VideoTagMapper;
 import com.yixuan.yh.video.mapper.VideoTagMpMapper;
 import com.yixuan.yh.video.mapper.multi.VideoMultiMapper;
 import com.yixuan.yh.video.mq.VideoPostMessage;
+import com.yixuan.yh.video.pojo.entity.VideoUploadTask;
+import com.yixuan.yh.video.pojo.response.*;
 import com.yixuan.yh.video.pojo.request.PostVideoMessageRequest;
-import com.yixuan.yh.video.pojo.response.VideoMainResponse;
-import com.yixuan.yh.video.pojo.response.VideoMainWithInteractionResponse;
 import com.yixuan.yh.video.service.VideoService;
 import io.milvus.v2.client.MilvusClientV2;
 import io.milvus.v2.service.vector.request.SearchReq;
@@ -66,6 +68,8 @@ public class VideoServiceImpl implements VideoService {
     private UserFollowPrivateClient userFollowPrivateClient;
     @Autowired
     private MinioUtils minioUtils;
+    @Autowired
+    private VideoUploadTaskMapper videoUploadTaskMapper;
 
     @Override
     public List<VideoMainResponse> getVideos() {
@@ -94,6 +98,22 @@ public class VideoServiceImpl implements VideoService {
     }
 
     @Override
+    public String postVideoStart(Long userId, Long fileSize, Integer totalChunks) {
+        Long uploadId = snowflakeUtils.nextId();
+
+        VideoUploadTask videoUploadTask = new VideoUploadTask();
+        videoUploadTask.setId(uploadId);
+        videoUploadTask.setUserId(userId);
+        videoUploadTask.setFileSize(fileSize);
+        videoUploadTask.setTotalChunks(totalChunks);
+        videoUploadTask.setChunkBitmap(new byte[]{0});
+
+        videoUploadTaskMapper.insert(videoUploadTask);
+
+        return uploadId.toString();
+    }
+
+    @Override
     public void postVideo(Long userId, Long uploadId, Long partNumber, MultipartFile file) throws Exception {
         minioUtils.uploadPart(uploadId, partNumber, file);
     }
@@ -101,9 +121,10 @@ public class VideoServiceImpl implements VideoService {
     @Override
     public void postVideoEnd(Long uploadId) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
         List<ComposeSource> composeSourceList = new ArrayList<>();
-        composeSourceList.add(ComposeSource.builder().bucket(minioUtils.getBucket()).object("1-1").build());
-        composeSourceList.add(ComposeSource.builder().bucket(minioUtils.getBucket()).object("1-2").build());
-        minioUtils.completeUploadPart(composeSourceList);
+        composeSourceList.add(ComposeSource.builder().bucket(minioUtils.getBucket()).object("3-0").build());
+        composeSourceList.add(ComposeSource.builder().bucket(minioUtils.getBucket()).object("3-1").build());
+
+//        System.out.println(minioUtils.completeUploadPart(composeSourceList));
     }
 
     private List<VideoMainResponse> getRecommendedVideos(Long userId) {
@@ -213,5 +234,37 @@ public class VideoServiceImpl implements VideoService {
     @Override
     public void putVideoStatusToPublished(Long videoId) {
         videoTagMapper.updateStatus(videoId, Video.VideoStatus.PUBLISHED);
+    }
+
+    @Override
+    public List<GetUploadedVideoResponse> getUploadedVideo(Long userId) {
+        return videoMapper.selectUploadedVideoByUserId(userId)
+                .stream()
+                .map(VideoMapStruct.INSTANCE::toGetUploadedVideoResponse)
+                .toList();
+    }
+
+    @Override
+    public List<GetPublishedVideoResponse> getPublishedVideo(Long userId) {
+        return videoMapper.selectPublishedVideoByUserId(userId)
+                .stream()
+                .map(VideoMapStruct.INSTANCE::toGetPublishedVideoResponse)
+                .toList();
+    }
+
+    @Override
+    public List<GetProcessingVideoResponse> getProcessingVideo(Long userId) {
+        return videoMapper.selectProcessingVideoByUserId(userId)
+                .stream()
+                .map(VideoMapStruct.INSTANCE::toGetProcessingVideoResponse)
+                .toList();
+    }
+
+    @Override
+    public List<GetRejectedVideoResponse> getRejectedVideo(Long userId) {
+        return videoMapper.selectRejectedVideoByUserId(userId)
+                .stream()
+                .map(VideoMapStruct.INSTANCE::toGetRejectedVideoResponse)
+                .toList();
     }
 }

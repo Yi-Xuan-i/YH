@@ -34,7 +34,6 @@ public class UserIdentifierWebFilter implements WebFilter {
             String token = exchange.getRequest().getQueryParams().getFirst("token");
             try {
                 Claims claims = jwtUtils.parseJwt(token);
-                System.out.println(claims);
                 return chain.filter(exchange)
                         .contextWrite(ctx -> ctx.put("userId", claims.get("id")));
             } catch (Exception e) {

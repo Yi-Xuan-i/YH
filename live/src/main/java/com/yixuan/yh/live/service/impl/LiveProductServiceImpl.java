@@ -36,7 +36,7 @@ public class LiveProductServiceImpl implements LiveProductService {
     @Override
     public PostLiveProductResponse postLiveProduct(Long userId, PostLiveProductRequest postLiveProductRequest) throws IOException {
 
-        // 这里需要鉴权
+        // 鉴权
         if (!liveCache.getAnchorId(postLiveProductRequest.getRoomId()).equals(userId)) {
             throw new BadRequestException("你没有权限！");
         }

@@ -1,9 +1,12 @@
-package com.yixuan.yh.user.pojo.request;
+package com.yixuan.yh.user.pojo.response;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
 
 @Data
 public class AddressResponse {
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long addressId;
 
     private Boolean isDefault;

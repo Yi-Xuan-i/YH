@@ -28,12 +28,13 @@ public class AdminAuthNInterceptor implements HandlerInterceptor {
         } catch (Exception e) {
             return false;
         }
-        Object id =  claims.get("id");
+        Object id = claims.get("id");
         if (id instanceof Integer) {
             UserContext.setUser(Long.valueOf((Integer) id));
         } else if (id instanceof Long) {
             UserContext.setUser((Long) id);
-        } else {}
+        } else {
+        }
         return true;
     }
 

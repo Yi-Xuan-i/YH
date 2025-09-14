@@ -14,6 +14,10 @@ spring:
       username: nacos
       password: nacos
       server-addr: 106.13.105.230:8848
+      config:
+        namespace: dev
+      discovery:
+        namespace: ${spring.cloud.nacos.config.namespace}
   config:
     import:
       - nacos:gateway-dev.yaml?group=DEFAULT_GROUP&refreshEnabled=true

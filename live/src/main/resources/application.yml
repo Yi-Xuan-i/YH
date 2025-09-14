@@ -60,8 +60,8 @@ logging:
   level:
     org.springframework.jdbc.support.JdbcTransactionManager: debug
 mt:
-  console-url: http://127.0.0.1:19998
-  core-url: http://127.0.0.1:19999
+  console-url: http://43.139.55.171:19998
+  core-url: http://43.139.55.171:19999
   bucket-name: video
   username: mt
   password: mt

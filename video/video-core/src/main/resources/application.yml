@@ -21,6 +21,10 @@ spring:
       username: nacos
       password: nacos
       server-addr: 106.13.105.230:8848
+      config:
+        namespace: dev
+      discovery:
+        namespace: ${spring.cloud.nacos.config.namespace}
     openfeign:
       httpclient:
         enabled: true # 开启 Feign 对 httpClient 的支持
@@ -37,18 +41,29 @@ spring:
       max-request-size: 7000MB
 #      enabled: false
 
-mybatis:
+#mybatis:
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#    map-underscore-to-camel-case: true # 开启驼峰命名自动映射
+mybatis-plus:
+  type-aliases-package: com.yixuan.yh.video.pojo
+  mapper-locations: "classpath*:/com/yixuan/yh/**/mapper/*.xml"
   configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-    map-underscore-to-camel-case: true # 开启驼峰命名自动映射
+  global-config:
+    db-config:
+      id-type: assign_id # id 为雪花算法生成
+      update-strategy: not_null
 
 logging:
   level:
     org.springframework.jdbc.support.JdbcTransactionManager: debug
 
 mt:
-  console-url: http://127.0.0.1:19998
-  core-url: http://127.0.0.1:19999
+  console-url: http://43.139.55.171:19998
+  core-url: http://43.139.55.171:19999
   bucket-name: video
   username: mt
   password: mt

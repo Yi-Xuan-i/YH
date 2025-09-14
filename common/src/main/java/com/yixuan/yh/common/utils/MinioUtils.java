@@ -77,18 +77,21 @@ public class MinioUtils {
     }
 
     /* 合并分块 */
-    public void completeUploadPart(List<ComposeSource> composeSourceList) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    public String completeUploadPart(List<ComposeSource> composeSourceList) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
         LocalDateTime localDateTime = LocalDateTime.now();
         String prefix = localDateTime.getYear() + "/" + localDateTime.getMonthValue() + "/" + localDateTime.getDayOfMonth();
 
         String newFileName = UUID.randomUUID().toString();
+        String fullFilePath = prefix + "/" + newFileName;
 
         minioClient.composeObject(
                 ComposeObjectArgs.builder()
                         .bucket(this.bucket)
-                        .object(prefix + "/" + newFileName)
+                        .object(fullFilePath)
                         .sources(composeSourceList)
                         .build()
         );
+
+        return fullFilePath;
     }
 }

@@ -22,7 +22,10 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class VideoConsumer {
+public class
+
+
+VideoConsumer {
 
     @Autowired
     private RestTemplate restTemplate;
@@ -78,7 +81,7 @@ public class VideoConsumer {
         }
         // 构建点赞记录对象
         List<VideoInteractionBatchRequest.Record> recordList = new ArrayList<>(videoInteractionMessageList.size());
-        for (VideoInteractionMessage videoInteractionMessage :videoInteractionMessageList) {
+        for (VideoInteractionMessage videoInteractionMessage : videoInteractionMessageList) {
             VideoInteractionBatchRequest.Record record = new VideoInteractionBatchRequest.Record();
             record.setVideoId(videoInteractionMessage.getVideoId());
             record.setUserId(videoInteractionMessage.getUserId());

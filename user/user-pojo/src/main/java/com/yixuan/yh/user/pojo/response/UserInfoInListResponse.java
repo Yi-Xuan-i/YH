@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class UserInfoInListResponse {
+    Long id;
     String name;
     String avatarUrl;
 }

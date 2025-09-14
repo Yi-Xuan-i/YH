@@ -1,7 +1,9 @@
 package com.yixuan.yh.user.service.impl;
 
+import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.yixuan.yh.user.mapper.UserMapper;
 import com.yixuan.yh.user.mapstruct.AuthMapStruct;
+import com.yixuan.yh.user.pojo.constant.UserConstant;
 import com.yixuan.yh.user.pojo.entity.User;
 import com.yixuan.yh.user.pojo.request.LoginRequest;
 import com.yixuan.yh.user.pojo.request.RegisterRequest;
@@ -33,14 +35,14 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public void register(RegisterRequest registerRequest) throws BadRequestException {
-        /* 手机号唯一性检测 */
+        /* 手机号唯一性检测（有并发安全，由唯一索引兜底） */
         if (userMapper.selectIsPhoneNumberExist(registerRequest.getPhoneNumber())) {
             throw new BadRequestException("手机号已经被注册！");
         }
 
         User user = AuthMapStruct.INSTANCE.registerRequestToUser(registerRequest);
         user.setId(snowflakeUtils.nextId());
-        user.setName("路人甲");
+        user.setName(UserConstant.USER_NAME_DEFAULT);
         user.setEncodedPassword(passwordEncoder.encode(registerRequest.getPassword()));
         userMapper.insertToRegister(user);
 

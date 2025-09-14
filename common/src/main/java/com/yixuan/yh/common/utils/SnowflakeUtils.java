@@ -12,9 +12,9 @@ public class SnowflakeUtils {
 
     // ==============================Fields===========================================
     /**
-     * 开始时间截 (2015-01-01)
+     * 开始时间截
      */
-    private final long twepoch = 1747090452683L;
+    private final long twepoch = 1749090452683L;
 
     /**
      * 机器id所占的位数

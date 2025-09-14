@@ -14,5 +14,14 @@ public class Video {
     Long likes;
     Long comments;
     Long favorites;
+    VideoStatus status;
     LocalDateTime createdTime;
+
+    public enum VideoStatus {
+        UPLOADED,
+        PROCESSING,
+        REJECTED,
+        PUBLISHED
+    }
+
 }

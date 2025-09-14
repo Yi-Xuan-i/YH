@@ -1,7 +1,6 @@
 package com.yixuan.yh.order.config;
 
-import com.yixuan.yh.order.constant.RabbitMQConstant;
-import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
@@ -23,10 +22,14 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public Queue videoPostQueue(RabbitAdmin rabbitAdmin) {
-        Queue videoPostQueue = new Queue(RabbitMQConstant.ORDER_QUEUE, true);
-        rabbitAdmin.declareQueue(videoPostQueue);
-        return videoPostQueue;
+    public SimpleRabbitListenerContainerFactory batchContainerFactory(ConnectionFactory connectionFactory) {
+        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+        factory.setConnectionFactory(connectionFactory);
+        factory.setBatchListener(true); // 启用批量监听
+        factory.setConsumerBatchEnabled(true); // 消费者批量拉取
+        factory.setBatchSize(10); // 每批最多处理10条
+        factory.setReceiveTimeout(5000L); // 关键！超时时间5秒（即使未满batchSize）
+        factory.setPrefetchCount(100); // 预取数量需足够大
+        return factory;
     }
-
 }

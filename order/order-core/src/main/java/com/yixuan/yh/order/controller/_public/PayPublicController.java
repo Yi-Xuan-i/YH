@@ -1,4 +1,4 @@
-package com.yixuan.yh.order.controller;
+package com.yixuan.yh.order.controller._public;
 
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
@@ -8,6 +8,8 @@ import com.alipay.api.request.AlipayTradeWapPayRequest;
 import com.yixuan.yh.order.mapper.OrderMapper;
 import com.yixuan.yh.order.pojo.entity.Order;
 import com.yixuan.yh.order.properties.AliPayProperties;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -16,36 +18,19 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Map;
 
+@Tag(name = "PayPublic")
 @RestController
 @RequestMapping("/public/pay")
-public class PayController {
+public class PayPublicController {
 
+    @Autowired
+    private AlipayClient alipayClient;
     @Autowired
     private AliPayProperties aliPayProperties;
     @Autowired
     private OrderMapper orderMapper;
 
-    @GetMapping("/request-pay")
-    public void requestpay(Long orderId, HttpServletResponse httpResponse) throws IOException, AlipayApiException {
-
-        // 获取订单金额
-        BigDecimal paymentAmount = orderMapper.selectPaymentAmountByOrderId(orderId);
-
-        AlipayClient alipayClient = new DefaultAlipayClient(aliPayProperties.url, aliPayProperties.appId, aliPayProperties.appPrivateKey, "json", "UTF-8", aliPayProperties.alipayPublicKey,"RSA2");
-        AlipayTradeWapPayRequest alipayRequest = new AlipayTradeWapPayRequest();// 创建API对应的request
-        alipayRequest.setNotifyUrl(aliPayProperties.notifyUrl + "/order/api/public/pay/notify"); // 在公共参数中设置回跳和通知地址
-        alipayRequest.setBizContent("{" +
-                "    \"out_trade_no\":\""+ orderId +"\"," +
-                "    \"total_amount\":"+ paymentAmount +"," +
-                "    \"subject\":\""+ "YH商城" +"\"," +
-                "    \"product_code\":\"QUICK_WAP_WAY\"" +
-                "  }");
-        String form = alipayClient.pageExecute(alipayRequest).getBody();
-        httpResponse.setContentType("text/html;charset=UTF-8");
-        httpResponse.getWriter().write(form);
-        httpResponse.getWriter().flush();
-    }
-
+    @Operation(summary = "支付宝支付成功回调")
     @PostMapping("/notify")
     public String payNotify(@RequestParam Map<String, String> params) throws AlipayApiException {
         // 验证签名

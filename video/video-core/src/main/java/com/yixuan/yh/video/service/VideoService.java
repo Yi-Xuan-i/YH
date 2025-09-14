@@ -1,8 +1,7 @@
 package com.yixuan.yh.video.service;
 
+import com.yixuan.yh.video.pojo.response.*;
 import com.yixuan.yh.video.pojo.request.PostVideoMessageRequest;
-import com.yixuan.yh.video.pojo.response.VideoMainResponse;
-import com.yixuan.yh.video.pojo.response.VideoMainWithInteractionResponse;
 import io.minio.errors.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -16,6 +15,8 @@ public interface VideoService {
 
     List<VideoMainWithInteractionResponse> getVideosWithInteractionStatus(Long userId);
 
+    String postVideoStart(Long userId, Long fileSize, Integer totalChunks);
+
     void postVideo(Long userId, Long uploadId, Long partNumber, MultipartFile file) throws Exception;
 
     void postVideoEnd(Long uploadId) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException;
@@ -23,4 +24,12 @@ public interface VideoService {
     void postVideoMessage(Long userId, PostVideoMessageRequest postVideoMessageRequest) throws IOException, InterruptedException;
 
     void putVideoStatusToPublished(Long videoId);
+
+    List<GetUploadedVideoResponse> getUploadedVideo(Long userId);
+
+    List<GetPublishedVideoResponse> getPublishedVideo(Long userId);
+
+    List<GetProcessingVideoResponse> getProcessingVideo(Long userId);
+
+    List<GetRejectedVideoResponse> getRejectedVideo(Long userId);
 }

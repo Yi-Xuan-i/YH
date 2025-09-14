@@ -1,6 +1,6 @@
 package com.yixuan.yh.user.service;
 
-import com.yixuan.yh.user.pojo.request.AddressResponse;
+import com.yixuan.yh.user.pojo.response.AddressResponse;
 import com.yixuan.yh.user.pojo.request.PutAddressRequest;
 import org.apache.coyote.BadRequestException;
 

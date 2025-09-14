@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.List;
 
 public interface LiveService {
-    Long postStartLive(Long userId, StartLiveRequest startLiveRequest) throws IOException;
+    String postStartLive(Long userId, StartLiveRequest startLiveRequest) throws IOException;
 
     void publishCallback(Long roomId, String clientId, String token) throws BadRequestException;
 

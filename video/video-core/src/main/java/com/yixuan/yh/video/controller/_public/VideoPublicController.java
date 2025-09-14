@@ -3,6 +3,7 @@ package com.yixuan.yh.video.controller._public;
 import com.yixuan.yh.common.response.Result;
 import com.yixuan.yh.video.pojo.response.VideoMainResponse;
 import com.yixuan.yh.video.service.VideoService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,21 +24,7 @@ public class VideoPublicController {
     @Autowired
     private VideoService videoService;
 
-    @PostMapping("/stream-upload")
-    public ResponseEntity<String> streamUpload(HttpServletRequest request) {
-        try (InputStream inputStream = request.getInputStream();
-             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                // 逐行处理数据（示例：打印内容）
-                System.out.println(line);
-            }
-            return ResponseEntity.ok("Upload processed");
-        } catch (IOException e) {
-            return ResponseEntity.status(500).body("Error processing upload");
-        }
-    }
-
+    @Operation(summary = "获取视频（未登录）")
     @GetMapping("/list")
     public Result<List<VideoMainResponse>> getVideos() {
         return Result.success(videoService.getVideos());

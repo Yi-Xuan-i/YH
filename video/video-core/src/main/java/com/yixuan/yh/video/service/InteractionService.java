@@ -20,7 +20,7 @@ public interface InteractionService {
 
     void favoriteBatch(VideoInteractionBatchRequest videoInteractionBatchRequest);
 
-    void comment(Long videoId, Long userId, PostCommentRequest postCommentRequest) throws BadRequestException;
+    String comment(Long videoId, Long userId, PostCommentRequest postCommentRequest) throws BadRequestException;
 
     List<GetCommentResponse> directComment(Long videoId);
 }

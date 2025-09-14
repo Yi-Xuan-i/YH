@@ -26,16 +26,16 @@ public interface VideoMapper {
     @Select("select status from video where id = #{id}")
     Video.VideoStatus selectVideoStatusUrlById(Long id);
 
-    @Select("select id, url, cover_url, description, likes, comments, favorites, created_time from video where creator_id = #{userId} and status = 'UPLOADED'")
+    @Select("select id, url, cover_url, description, likes, comments, favorites, created_time from video where creator_id = #{userId} and status = 'UPLOADED' order by created_time desc")
     List<Video> selectUploadedVideoByUserId(Long userId);
 
-    @Select("select id, url, cover_url, description, likes, comments, favorites, created_time from video where creator_id = #{userId} and status = 'PUBLISHED'")
+    @Select("select id, url, cover_url, description, likes, comments, favorites, created_time from video where creator_id = #{userId} and status = 'PUBLISHED' order by created_time desc")
     List<Video> selectPublishedVideoByUserId(Long userId);
 
-    @Select("select id, url, cover_url, description, likes, comments, favorites, created_time from video where creator_id = #{userId} and status = 'PUBLISHED'")
+    @Select("select id, url, cover_url, description, created_time from video where creator_id = #{userId} and status = 'PROCESSING' order by created_time desc")
     List<Video> selectProcessingVideoByUserId(Long userId);
 
-    @Select("select id, url, cover_url, description, likes, comments, favorites, created_time from video where creator_id = #{userId} and status = 'PUBLISHED'")
+    @Select("select id, url, cover_url, description, created_time from video where creator_id = #{userId} and status = 'REJECTED' order by created_time desc")
     List<Video> selectRejectedVideoByUserId(Long userId);
 
     @Select("select count(*) from video where id = #{videoId}")

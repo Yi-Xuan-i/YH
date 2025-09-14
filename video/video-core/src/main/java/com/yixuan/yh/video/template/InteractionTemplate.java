@@ -3,8 +3,6 @@ package com.yixuan.yh.video.template;
 import com.yixuan.yh.video.mq.VideoInteractionMessage;
 import com.yixuan.yh.video.pojo._enum.InteractionStatus;
 
-import java.util.concurrent.locks.Lock;
-
 public abstract class InteractionTemplate {
 
     public void handle(Long userId, Long videoId, InteractionStatus status) throws Exception {

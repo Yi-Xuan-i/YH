@@ -27,7 +27,7 @@ public class AuditInterceptor implements HandlerInterceptor {
         Audit audit = new Audit();
         audit.setAdminId(UserContext.getUser());
         audit.setRequestMethod(request.getMethod());
-        audit.setRequestPath(request.getServletPath());
+        audit.setRequestPath(request.getRequestURI());
         audit.setRequestBody(getRequestBody(request));
         auditService.addRecord(audit);
     }

@@ -1,5 +1,6 @@
 package com.yixuan.yh.order.consumer;
 
+import com.alipay.api.AlipayApiException;
 import com.yixuan.yh.common.response.Result;
 import com.yixuan.yh.order.constant.RabbitMQConstant;
 import com.yixuan.yh.order.mq.OrderExpirationMessage;
@@ -37,9 +38,10 @@ public class OrderConsumer {
             exchange = @Exchange(name = RabbitMQConstant.ORDER_DELAY_EXCHANGE, durable = "true", delayed = "true"),
             key = RabbitMQConstant.ORDER_DELAY_QUEUE_KEY
     ))
-    public void handleOrderExpiration(OrderExpirationMessage orderExpirationMessage) {
+    public void handleOrderExpiration(OrderExpirationMessage orderExpirationMessage) throws AlipayApiException {
         // 更新订单状态
         if (orderService.putToCancelIfUnpaid(orderExpirationMessage.getOrderId())) {
+            System.out.println("归还库存！");
             // 归还占用库存
             Result<Void> result = productPrivateClient.putReservedStock(orderExpirationMessage.getSkuId(), Map.of("quantity", orderExpirationMessage.getQuantity()));
             if (result.isError()) {

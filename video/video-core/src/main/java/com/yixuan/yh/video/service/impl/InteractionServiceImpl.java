@@ -1,6 +1,10 @@
 package com.yixuan.yh.video.service.impl;
 
+import com.yixuan.yh.common.exception.YHServerException;
+import com.yixuan.yh.common.response.Result;
 import com.yixuan.yh.common.utils.SnowflakeUtils;
+import com.yixuan.yh.user.feign.UserPrivateClient;
+import com.yixuan.yh.user.pojo.response.UserInfoInListResponse;
 import com.yixuan.yh.video.mapper.VideoUserCommentMapper;
 import com.yixuan.yh.video.mapper.VideoUserFavoriteMapper;
 import com.yixuan.yh.video.mapper.VideoUserLikeMapper;
@@ -21,7 +25,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class InteractionServiceImpl implements InteractionService {
@@ -40,6 +47,8 @@ public class InteractionServiceImpl implements InteractionService {
     private SnowflakeUtils snowflakeUtils;
     @Autowired
     private VideoUserCommentMapper videoUserCommentMapper;
+    @Autowired
+    private UserPrivateClient userPrivateClient;
 
     @Override
     public void like(Long userId, Long videoId) throws Exception {
@@ -102,7 +111,7 @@ public class InteractionServiceImpl implements InteractionService {
     }
 
     @Override
-    public void comment(Long videoId, Long userId, PostCommentRequest postCommentRequest) throws BadRequestException {
+    public String comment(Long videoId, Long userId, PostCommentRequest postCommentRequest) throws BadRequestException {
         // 判断视频是否存在
         if (!videoMapper.selectIsExistById(videoId)) {
             throw new BadRequestException("视频不存在！");
@@ -114,13 +123,42 @@ public class InteractionServiceImpl implements InteractionService {
         videoUserComment.setUserId(userId);
 
         videoUserCommentMapper.insert(videoUserComment);
+
+        return videoUserComment.getId().toString();
     }
 
     @Override
     public List<GetCommentResponse> directComment(Long videoId) {
-        return videoUserCommentMapper.selectDirectComment(videoId)
+        List<VideoUserComment> videoUserCommentList = videoUserCommentMapper.selectDirectComment(videoId);
+        // 判断是否非空
+        if (videoUserCommentList.isEmpty()) {
+            return Collections.emptyList();
+        }
+        // 转换实体类
+        List<GetCommentResponse> getCommentResponseList = videoUserCommentList
                 .stream()
                 .map(InteractionMapStruct.INSTANCE::toGetCommentResponse)
                 .toList();
+        // 获取所有用户id
+        List<Long> userIdList = getCommentResponseList.stream().map(GetCommentResponse::getUserId).toList();
+        // 根据用户id查询用户数据
+        Result<List<UserInfoInListResponse>> result = userPrivateClient.getUserInfoInList(userIdList);
+        if (result.isError()) {
+            throw new YHServerException(result.getMsg());
+        }
+        // 建立用户id到用户数据的字典
+        List<UserInfoInListResponse> userInfoList = result.getData();
+        Map<Long, UserInfoInListResponse> userInfoMap = new HashMap<>(userInfoList.size());
+        for (UserInfoInListResponse userInfo : userInfoList) {
+            userInfoMap.put(userInfo.getId(), userInfo);
+        }
+        // 完善comment数据
+        getCommentResponseList.forEach(getCommentResponse -> {
+            UserInfoInListResponse userInfo = userInfoMap.get(getCommentResponse.getUserId());
+            getCommentResponse.setName(userInfo.getName());
+            getCommentResponse.setAvatarUrl(userInfo.getAvatarUrl());
+        });
+
+        return getCommentResponseList;
     }
 }

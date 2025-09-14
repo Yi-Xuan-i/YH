@@ -17,7 +17,7 @@ public class AdminWebConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(adminAuthNInterceptor).addPathPatterns("/api/**");
-        registry.addInterceptor(auditInterceptor).addPathPatterns("/api/**");
+        registry.addInterceptor(adminAuthNInterceptor).addPathPatterns("/**").excludePathPatterns("/auth/**");
+        registry.addInterceptor(auditInterceptor).addPathPatterns("/**").excludePathPatterns("/auth/**");
     }
 }

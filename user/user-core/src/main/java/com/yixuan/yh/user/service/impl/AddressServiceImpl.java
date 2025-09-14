@@ -3,7 +3,7 @@ package com.yixuan.yh.user.service.impl;
 import com.yixuan.yh.user.mapper.AddressMapper;
 import com.yixuan.yh.user.mapstruct.AddressMapstruct;
 import com.yixuan.yh.user.pojo.entity.UserAddress;
-import com.yixuan.yh.user.pojo.request.AddressResponse;
+import com.yixuan.yh.user.pojo.response.AddressResponse;
 import com.yixuan.yh.user.pojo.request.PutAddressRequest;
 import com.yixuan.yh.common.utils.SnowflakeUtils;
 import com.yixuan.yh.user.service.AddressService;

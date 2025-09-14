@@ -52,7 +52,7 @@ public class LiveServiceImpl implements LiveService {
 
     @Override
     @Transactional
-    public Long postStartLive(Long userId, StartLiveRequest startLiveRequest) throws IOException {
+    public String postStartLive(Long userId, StartLiveRequest startLiveRequest) throws IOException {
 
         Long roomId = snowflakeUtils.nextId();
 
@@ -72,7 +72,7 @@ public class LiveServiceImpl implements LiveService {
         liveDocument.setCreatedTime(LocalDateTime.now());
         liveRepository.save(liveDocument);
 
-        return liveDocument.getRoomId();
+        return liveDocument.getRoomId().toString();
     }
 
     @Override

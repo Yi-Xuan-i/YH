@@ -1,5 +1,15 @@
 package com.yixuan.yh.order.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
+import com.alipay.api.AlipayApiException;
+import com.alipay.api.AlipayClient;
+import com.alipay.api.domain.AlipayTradePrecreateModel;
+import com.alipay.api.request.AlipayTradeCloseRequest;
+import com.alipay.api.request.AlipayTradePrecreateRequest;
+import com.alipay.api.request.AlipayTradeQueryRequest;
+import com.alipay.api.response.AlipayTradeCloseResponse;
+import com.alipay.api.response.AlipayTradePrecreateResponse;
+import com.alipay.api.response.AlipayTradeQueryResponse;
 import com.yixuan.yh.common.response.Result;
 import com.yixuan.yh.common.utils.SnowflakeUtils;
 import com.yixuan.yh.order.mapper.OrderItemMapper;
@@ -34,10 +44,12 @@ public class OrderServiceImpl implements OrderService {
     private OrderMapper orderMapper;
     @Autowired
     private OrderItemMapper orderItemMapper;
+    @Autowired
+    private AlipayClient alipayClient;
 
     @Override
     @GlobalTransactional
-    public PostOrderResponse postOrder(Long userId, PostOrderRequest postOrderRequest) throws BadRequestException {
+    public PostOrderResponse postOrder(Long userId, PostOrderRequest postOrderRequest) throws BadRequestException, AlipayApiException {
 
         Long orderId = snowflakeUtils.nextId();
         // 获取订单需要用到商品数据（并预占库存）
@@ -70,7 +82,26 @@ public class OrderServiceImpl implements OrderService {
         orderItem.setPrice(partOfOrderResponse.getPrice());
         orderItemMapper.insert(orderItem);
 
-        return new PostOrderResponse(orderItem.getOrderId(), aliPayProperties.notifyUrl + "/order/api/public/pay/request-pay?orderId=" + order.getOrderId());
+        /* 获取请求二维码 */
+        AlipayTradePrecreateRequest request = new AlipayTradePrecreateRequest();
+        request.setNotifyUrl(aliPayProperties.getNotifyUrl() + "/order/api/public/pay/notify");
+
+        // 构建订单参数（必须与本地订单一致）
+        AlipayTradePrecreateModel model = new AlipayTradePrecreateModel();
+        model.setOutTradeNo(String.valueOf(orderId));
+        model.setTotalAmount(String.valueOf(order.getPaymentAmount()));
+        model.setSubject("YH");
+        model.setTimeoutExpress("1m");
+
+        request.setBizModel(model);
+
+        // 发起支付请求获取二维码
+        AlipayTradePrecreateResponse response = alipayClient.execute(request);
+        if (response.isSuccess()) {
+            return new PostOrderResponse(orderId, response.getQrCode());
+        } else {
+            throw new BadRequestException("服务器异常！");
+        }
     }
 
     @Override
@@ -79,7 +110,24 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Boolean putToCancelIfUnpaid(Long orderId) {
-        return orderMapper.updateStatusToCancelIfUnPaid(orderId);
+    public Boolean putToCancelIfUnpaid(Long orderId) throws AlipayApiException {
+        AlipayTradeCloseRequest request = new AlipayTradeCloseRequest();
+        JSONObject bizContent = new JSONObject();
+        bizContent.put("out_trade_no", orderId);
+        request.setBizContent(bizContent.toString());
+        AlipayTradeCloseResponse response = alipayClient.execute(request);
+        if (response.isSuccess()) {
+            return orderMapper.updateStatusToCancelIfUnPaid(orderId);
+        }
+        // 订单已支付或处于无法关闭的状态
+        if ("ACQ.TRADE_STATUS_ERROR".equals(response.getSubCode())) {
+            AlipayTradeQueryRequest queryRequest = new AlipayTradeQueryRequest();
+            queryRequest.setBizContent("{\"out_trade_no\":\"" + orderId + "\"}");
+            AlipayTradeQueryResponse queryResponse = alipayClient.execute(queryRequest);
+            // 确认是因为已支付导致的关闭失败
+            return !"TRADE_SUCCESS".equals(queryResponse.getTradeStatus());
+        }
+        // 交易不存在（发起了订单但实际上没有发送请求进行支付）
+        return "ACQ.TRADE_NOT_EXIST".equals(response.getSubCode());
     }
 }

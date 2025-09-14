@@ -32,8 +32,6 @@ public class CartServiceImpl implements CartService {
     @Autowired
     private SnowflakeUtils snowflakeUtils;
     @Autowired
-    private ProductMapper productMapper;
-    @Autowired
     private ProductMultiMapper productMultiMapper;
 
     @Override

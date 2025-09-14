@@ -27,11 +27,6 @@ public class VideoUserComment {
     private Long userId;
 
     /**
-     * 根评论ID
-     */
-    private Long rootId;
-
-    /**
      * 直接父评论ID
      */
     private Long parentId;

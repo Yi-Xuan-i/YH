@@ -1,0 +1,33 @@
+server:
+  port: 11111
+spring:
+  cloud:
+    openfeign:
+      httpclient:
+        enabled: true # 开启 Feign 对 httpClient 的支持
+    #    loadbalancer:
+    #      nacos:
+    #        enabled: true
+    nacos:
+      server-addr: 106.13.105.230:8848
+      username: nacos
+      password: nacos
+  config:
+    import: nacos:testService-dev.yaml?group=DEFAULT_GROUP&refreshEnabled=true
+
+  ai:
+    mcp:
+      server:
+        type: async
+        sse-endpoint: /sse
+        sse-message-endpoint: /mcp
+
+    alibaba:
+      mcp:
+        nacos:
+          server-addr: 106.13.105.230:8848
+          username: nacos
+          password: nacos
+          registry:
+            enabled: true
+            service-name: testService
