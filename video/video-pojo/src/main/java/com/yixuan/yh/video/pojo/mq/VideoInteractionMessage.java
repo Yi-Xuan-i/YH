@@ -1,4 +1,4 @@
-package com.yixuan.yh.video.mq;
+package com.yixuan.yh.video.pojo.mq;
 
 import com.yixuan.yh.video.pojo._enum.InteractionStatus;
 import lombok.AllArgsConstructor;

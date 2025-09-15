@@ -1,4 +1,4 @@
-package com.yixuan.yh.videoprocessor.mq;
+package com.yixuan.yh.video.pojo.mq;
 
 import lombok.Data;
 

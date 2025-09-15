@@ -5,6 +5,7 @@ import com.yixuan.yh.common.response.Result;
 import com.yixuan.yh.common.utils.SnowflakeUtils;
 import com.yixuan.yh.user.feign.UserPrivateClient;
 import com.yixuan.yh.user.pojo.response.UserInfoInListResponse;
+import com.yixuan.yh.video.constant.RabbitMQConstant;
 import com.yixuan.yh.video.mapper.VideoUserCommentMapper;
 import com.yixuan.yh.video.mapper.VideoUserFavoriteMapper;
 import com.yixuan.yh.video.mapper.VideoUserLikeMapper;
@@ -14,6 +15,7 @@ import com.yixuan.yh.video.mapper.VideoMapper;
 import com.yixuan.yh.video.pojo.entity.VideoUserComment;
 import com.yixuan.yh.video.pojo.entity.VideoUserFavorite;
 import com.yixuan.yh.video.pojo.entity.VideoUserLike;
+import com.yixuan.yh.video.pojo.mq.VideoCommentMessage;
 import com.yixuan.yh.video.pojo.request.PostCommentRequest;
 import com.yixuan.yh.video.pojo.request.VideoInteractionBatchRequest;
 import com.yixuan.yh.video.pojo.response.GetCommentResponse;
@@ -21,6 +23,7 @@ import com.yixuan.yh.video.service.InteractionService;
 import com.yixuan.yh.video.template.FavoriteInteraction;
 import com.yixuan.yh.video.template.LikeInteraction;
 import org.apache.coyote.BadRequestException;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,6 +52,8 @@ public class InteractionServiceImpl implements InteractionService {
     private VideoUserCommentMapper videoUserCommentMapper;
     @Autowired
     private UserPrivateClient userPrivateClient;
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     @Override
     public void like(Long userId, Long videoId) throws Exception {
@@ -117,12 +122,22 @@ public class InteractionServiceImpl implements InteractionService {
             throw new BadRequestException("视频不存在！");
         }
 
+        // 存储评论数据到数据库
         VideoUserComment videoUserComment = InteractionMapStruct.INSTANCE.toVideoUserComment(postCommentRequest);
         videoUserComment.setId(snowflakeUtils.nextId());
         videoUserComment.setVideoId(videoId);
         videoUserComment.setUserId(userId);
 
         videoUserCommentMapper.insert(videoUserComment);
+
+        // 发布评论事件（丢失风险）
+        VideoCommentMessage videoCommentMessage = new VideoCommentMessage();
+        videoCommentMessage.setId(videoUserComment.getId());
+        videoCommentMessage.setVideoId(videoUserComment.getVideoId());
+        videoCommentMessage.setUserId(videoUserComment.getUserId());
+        videoCommentMessage.setContent(videoUserComment.getContent());
+
+        rabbitTemplate.convertAndSend(RabbitMQConstant.VIDEO_COMMENT_FANOUT_EXCHANGE, "", videoCommentMessage);
 
         return videoUserComment.getId().toString();
     }

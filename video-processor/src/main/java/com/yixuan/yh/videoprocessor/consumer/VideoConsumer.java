@@ -3,9 +3,9 @@ package com.yixuan.yh.videoprocessor.consumer;
 import com.yixuan.yh.common.response.Result;
 import com.yixuan.yh.video.feign.InteractionPrivateClient;
 import com.yixuan.yh.video.feign.VideoPrivateClient;
+import com.yixuan.yh.video.pojo.mq.VideoInteractionMessage;
+import com.yixuan.yh.video.pojo.mq.VideoPostMessage;
 import com.yixuan.yh.video.pojo.request.VideoInteractionBatchRequest;
-import com.yixuan.yh.videoprocessor.mq.VideoInteractionMessage;
-import com.yixuan.yh.videoprocessor.mq.VideoPostMessage;
 import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,10 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class
-
-
-VideoConsumer {
+public class VideoConsumer {
 
     @Autowired
     private RestTemplate restTemplate;

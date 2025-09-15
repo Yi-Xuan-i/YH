@@ -14,7 +14,7 @@ import com.yixuan.yh.video.mapper.VideoMapper;
 import com.yixuan.yh.video.mapper.VideoTagMapper;
 import com.yixuan.yh.video.mapper.VideoTagMpMapper;
 import com.yixuan.yh.video.mapper.multi.VideoMultiMapper;
-import com.yixuan.yh.video.mq.VideoPostMessage;
+import com.yixuan.yh.video.pojo.mq.VideoPostMessage;
 import com.yixuan.yh.video.pojo.entity.VideoUploadTask;
 import com.yixuan.yh.video.pojo.response.*;
 import com.yixuan.yh.video.pojo.request.PostVideoMessageRequest;

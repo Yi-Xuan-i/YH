@@ -1,6 +1,6 @@
 package com.yixuan.yh.video.template;
 
-import com.yixuan.yh.video.mq.VideoInteractionMessage;
+import com.yixuan.yh.video.pojo.mq.VideoInteractionMessage;
 import com.yixuan.yh.video.pojo._enum.InteractionStatus;
 
 public abstract class InteractionTemplate {

@@ -2,7 +2,7 @@ package com.yixuan.yh.video.template;
 
 import com.yixuan.yh.common.utils.SnowflakeUtils;
 import com.yixuan.yh.video.mapper.VideoUserFavoriteMapper;
-import com.yixuan.yh.video.mq.VideoInteractionMessage;
+import com.yixuan.yh.video.pojo.mq.VideoInteractionMessage;
 import com.yixuan.yh.video.pojo._enum.InteractionStatus;
 import com.yixuan.yh.video.cache.VideoUserFavoriteCache;
 import com.yixuan.yh.video.constant.RabbitMQConstant;

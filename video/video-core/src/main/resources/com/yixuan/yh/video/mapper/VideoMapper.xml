@@ -9,9 +9,16 @@
             update video set likes = likes + #{likeIncr.incrNumber} where id = #{likeIncr.videoId}
         </foreach>
     </update>
+
     <update id="updateFavoriteBatch">
         <foreach collection="favoriteIncrList" item="favoriteIncr" separator=";">
             update video set favorites = favorites + #{favoriteIncr.incrNumber} where id = #{favoriteIncr.videoId}
+        </foreach>
+    </update>
+
+    <update id="updateCommentBatch">
+        <foreach collection="videoCommentIncrMessageList" item="videoCommentIncrMessage" separator=";">
+            update video set comments = comments + #{videoCommentIncrMessage.incrNumber} where id = #{videoCommentIncrMessage.videoId}
         </foreach>
     </update>
 

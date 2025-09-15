@@ -2,6 +2,7 @@ package com.yixuan.yh.video.mapper;
 
 import com.yixuan.yh.video.pojo.entity.Video;
 import com.yixuan.yh.video.pojo.request.VideoInteractionBatchRequest;
+import com.yixuan.yh.videoprocessor.mq.VideoCommentIncrMessage;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -22,6 +23,8 @@ public interface VideoMapper {
     void updateLikeBatch(List<VideoInteractionBatchRequest.Incr> likeIncrList);
 
     void updateFavoriteBatch(List<VideoInteractionBatchRequest.Incr> favoriteIncrList);
+
+    void updateCommentBatch(List<VideoCommentIncrMessage> videoCommentIncrMessageList);
 
     @Select("select status from video where id = #{id}")
     Video.VideoStatus selectVideoStatusUrlById(Long id);

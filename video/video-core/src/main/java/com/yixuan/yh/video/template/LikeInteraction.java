@@ -1,22 +1,17 @@
 package com.yixuan.yh.video.template;
 
 import com.yixuan.yh.common.utils.SnowflakeUtils;
-import com.yixuan.yh.video.mq.VideoInteractionMessage;
+import com.yixuan.yh.video.pojo.mq.VideoInteractionMessage;
 import com.yixuan.yh.video.pojo._enum.InteractionStatus;
 import com.yixuan.yh.video.cache.VideoUserLikeCache;
 import com.yixuan.yh.video.constant.RabbitMQConstant;
-import com.yixuan.yh.video.constant.RedisConstant;
 import com.yixuan.yh.video.mapper.VideoUserLikeMapper;
-import com.yixuan.yh.video.pojo.entity.VideoUserLike;
 import org.apache.coyote.BadRequestException;
 import org.redisson.api.RedissonClient;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Component;
-
-import java.util.Collections;
-import java.util.concurrent.locks.Lock;
 
 @Component
 public class LikeInteraction extends InteractionTemplate {
