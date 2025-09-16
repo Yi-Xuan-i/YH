@@ -133,6 +133,7 @@ public class InteractionServiceImpl implements InteractionService {
         // 发布评论事件（丢失风险）
         VideoCommentMessage videoCommentMessage = new VideoCommentMessage();
         videoCommentMessage.setId(videoUserComment.getId());
+        videoCommentMessage.setParentId(videoUserComment.getParentId());
         videoCommentMessage.setVideoId(videoUserComment.getVideoId());
         videoCommentMessage.setUserId(videoUserComment.getUserId());
         videoCommentMessage.setContent(videoUserComment.getContent());
