@@ -22,7 +22,7 @@ public class VideoCommentIncrMessage {
 
     @Data
     public static class ReplyIncr {
-        Long parentId;
+        Long rootId;
         Integer incrNumber;
     }
 }

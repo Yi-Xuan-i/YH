@@ -53,23 +53,23 @@ public class VideoCommentConsumer {
             commentIncrList.add(commentIncr);
         }
 
-        /* 统计评论增加的回复数 */
+        /* 统计直接评论增加的回复数 */
         Map<Long, Integer> replyIncrMap = new HashMap<>(videoCommentMessageList.size());
 
         videoCommentMessageList.forEach(videoCommentMessage -> {
-            Long parentId = videoCommentMessage.getParentId();
-            if (parentId != null) {
-                if (!replyIncrMap.containsKey(parentId)) {
-                    replyIncrMap.put(parentId, 0);
+            Long rootId = videoCommentMessage.getRootId();
+            if (rootId != null) {
+                if (!replyIncrMap.containsKey(rootId)) {
+                    replyIncrMap.put(rootId, 0);
                 }
-                replyIncrMap.replace(parentId, replyIncrMap.get(parentId) + 1);
+                replyIncrMap.replace(rootId, replyIncrMap.get(rootId) + 1);
             }
         });
 
         List<VideoCommentIncrMessage.ReplyIncr> replyIncrList = new ArrayList<>(videoCommentMessageList.size());
         for (Map.Entry<Long, Integer> entry : replyIncrMap.entrySet()) {
             VideoCommentIncrMessage.ReplyIncr replyIncr = new VideoCommentIncrMessage.ReplyIncr();
-            replyIncr.setParentId(entry.getKey());
+            replyIncr.setRootId(entry.getKey());
             replyIncr.setIncrNumber(entry.getValue());
 
             replyIncrList.add(replyIncr);
