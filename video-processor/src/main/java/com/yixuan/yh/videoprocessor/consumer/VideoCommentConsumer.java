@@ -33,26 +33,49 @@ public class VideoCommentConsumer {
             containerFactory = "batchContainerFactory"
     )
     public void handleVideoCommentMessage(List<VideoCommentMessage> videoCommentMessageList) {
-        Map<Long, Long> commentIncrMap = new HashMap<>(videoCommentMessageList.size());
+        /* 统计视频增加的评论数 */
+        Map<Long, Integer> commentIncrMap = new HashMap<>(videoCommentMessageList.size());
 
-        videoCommentMessageList.forEach((videoCommentMessage -> {
+        videoCommentMessageList.forEach(videoCommentMessage -> {
             Long videoId = videoCommentMessage.getVideoId();
             if (!commentIncrMap.containsKey(videoId)) {
-                commentIncrMap.put(videoId, 0L);
+                commentIncrMap.put(videoId, 0);
             }
             commentIncrMap.replace(videoId, commentIncrMap.get(videoId) + 1);
-        }));
+        });
 
-        List<VideoCommentIncrMessage> videoCommentIncrMessageList = new ArrayList<>(videoCommentMessageList.size());
-        for (Map.Entry<Long, Long> entry : commentIncrMap.entrySet()) {
-            VideoCommentIncrMessage videoCommentIncrMessage = new VideoCommentIncrMessage();
-            videoCommentIncrMessage.setVideoId(entry.getKey());
-            videoCommentIncrMessage.setIncrNumber(entry.getValue());
+        List<VideoCommentIncrMessage.CommentIncr> commentIncrList = new ArrayList<>(videoCommentMessageList.size());
+        for (Map.Entry<Long, Integer> entry : commentIncrMap.entrySet()) {
+            VideoCommentIncrMessage.CommentIncr commentIncr = new VideoCommentIncrMessage.CommentIncr();
+            commentIncr.setVideoId(entry.getKey());
+            commentIncr.setIncrNumber(entry.getValue());
 
-            videoCommentIncrMessageList.add(videoCommentIncrMessage);
+            commentIncrList.add(commentIncr);
         }
 
-        rabbitTemplate.convertAndSend(RabbitMQConstant.VIDEO_COMMENT_DIRECT_EXCHANGE, RabbitMQConstant.VIDEO_COMMENT_INCR_QUEUE, videoCommentIncrMessageList);
+        /* 统计评论增加的回复数 */
+        Map<Long, Integer> replyIncrMap = new HashMap<>(videoCommentMessageList.size());
+
+        videoCommentMessageList.forEach(videoCommentMessage -> {
+            Long parentId = videoCommentMessage.getParentId();
+            if (parentId != null) {
+                if (!replyIncrMap.containsKey(parentId)) {
+                    replyIncrMap.put(parentId, 0);
+                }
+                replyIncrMap.replace(parentId, replyIncrMap.get(parentId) + 1);
+            }
+        });
+
+        List<VideoCommentIncrMessage.ReplyIncr> replyIncrList = new ArrayList<>(videoCommentMessageList.size());
+        for (Map.Entry<Long, Integer> entry : replyIncrMap.entrySet()) {
+            VideoCommentIncrMessage.ReplyIncr replyIncr = new VideoCommentIncrMessage.ReplyIncr();
+            replyIncr.setParentId(entry.getKey());
+            replyIncr.setIncrNumber(entry.getValue());
+
+            replyIncrList.add(replyIncr);
+        }
+
+        rabbitTemplate.convertAndSend(RabbitMQConstant.VIDEO_COMMENT_DIRECT_EXCHANGE, RabbitMQConstant.VIDEO_COMMENT_INCR_QUEUE, new VideoCommentIncrMessage(commentIncrList, replyIncrList));
     }
 
 }
