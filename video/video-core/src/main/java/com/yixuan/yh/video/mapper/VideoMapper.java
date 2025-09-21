@@ -24,7 +24,7 @@ public interface VideoMapper {
 
     void updateFavoriteBatch(List<VideoInteractionBatchRequest.Incr> favoriteIncrList);
 
-    void updateCommentBatch(List<VideoCommentIncrMessage> videoCommentIncrMessageList);
+    void updateCommentBatch(List<VideoCommentIncrMessage.CommentIncr> commentIncrList);
 
     @Select("select status from video where id = #{id}")
     Video.VideoStatus selectVideoStatusUrlById(Long id);

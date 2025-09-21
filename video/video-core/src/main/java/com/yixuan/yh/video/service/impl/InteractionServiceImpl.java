@@ -122,20 +122,29 @@ public class InteractionServiceImpl implements InteractionService {
             throw new BadRequestException("视频不存在！");
         }
 
+        // 获取根评论id
+        Long rootId = null;
+
+        // 如果 parentId 为空则为直接评论，根路径id为自己本身（反之去查询）
+        if (postCommentRequest.getParentId() != null) {
+            rootId = videoUserCommentMapper.selectRootIdById(postCommentRequest.getParentId());
+        }
+
         // 存储评论数据到数据库
         VideoUserComment videoUserComment = InteractionMapStruct.INSTANCE.toVideoUserComment(postCommentRequest);
         videoUserComment.setId(snowflakeUtils.nextId());
         videoUserComment.setVideoId(videoId);
         videoUserComment.setUserId(userId);
+        videoUserComment.setRootId(rootId == null ? videoUserComment.getId() : rootId);
 
         videoUserCommentMapper.insert(videoUserComment);
 
         // 发布评论事件（丢失风险）
         VideoCommentMessage videoCommentMessage = new VideoCommentMessage();
         videoCommentMessage.setId(videoUserComment.getId());
-        videoCommentMessage.setParentId(videoUserComment.getParentId());
         videoCommentMessage.setVideoId(videoUserComment.getVideoId());
         videoCommentMessage.setUserId(videoUserComment.getUserId());
+        videoCommentMessage.setRootId(rootId);
         videoCommentMessage.setContent(videoUserComment.getContent());
 
         rabbitTemplate.convertAndSend(RabbitMQConstant.VIDEO_COMMENT_FANOUT_EXCHANGE, "", videoCommentMessage);

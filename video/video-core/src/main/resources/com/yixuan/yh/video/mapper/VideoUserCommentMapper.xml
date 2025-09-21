@@ -4,4 +4,9 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yixuan.yh.video.mapper.VideoUserCommentMapper">
 
+    <update id="updateReplyBatch">
+        <foreach collection="replyIncrList" item="replyIncr" separator=";">
+            update video_user_comment set reply_count = reply_count + #{replyIncr.incrNumber} where id = #{replyIncr.rootId}
+        </foreach>
+    </update>
 </mapper>

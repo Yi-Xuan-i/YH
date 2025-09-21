@@ -17,8 +17,8 @@
     </update>
 
     <update id="updateCommentBatch">
-        <foreach collection="videoCommentIncrMessageList" item="videoCommentIncrMessage" separator=";">
-            update video set comments = comments + #{videoCommentIncrMessage.incrNumber} where id = #{videoCommentIncrMessage.videoId}
+        <foreach collection="commentIncrList" item="commentIncr" separator=";">
+            update video set comments = comments + #{commentIncr.incrNumber} where id = #{commentIncr.videoId}
         </foreach>
     </update>
 
