@@ -15,6 +15,7 @@ public class GetCommentResponse {
     private Long userId;
     private String name;
     private String avatarUrl;
+    private Integer replyCount;
     private Integer likeCount;
     private LocalDateTime updatedAt;
 }

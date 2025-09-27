@@ -37,6 +37,11 @@ public class VideoUserComment {
     private Long parentId;
 
     /**
+     * 回复数
+     */
+    private Integer replyCount;
+
+    /**
      * 点赞数
      */
     private Integer likeCount;
