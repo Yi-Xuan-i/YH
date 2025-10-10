@@ -7,7 +7,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-public class GetCommentResponse {
+public class GetDirectCommentResponse {
     @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
     private String content;

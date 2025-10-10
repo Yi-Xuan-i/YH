@@ -1,8 +1,10 @@
 package com.yixuan.yh.video.service;
 
+import com.yixuan.yh.video.pojo.entity.multi.CommentWithReceiver;
 import com.yixuan.yh.video.pojo.request.PostCommentRequest;
 import com.yixuan.yh.video.pojo.request.VideoInteractionBatchRequest;
-import com.yixuan.yh.video.pojo.response.GetCommentResponse;
+import com.yixuan.yh.video.pojo.response.GetDirectCommentResponse;
+import com.yixuan.yh.video.pojo.response.GetReplyCommentResponse;
 import org.apache.coyote.BadRequestException;
 
 import java.util.List;
@@ -22,5 +24,7 @@ public interface InteractionService {
 
     String comment(Long videoId, Long userId, PostCommentRequest postCommentRequest) throws BadRequestException;
 
-    List<GetCommentResponse> directComment(Long videoId);
+    List<GetDirectCommentResponse> directComment(Long videoId);
+
+    List<GetReplyCommentResponse> replyComment(Long commentId);
 }

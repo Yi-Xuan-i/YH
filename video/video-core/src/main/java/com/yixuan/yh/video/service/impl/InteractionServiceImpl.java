@@ -15,14 +15,17 @@ import com.yixuan.yh.video.mapper.VideoMapper;
 import com.yixuan.yh.video.pojo.entity.VideoUserComment;
 import com.yixuan.yh.video.pojo.entity.VideoUserFavorite;
 import com.yixuan.yh.video.pojo.entity.VideoUserLike;
+import com.yixuan.yh.video.pojo.entity.multi.CommentWithReceiver;
 import com.yixuan.yh.video.pojo.mq.VideoCommentMessage;
 import com.yixuan.yh.video.pojo.request.PostCommentRequest;
 import com.yixuan.yh.video.pojo.request.VideoInteractionBatchRequest;
-import com.yixuan.yh.video.pojo.response.GetCommentResponse;
+import com.yixuan.yh.video.pojo.response.GetDirectCommentResponse;
+import com.yixuan.yh.video.pojo.response.GetReplyCommentResponse;
 import com.yixuan.yh.video.service.InteractionService;
 import com.yixuan.yh.video.template.FavoriteInteraction;
 import com.yixuan.yh.video.template.LikeInteraction;
 import org.apache.coyote.BadRequestException;
+import org.mapstruct.control.MappingControl;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,6 +35,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class InteractionServiceImpl implements InteractionService {
@@ -153,19 +158,19 @@ public class InteractionServiceImpl implements InteractionService {
     }
 
     @Override
-    public List<GetCommentResponse> directComment(Long videoId) {
+    public List<GetDirectCommentResponse> directComment(Long videoId) {
         List<VideoUserComment> videoUserCommentList = videoUserCommentMapper.selectDirectComment(videoId);
         // 判断是否非空
         if (videoUserCommentList.isEmpty()) {
             return Collections.emptyList();
         }
         // 转换实体类
-        List<GetCommentResponse> getCommentResponseList = videoUserCommentList
+        List<GetDirectCommentResponse> directCommentResponseList = videoUserCommentList
                 .stream()
-                .map(InteractionMapStruct.INSTANCE::toGetCommentResponse)
+                .map(InteractionMapStruct.INSTANCE::toGetDirectCommentResponse)
                 .toList();
         // 获取所有用户id
-        List<Long> userIdList = getCommentResponseList.stream().map(GetCommentResponse::getUserId).toList();
+        List<Long> userIdList = directCommentResponseList.stream().map(GetDirectCommentResponse::getUserId).toList();
         // 根据用户id查询用户数据
         Result<List<UserInfoInListResponse>> result = userPrivateClient.getUserInfoInList(userIdList);
         if (result.isError()) {
@@ -178,12 +183,53 @@ public class InteractionServiceImpl implements InteractionService {
             userInfoMap.put(userInfo.getId(), userInfo);
         }
         // 完善comment数据
-        getCommentResponseList.forEach(getCommentResponse -> {
+        directCommentResponseList.forEach(getCommentResponse -> {
             UserInfoInListResponse userInfo = userInfoMap.get(getCommentResponse.getUserId());
             getCommentResponse.setName(userInfo.getName());
             getCommentResponse.setAvatarUrl(userInfo.getAvatarUrl());
         });
 
-        return getCommentResponseList;
+        return directCommentResponseList;
+    }
+
+    @Override
+    public List<GetReplyCommentResponse> replyComment(Long commentId) {
+        List<CommentWithReceiver> videoUserCommentList = videoUserCommentMapper.selectReplyComment(commentId);
+        // 转换格式
+        List<GetReplyCommentResponse> replyCommentResponseList = videoUserCommentList
+                .stream()
+                .map(InteractionMapStruct.INSTANCE::toGetReplyCommentResponse)
+                .toList();
+        // 获取所有用户id
+        List<Long> userIdList = replyCommentResponseList.stream()
+                .flatMap(reply -> Stream.of(
+                        reply.getSenderId(),
+                        reply.getReceiverId()
+                ))
+                .distinct()
+                .toList();
+        // 查询用户数据
+        Result<List<UserInfoInListResponse>> result = userPrivateClient.getUserInfoInList(userIdList);
+        if (result.isError()) {
+            throw new YHServerException(result.getMsg());
+        }
+        // 建立用户id到用户数据的字典
+        List<UserInfoInListResponse> userInfoList = result.getData();
+        Map<Long, UserInfoInListResponse> userInfoMap = new HashMap<>(userInfoList.size());
+        for (UserInfoInListResponse userInfo : userInfoList) {
+            userInfoMap.put(userInfo.getId(), userInfo);
+        }
+        // 完善用户数据
+        for (GetReplyCommentResponse replyCommentResponse : replyCommentResponseList) {
+            UserInfoInListResponse senderInfo = userInfoMap.get(replyCommentResponse.getSenderId());
+            UserInfoInListResponse receiverInfo = userInfoMap.get(replyCommentResponse.getReceiverId());
+
+            replyCommentResponse.setSenderName(senderInfo.getName());
+            replyCommentResponse.setSenderAvatar(senderInfo.getAvatarUrl());
+            replyCommentResponse.setReceiverName(receiverInfo.getName());
+            replyCommentResponse.setReceiverAvatar(receiverInfo.getAvatarUrl());
+        }
+
+        return replyCommentResponseList;
     }
 }

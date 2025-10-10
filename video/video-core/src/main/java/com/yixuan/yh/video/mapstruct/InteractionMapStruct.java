@@ -1,8 +1,10 @@
 package com.yixuan.yh.video.mapstruct;
 
 import com.yixuan.yh.video.pojo.entity.VideoUserComment;
+import com.yixuan.yh.video.pojo.entity.multi.CommentWithReceiver;
 import com.yixuan.yh.video.pojo.request.PostCommentRequest;
-import com.yixuan.yh.video.pojo.response.GetCommentResponse;
+import com.yixuan.yh.video.pojo.response.GetDirectCommentResponse;
+import com.yixuan.yh.video.pojo.response.GetReplyCommentResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -13,5 +15,7 @@ public interface InteractionMapStruct {
 
     VideoUserComment toVideoUserComment(PostCommentRequest postCommentRequest);
 
-    GetCommentResponse toGetCommentResponse(VideoUserComment videoUserComment);
+    GetDirectCommentResponse toGetDirectCommentResponse(VideoUserComment videoUserComment);
+
+    GetReplyCommentResponse toGetReplyCommentResponse(CommentWithReceiver commentWithReceiver);
 }

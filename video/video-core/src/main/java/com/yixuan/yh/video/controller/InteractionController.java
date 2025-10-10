@@ -3,7 +3,8 @@ package com.yixuan.yh.video.controller;
 import com.yixuan.yh.common.response.Result;
 import com.yixuan.yh.common.utils.UserContext;
 import com.yixuan.yh.video.pojo.request.PostCommentRequest;
-import com.yixuan.yh.video.pojo.response.GetCommentResponse;
+import com.yixuan.yh.video.pojo.response.GetDirectCommentResponse;
+import com.yixuan.yh.video.pojo.response.GetReplyCommentResponse;
 import com.yixuan.yh.video.service.InteractionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -58,8 +59,14 @@ public class InteractionController {
 
     @Operation(summary = "获取视频直接评论")
     @GetMapping("/comment/{videoId}")
-    public Result<List<GetCommentResponse>> directComment(@PathVariable Long videoId) {
+    public Result<List<GetDirectCommentResponse>> directComment(@PathVariable Long videoId) {
         return Result.success(interactionService.directComment(videoId));
+    }
+
+    @Operation(summary = "获取视频评论的回复")
+    @GetMapping("/comment/reply/{commentId}")
+    public Result<List<GetReplyCommentResponse>> replyComment(@PathVariable Long commentId) {
+        return Result.success(interactionService.replyComment( commentId));
     }
 
 }
