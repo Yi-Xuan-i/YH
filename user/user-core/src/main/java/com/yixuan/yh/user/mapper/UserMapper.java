@@ -3,6 +3,7 @@ package com.yixuan.yh.user.mapper;
 import com.yixuan.yh.user.pojo.entity.User;
 import com.yixuan.yh.user.pojo.request.ProfileRequest;
 import com.yixuan.yh.user.pojo.response.ProfileResponse;
+import com.yixuan.yh.user.pojo.response.UserSearchResponse;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -37,4 +38,7 @@ public interface UserMapper {
     String selectNameById(String id);
 
     List<User> selectUserInfoInList(List<Long> idList);
+
+    @Select("select user.id, name, avatar_url, bio, CASE WHEN f.id IS NOT NULL THEN true ELSE false END AS is_followed from user left join user_follow f on follower_id = #{userId} and followee_id = user.id  where name like CONCAT(#{query}, '%')")
+    List<UserSearchResponse> selectUserByNamePrefix(Long userId, String query);
 }

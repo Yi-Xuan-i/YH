@@ -12,5 +12,6 @@ public class User {
     private String name;
     private String encodedPassword;
     private String avatarUrl;
+    private String bio;
     private LocalDateTime createdTime;
 }
