@@ -53,20 +53,19 @@ public class InteractionController {
     @Operation(summary = "视频评论（或回复评论）")
     @PostMapping("/comment/{videoId}")
     public Result<String> comment(@PathVariable Long videoId, @RequestBody PostCommentRequest postCommentRequest) throws BadRequestException {
-        interactionService.comment(videoId, UserContext.getUser(), postCommentRequest);
-        return Result.success();
+        return Result.success(interactionService.comment(videoId, UserContext.getUser(), postCommentRequest));
     }
 
     @Operation(summary = "获取视频直接评论")
     @GetMapping("/comment/{videoId}")
-    public Result<List<GetDirectCommentResponse>> directComment(@PathVariable Long videoId) {
-        return Result.success(interactionService.directComment(videoId));
+    public Result<List<GetDirectCommentResponse>> directComment(@PathVariable Long videoId, @RequestParam(required = false) Long lastMinId) {
+        return Result.success(interactionService.directComment(videoId, lastMinId));
     }
 
     @Operation(summary = "获取视频评论的回复")
     @GetMapping("/comment/reply/{commentId}")
-    public Result<List<GetReplyCommentResponse>> replyComment(@PathVariable Long commentId) {
-        return Result.success(interactionService.replyComment( commentId));
+    public Result<List<GetReplyCommentResponse>> replyComment(@PathVariable Long commentId, @RequestParam(required = false) Long lastMaxId) {
+        return Result.success(interactionService.replyComment(commentId, lastMaxId));
     }
 
 }

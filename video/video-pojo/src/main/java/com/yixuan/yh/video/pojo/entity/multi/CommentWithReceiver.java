@@ -10,6 +10,7 @@ public class CommentWithReceiver {
     private String content;
     private Long senderId;
     private Long receiverId;
+    private Long parentId;
     private Integer likeCount;
     private LocalDateTime updatedAt;
 }

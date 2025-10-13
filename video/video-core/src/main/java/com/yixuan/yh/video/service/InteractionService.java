@@ -24,7 +24,7 @@ public interface InteractionService {
 
     String comment(Long videoId, Long userId, PostCommentRequest postCommentRequest) throws BadRequestException;
 
-    List<GetDirectCommentResponse> directComment(Long videoId);
+    List<GetDirectCommentResponse> directComment(Long videoId, Long lastMinId);
 
-    List<GetReplyCommentResponse> replyComment(Long commentId);
+    List<GetReplyCommentResponse> replyComment(Long commentId, Long lastMaxId);
 }

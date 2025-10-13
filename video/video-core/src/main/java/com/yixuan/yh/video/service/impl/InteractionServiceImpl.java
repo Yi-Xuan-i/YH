@@ -25,7 +25,6 @@ import com.yixuan.yh.video.service.InteractionService;
 import com.yixuan.yh.video.template.FavoriteInteraction;
 import com.yixuan.yh.video.template.LikeInteraction;
 import org.apache.coyote.BadRequestException;
-import org.mapstruct.control.MappingControl;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,7 +34,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
@@ -122,7 +120,7 @@ public class InteractionServiceImpl implements InteractionService {
 
     @Override
     public String comment(Long videoId, Long userId, PostCommentRequest postCommentRequest) throws BadRequestException {
-        // 判断视频是否存在
+        // 判断视频是否存在（如果是回复不应该传递videoId）
         if (!videoMapper.selectIsExistById(videoId)) {
             throw new BadRequestException("视频不存在！");
         }
@@ -158,8 +156,8 @@ public class InteractionServiceImpl implements InteractionService {
     }
 
     @Override
-    public List<GetDirectCommentResponse> directComment(Long videoId) {
-        List<VideoUserComment> videoUserCommentList = videoUserCommentMapper.selectDirectComment(videoId);
+    public List<GetDirectCommentResponse> directComment(Long videoId, Long lastMinId) {
+        List<VideoUserComment> videoUserCommentList = videoUserCommentMapper.selectDirectComment(videoId, lastMinId);
         // 判断是否非空
         if (videoUserCommentList.isEmpty()) {
             return Collections.emptyList();
@@ -193,8 +191,8 @@ public class InteractionServiceImpl implements InteractionService {
     }
 
     @Override
-    public List<GetReplyCommentResponse> replyComment(Long commentId) {
-        List<CommentWithReceiver> videoUserCommentList = videoUserCommentMapper.selectReplyComment(commentId);
+    public List<GetReplyCommentResponse> replyComment(Long commentId, Long lastMaxId) {
+        List<CommentWithReceiver> videoUserCommentList = videoUserCommentMapper.selectReplyComment(commentId, lastMaxId);
         // 转换格式
         List<GetReplyCommentResponse> replyCommentResponseList = videoUserCommentList
                 .stream()

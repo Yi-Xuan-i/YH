@@ -36,7 +36,7 @@ public class InteractionTest {
         PostCommentRequest postCommentRequest2 = new PostCommentRequest();
         postCommentRequest2.setContent("视频很不错！");
         interactionService.comment(videoId2, userId2, postCommentRequest2);
-        assertNotNull(interactionService.directComment(videoId2), "评论插入异常！");
+        assertNotNull(interactionService.directComment(videoId2, null), "评论插入异常！");
     }
 
 }

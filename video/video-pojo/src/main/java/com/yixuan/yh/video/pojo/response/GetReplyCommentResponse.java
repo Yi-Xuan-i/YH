@@ -19,6 +19,8 @@ public class GetReplyCommentResponse {
     private Long receiverId;
     private String receiverName;
     private String receiverAvatar;
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long parentId;
     private Integer likeCount;
     private LocalDateTime updatedAt;
 }
