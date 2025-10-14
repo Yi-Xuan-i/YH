@@ -9,7 +9,6 @@ public class CommentWithReceiver {
     private Long id;
     private String content;
     private Long senderId;
-    private Long receiverCommentId;
     private Long receiverId;
     private Long parentId;
     private Integer likeCount;

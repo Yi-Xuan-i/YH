@@ -16,8 +16,6 @@ public class GetReplyCommentResponse {
     private String senderName;
     private String senderAvatar;
     @JsonSerialize(using = ToStringSerializer.class)
-    private Long receiverCommentId;
-    @JsonSerialize(using = ToStringSerializer.class)
     private Long receiverId;
     private String receiverName;
     private String receiverAvatar;

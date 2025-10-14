@@ -26,7 +26,6 @@
         a.id,
         a.content,
         a.user_id as senderId,
-        b.id as receiverCommentId,
         b.user_id as receiverId,
         a.parent_id,
         a.reply_count,
