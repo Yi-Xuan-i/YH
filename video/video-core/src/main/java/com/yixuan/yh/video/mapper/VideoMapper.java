@@ -32,14 +32,11 @@ public interface VideoMapper {
     @Select("select id, url, cover_url, description, likes, comments, favorites, created_time from video where creator_id = #{userId} and status = 'UPLOADED' order by created_time desc")
     List<Video> selectUploadedVideoByUserId(Long userId);
 
-    @Select("select id, url, cover_url, description, likes, comments, favorites, created_time from video where creator_id = #{userId} and status = 'PUBLISHED' order by created_time desc")
-    List<Video> selectPublishedVideoByUserId(Long userId);
+    List<Video> selectPublishedVideoByUserId(Long userId, Long lastMinId);
 
-    @Select("select id, url, cover_url, description, created_time from video where creator_id = #{userId} and status = 'PROCESSING' order by created_time desc")
-    List<Video> selectProcessingVideoByUserId(Long userId);
+    List<Video> selectProcessingVideoByUserId(Long userId, Long lastMinId);
 
-    @Select("select id, url, cover_url, description, created_time from video where creator_id = #{userId} and status = 'REJECTED' order by created_time desc")
-    List<Video> selectRejectedVideoByUserId(Long userId);
+    List<Video> selectRejectedVideoByUserId(Long userId, Long lastMinId);
 
     @Select("select count(*) from video where id = #{videoId}")
     boolean selectIsExistById(Long videoId);

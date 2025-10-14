@@ -245,24 +245,24 @@ public class VideoServiceImpl implements VideoService {
     }
 
     @Override
-    public List<GetPublishedVideoResponse> getPublishedVideo(Long userId) {
-        return videoMapper.selectPublishedVideoByUserId(userId)
+    public List<GetPublishedVideoResponse> getPublishedVideo(Long userId, Long lastMinId) {
+        return videoMapper.selectPublishedVideoByUserId(userId, lastMinId)
                 .stream()
                 .map(VideoMapStruct.INSTANCE::toGetPublishedVideoResponse)
                 .toList();
     }
 
     @Override
-    public List<GetProcessingVideoResponse> getProcessingVideo(Long userId) {
-        return videoMapper.selectProcessingVideoByUserId(userId)
+    public List<GetProcessingVideoResponse> getProcessingVideo(Long userId, Long lastMinId) {
+        return videoMapper.selectProcessingVideoByUserId(userId, lastMinId)
                 .stream()
                 .map(VideoMapStruct.INSTANCE::toGetProcessingVideoResponse)
                 .toList();
     }
 
     @Override
-    public List<GetRejectedVideoResponse> getRejectedVideo(Long userId) {
-        return videoMapper.selectRejectedVideoByUserId(userId)
+    public List<GetRejectedVideoResponse> getRejectedVideo(Long userId, Long lastMinId) {
+        return videoMapper.selectRejectedVideoByUserId(userId, lastMinId)
                 .stream()
                 .map(VideoMapStruct.INSTANCE::toGetRejectedVideoResponse)
                 .toList();

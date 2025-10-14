@@ -27,9 +27,9 @@ public interface VideoService {
 
     List<GetUploadedVideoResponse> getUploadedVideo(Long userId);
 
-    List<GetPublishedVideoResponse> getPublishedVideo(Long userId);
+    List<GetPublishedVideoResponse> getPublishedVideo(Long userId, Long lastMinId);
 
-    List<GetProcessingVideoResponse> getProcessingVideo(Long userId);
+    List<GetProcessingVideoResponse> getProcessingVideo(Long userId, Long lastMinId);
 
-    List<GetRejectedVideoResponse> getRejectedVideo(Long userId);
+    List<GetRejectedVideoResponse> getRejectedVideo(Long userId, Long lastMinId);
 }

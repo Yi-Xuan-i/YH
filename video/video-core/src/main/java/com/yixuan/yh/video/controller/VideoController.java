@@ -63,20 +63,20 @@ public class VideoController {
 
     @Operation(summary = "获取自己已发布的视频")
     @GetMapping("/published")
-    public Result<List<GetPublishedVideoResponse>> getPublishedVideo() {
-        return Result.success(videoService.getPublishedVideo(UserContext.getUser()));
+    public Result<List<GetPublishedVideoResponse>> getPublishedVideo(@RequestParam(required = false) Long lastMinId) {
+        return Result.success(videoService.getPublishedVideo(UserContext.getUser(), lastMinId));
     }
 
     @Operation(summary = "获取自己审核中的视频")
     @GetMapping("/processing")
-    public Result<List<GetProcessingVideoResponse>> getProcessingVideo() {
-        return Result.success(videoService.getProcessingVideo(UserContext.getUser()));
+    public Result<List<GetProcessingVideoResponse>> getProcessingVideo(@RequestParam(required = false) Long lastMinId) {
+        return Result.success(videoService.getProcessingVideo(UserContext.getUser(), lastMinId));
     }
 
     @Operation(summary = "获取自己未通过的视频")
     @GetMapping("/rejected")
-    public Result<List<GetRejectedVideoResponse>> getRejectedVideo() {
-        return Result.success(videoService.getRejectedVideo(UserContext.getUser()));
+    public Result<List<GetRejectedVideoResponse>> getRejectedVideo(@RequestParam(required = false) Long lastMinId) {
+        return Result.success(videoService.getRejectedVideo(UserContext.getUser(), lastMinId));
     }
 }
 

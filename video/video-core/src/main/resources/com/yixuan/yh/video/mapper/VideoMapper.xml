@@ -22,4 +22,61 @@
         </foreach>
     </update>
 
+    <select id="selectPublishedVideoByUserId" resultType="com.yixuan.yh.video.pojo.entity.Video">
+        select id,
+        url,
+        cover_url,
+        description,
+        likes,
+        comments,
+        favorites,
+        created_time
+        from video
+        where creator_id = #{userId}
+        and status = 'PUBLISHED'
+        <if test="lastMinId != null">
+            and id &lt; #{lastMinId}
+        </if>
+        order by id desc
+        limit 10;
+    </select>
+
+    <select id="selectProcessingVideoByUserId" resultType="com.yixuan.yh.video.pojo.entity.Video">
+        select id,
+        url,
+        cover_url,
+        description,
+        likes,
+        comments,
+        favorites,
+        created_time
+        from video
+        where creator_id = #{userId}
+        and status = 'PROCESSING'
+        <if test="lastMinId != null">
+            and id &lt; #{lastMinId}
+        </if>
+        order by id desc
+        limit 10
+    </select>
+
+    <select id="selectRejectedVideoByUserId" resultType="com.yixuan.yh.video.pojo.entity.Video">
+        select id,
+        url,
+        cover_url,
+        description,
+        likes,
+        comments,
+        favorites,
+        created_time
+        from video
+        where creator_id = #{userId}
+        and status = 'REJECTED'
+        <if test="lastMinId != null">
+            and id &lt; #{lastMinId}
+        </if>
+        order by id desc
+        limit 10
+    </select>
+
 </mapper>
