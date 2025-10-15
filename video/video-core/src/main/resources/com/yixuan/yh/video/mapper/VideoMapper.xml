@@ -79,4 +79,22 @@
         limit 10
     </select>
 
+    <select id="selectLikeVideoByUserId" resultType="com.yixuan.yh.video.pojo.entity.multi.VideoWithLike">
+        select l.id as like_id, video.id as video_id, creator_id, url, cover_url, description, likes
+        from video
+        join
+        (
+        select id, video_id
+        from video_user_like
+        where user_id = #{userId}
+        <if test="lastMinId != null">
+            and id &lt; #{lastMinId}
+        </if>
+        order by id desc
+        limit 10
+        ) l
+        on video.id = l.video_id
+        order by l.id desc
+    </select>
+
 </mapper>

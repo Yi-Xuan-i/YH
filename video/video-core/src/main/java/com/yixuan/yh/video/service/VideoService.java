@@ -32,4 +32,6 @@ public interface VideoService {
     List<GetProcessingVideoResponse> getProcessingVideo(Long userId, Long lastMinId);
 
     List<GetRejectedVideoResponse> getRejectedVideo(Long userId, Long lastMinId);
+
+    List<GetLikeVideoResponse> getLikeVideo(Long userId, Long lastMinId);
 }

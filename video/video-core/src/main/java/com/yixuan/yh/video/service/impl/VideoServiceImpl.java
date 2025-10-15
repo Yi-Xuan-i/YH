@@ -1,19 +1,20 @@
 package com.yixuan.yh.video.service.impl;
 
 import com.yixuan.mt.client.MTClient;
+import com.yixuan.yh.common.exception.YHServerException;
+import com.yixuan.yh.common.response.Result;
 import com.yixuan.yh.common.utils.MinioUtils;
 import com.yixuan.yh.common.utils.SnowflakeUtils;
 import com.yixuan.yh.user.feign.UserFollowPrivateClient;
 import com.yixuan.yh.user.feign.UserPreferencesPrivateClient;
+import com.yixuan.yh.user.feign.UserPrivateClient;
 import com.yixuan.yh.video.constant.RabbitMQConstant;
-import com.yixuan.yh.video.mapper.VideoUploadTaskMapper;
+import com.yixuan.yh.video.mapper.*;
 import com.yixuan.yh.video.mapstruct.VideoMapStruct;
 import com.yixuan.yh.video.pojo.entity.Video;
 import com.yixuan.yh.video.pojo.entity.VideoTag;
-import com.yixuan.yh.video.mapper.VideoMapper;
-import com.yixuan.yh.video.mapper.VideoTagMapper;
-import com.yixuan.yh.video.mapper.VideoTagMpMapper;
 import com.yixuan.yh.video.mapper.multi.VideoMultiMapper;
+import com.yixuan.yh.video.pojo.entity.multi.VideoWithLike;
 import com.yixuan.yh.video.pojo.mq.VideoPostMessage;
 import com.yixuan.yh.video.pojo.entity.VideoUploadTask;
 import com.yixuan.yh.video.pojo.response.*;
@@ -39,6 +40,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Service
@@ -70,6 +72,8 @@ public class VideoServiceImpl implements VideoService {
     private MinioUtils minioUtils;
     @Autowired
     private VideoUploadTaskMapper videoUploadTaskMapper;
+    @Autowired
+    private UserPrivateClient userPrivateClient;
 
     @Override
     public List<VideoMainResponse> getVideos() {
@@ -266,5 +270,39 @@ public class VideoServiceImpl implements VideoService {
                 .stream()
                 .map(VideoMapStruct.INSTANCE::toGetRejectedVideoResponse)
                 .toList();
+    }
+
+    @Override
+    public List<GetLikeVideoResponse> getLikeVideo(Long userId, Long lastMinId) {
+        // 获取数据
+        List<VideoWithLike> videoWithLikeList = videoMapper.selectLikeVideoByUserId(userId, lastMinId);
+        if (videoWithLikeList.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // 转换格式
+        List<GetLikeVideoResponse> likeVideoResponseList = videoMapper.selectLikeVideoByUserId(userId, lastMinId)
+                .stream()
+                .map(VideoMapStruct.INSTANCE::toGetLikeVideoResponse)
+                .toList();
+
+        // 提取 creatorId
+        List<Long> creatorIdList = likeVideoResponseList.stream()
+                .map(GetLikeVideoResponse::getCreatorId)
+                .toList();
+
+        // 获取对应 creatorName
+        Result<Map<Long, String>> result = userPrivateClient.getNameBatch(creatorIdList);
+        if (result.isError()) {
+            throw new YHServerException(result.getMsg());
+        }
+        Map<Long, String> idToNameMap = result.getData();
+
+        // 完善数据
+        likeVideoResponseList.forEach(response -> {
+            response.setCreatorName(idToNameMap.get(response.getCreatorId()));
+        });
+
+        return likeVideoResponseList;
     }
 }

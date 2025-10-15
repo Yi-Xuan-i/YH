@@ -2,11 +2,8 @@ package com.yixuan.yh.video.controller;
 
 import com.yixuan.yh.common.response.Result;
 import com.yixuan.yh.common.utils.UserContext;
-import com.yixuan.yh.video.pojo.response.GetProcessingVideoResponse;
-import com.yixuan.yh.video.pojo.response.GetPublishedVideoResponse;
-import com.yixuan.yh.video.pojo.response.GetRejectedVideoResponse;
+import com.yixuan.yh.video.pojo.response.*;
 import com.yixuan.yh.video.pojo.request.PostVideoMessageRequest;
-import com.yixuan.yh.video.pojo.response.VideoMainWithInteractionResponse;
 import com.yixuan.yh.video.service.VideoService;
 import io.minio.errors.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -77,6 +74,12 @@ public class VideoController {
     @GetMapping("/rejected")
     public Result<List<GetRejectedVideoResponse>> getRejectedVideo(@RequestParam(required = false) Long lastMinId) {
         return Result.success(videoService.getRejectedVideo(UserContext.getUser(), lastMinId));
+    }
+
+    @Operation(summary = "获取自己喜欢的视频")
+    @GetMapping("/like")
+    public Result<List<GetLikeVideoResponse>> getLikeVideo(@RequestParam(required = false) Long lastMinId) {
+        return Result.success(videoService.getLikeVideo(UserContext.getUser(), lastMinId));
     }
 }
 

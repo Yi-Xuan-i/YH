@@ -1,6 +1,7 @@
 package com.yixuan.yh.video.mapper;
 
 import com.yixuan.yh.video.pojo.entity.Video;
+import com.yixuan.yh.video.pojo.entity.multi.VideoWithLike;
 import com.yixuan.yh.video.pojo.request.VideoInteractionBatchRequest;
 import com.yixuan.yh.videoprocessor.mq.VideoCommentIncrMessage;
 import org.apache.ibatis.annotations.Insert;
@@ -40,4 +41,6 @@ public interface VideoMapper {
 
     @Select("select count(*) from video where id = #{videoId}")
     boolean selectIsExistById(Long videoId);
+
+    List<VideoWithLike> selectLikeVideoByUserId(Long userId, Long lastMinId);
 }

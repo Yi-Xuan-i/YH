@@ -1,10 +1,8 @@
 package com.yixuan.yh.video.mapstruct;
 
 import com.yixuan.yh.video.pojo.entity.Video;
-import com.yixuan.yh.video.pojo.response.GetProcessingVideoResponse;
-import com.yixuan.yh.video.pojo.response.GetPublishedVideoResponse;
-import com.yixuan.yh.video.pojo.response.GetRejectedVideoResponse;
-import com.yixuan.yh.video.pojo.response.GetUploadedVideoResponse;
+import com.yixuan.yh.video.pojo.entity.multi.VideoWithLike;
+import com.yixuan.yh.video.pojo.response.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -17,4 +15,5 @@ public interface VideoMapStruct {
     GetPublishedVideoResponse toGetPublishedVideoResponse(Video video);
     GetProcessingVideoResponse toGetProcessingVideoResponse(Video video);
     GetRejectedVideoResponse toGetRejectedVideoResponse(Video video);
+    GetLikeVideoResponse toGetLikeVideoResponse(VideoWithLike videoWithLike);
 }
