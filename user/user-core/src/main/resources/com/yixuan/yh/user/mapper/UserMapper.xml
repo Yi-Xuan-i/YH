@@ -3,6 +3,12 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yixuan.yh.user.mapper.UserMapper">
+    <select id="selectNameByIdList" resultType="com.yixuan.yh.user.pojo.entity.User">
+        select id, name from user where id in
+        <foreach collection="idList" open="(" close=")" separator="," item="id">
+            #{id}
+        </foreach>
+    </select>
 
     <select id="selectUserInfoInList" resultType="com.yixuan.yh.user.pojo.entity.User">
         select id, name, avatar_url from user where id in

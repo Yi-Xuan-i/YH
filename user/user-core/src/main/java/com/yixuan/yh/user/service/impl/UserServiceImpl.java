@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -20,6 +22,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public String getName(String id) {
         return userMapper.selectNameById(id);
+    }
+
+    @Override
+    public Map<Long, String> getNameBatch(List<Long> idList) {
+        return userMapper.selectNameByIdList(idList)
+                .stream()
+                .collect(Collectors.toMap(User::getId, User::getName));
     }
 
     @Override

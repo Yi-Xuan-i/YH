@@ -26,7 +26,7 @@ public interface UserMapper {
     ProfileResponse selectProfile(Long userId);
 
     @Select("select name, avatar_url from user where id = #{userId}")
-    User selectBasicProfile(Long userId);
+    User selectProfileBasic(Long userId);
 
     @Update("update user set avatar_url = #{newAvatarUrl} where id = #{userId}")
     void updateAvatarUrl(Long userId, String newAvatarUrl);
@@ -36,6 +36,8 @@ public interface UserMapper {
 
     @Select("select name from user where id = #{id}")
     String selectNameById(String id);
+
+    List<User> selectNameByIdList(List<Long> idList);
 
     List<User> selectUserInfoInList(List<Long> idList);
 
