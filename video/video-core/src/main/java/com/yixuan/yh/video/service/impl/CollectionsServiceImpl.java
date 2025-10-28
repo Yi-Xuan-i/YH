@@ -21,8 +21,8 @@ public class CollectionsServiceImpl implements CollectionsService {
     private final SnowflakeUtils snowflakeUtils;
 
     @Override
-    public List<GetCollectionsResponse> getCollections(Long userId) {
-        return videoUserCollectionsMapper.selectByUserId(userId)
+    public List<GetCollectionsResponse> getCollections(Long userId, Long lastMinId) {
+        return videoUserCollectionsMapper.selectByUserId(userId, lastMinId)
                 .stream().map(CollectionsMapStruct.INSTANCE::toGetCollectionsResponse)
                 .toList();
     }

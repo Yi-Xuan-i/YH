@@ -22,8 +22,8 @@ public class CollectionsController {
 
     @Operation(summary = "获取收藏夹")
     @GetMapping
-    public Result<List<GetCollectionsResponse>> getCollections() {
-        return Result.success(collectionsService.getCollections(UserContext.getUser()));
+    public Result<List<GetCollectionsResponse>> getCollections(@RequestParam(required = false) Long lastMinId) {
+        return Result.success(collectionsService.getCollections(UserContext.getUser(), lastMinId));
     }
 
     @Operation(summary = "创建收藏夹")

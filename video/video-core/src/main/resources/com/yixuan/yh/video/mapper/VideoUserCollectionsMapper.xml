@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yixuan.yh.video.mapper.VideoUserCollectionsMapper">
+
+    <select id="selectByUserId" resultType="com.yixuan.yh.video.pojo.entity.VideoUserCollections">
+        select id, name, item_count from video_user_collections where user_id = #{userId}
+        <if test="lastMinId != null">
+            and id &lt; #{lastMinId}
+        </if>
+        order by id desc limit 15
+    </select>
+
+</mapper>
