@@ -3,6 +3,7 @@ package com.yixuan.yh.video.controller;
 import com.yixuan.yh.common.response.Result;
 import com.yixuan.yh.common.utils.UserContext;
 import com.yixuan.yh.video.pojo.request.PostCollectionsRequest;
+import com.yixuan.yh.video.pojo.request.PutCollectionsRequest;
 import com.yixuan.yh.video.pojo.response.GetCollectionsResponse;
 import com.yixuan.yh.video.service.CollectionsService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,6 +31,20 @@ public class CollectionsController {
     @PostMapping
     public Result<String> postCollections(@RequestBody PostCollectionsRequest postCollectionsRequest) {
         return Result.success(collectionsService.postCollections(UserContext.getUser(), postCollectionsRequest));
+    }
+
+    @Operation(summary = "修改收藏夹")
+    @PutMapping("/{collectionsId}")
+    public Result<Void> putCollections(@PathVariable Long collectionsId, @RequestBody PutCollectionsRequest putCollectionsRequest) {
+        collectionsService.putCollections(collectionsId, putCollectionsRequest);
+        return Result.success();
+    }
+
+    @Operation(summary = "删除收藏夹")
+    @DeleteMapping("/{collectionsId}")
+    public Result<Void> deleteCollections(@PathVariable Long collectionsId) {
+        collectionsService.deleteCollections(collectionsId);
+        return Result.success();
     }
 
 }

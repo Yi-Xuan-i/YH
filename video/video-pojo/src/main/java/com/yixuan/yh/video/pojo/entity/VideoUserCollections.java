@@ -1,11 +1,13 @@
 package com.yixuan.yh.video.pojo.entity;
 
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+@TableName("video_user_collections")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

@@ -2,6 +2,7 @@ package com.yixuan.yh.video.mapstruct;
 
 import com.yixuan.yh.video.pojo.entity.VideoUserCollections;
 import com.yixuan.yh.video.pojo.request.PostCollectionsRequest;
+import com.yixuan.yh.video.pojo.request.PutCollectionsRequest;
 import com.yixuan.yh.video.pojo.response.GetCollectionsResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -13,4 +14,6 @@ public interface CollectionsMapStruct {
     GetCollectionsResponse toGetCollectionsResponse(VideoUserCollections videoUserCollections);
 
     VideoUserCollections toVideoUserCollections(PostCollectionsRequest postCollectionsRequest);
+
+    VideoUserCollections toVideoUserCollections(PutCollectionsRequest putCollectionsRequest);
 }
