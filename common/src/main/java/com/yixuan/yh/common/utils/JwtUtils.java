@@ -18,10 +18,22 @@ public class JwtUtils {
     private String signKey;
     private Long expire;
 
+    public String generateJwt(Map<String, Object> claims) {
+        return generateJwt(signKey, expire, claims);
+    }
+
+    public String generateJwt(String signKey, Map<String, Object> claims) {
+        return generateJwt(signKey, expire, claims);
+    }
+
+    public String generateJwt(long expire, Map<String, Object> claims) {
+        return generateJwt(signKey, expire, claims);
+    }
+
     /**
      * 生成JWT
      */
-    public String generateJwt(Map<String, Object> claims) {
+    public String generateJwt(String signKey, long expire, Map<String, Object> claims) {
         return Jwts.builder()
                 .signWith(SignatureAlgorithm.HS256, signKey) // 签名算法
                 .setClaims(claims) // 自定义内容(载荷)
@@ -37,5 +49,17 @@ public class JwtUtils {
                 .setSigningKey(signKey)
                 .parseClaimsJws(jwt)
                 .getBody();
+    }
+
+    /**
+     * 判断JWT是否过期（如果JWT是错误也会视为过期）
+     */
+    public boolean isExpired(String jwt) {
+        try {
+            parseJwt(jwt);
+            return false;
+        } catch (Exception e) {
+            return true;
+        }
     }
 }
