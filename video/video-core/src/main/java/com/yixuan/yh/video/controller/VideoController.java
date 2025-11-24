@@ -81,5 +81,11 @@ public class VideoController {
     public Result<List<GetLikeVideoResponse>> getLikeVideo(@RequestParam(required = false) Long lastMinId) {
         return Result.success(videoService.getLikeVideo(UserContext.getUser(), lastMinId));
     }
+
+    @Operation(summary = "获取自己收藏的视频")
+    @GetMapping("/favorite")
+    public Result<List<GetFavoriteVideoResponse>> getFavoriteVideo(@RequestParam(required = false) Long lastMinId) {
+        return Result.success(videoService.getFavoriteVideo(UserContext.getUser(), lastMinId));
+    }
 }
 

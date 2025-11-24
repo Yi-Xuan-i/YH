@@ -18,5 +18,5 @@ public interface UserPrivateClient {
     Result<Map<Long, String>> getNameBatch(@RequestParam List<Long> idList);
 
     @GetMapping("/user/api/private/info-in-list")
-     Result<List<UserInfoInListResponse>> getUserInfoInList(@RequestParam List<Long> idList);
+    Result<List<UserInfoInListResponse>> getUserInfoInList(@RequestParam List<Long> idList);
 }

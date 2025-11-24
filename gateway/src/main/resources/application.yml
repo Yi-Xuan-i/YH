@@ -29,3 +29,13 @@ logging:
       netty: DEBUG
     io:
       netty: DEBUG
+
+knife4j:
+  gateway:
+    enabled: true
+    strategy: discover  # 服务发现模式
+    discover:
+      enabled: true
+      version: openapi3  # 子服务规范: openapi3 或 swagger2
+      excluded-services:
+        - gateway

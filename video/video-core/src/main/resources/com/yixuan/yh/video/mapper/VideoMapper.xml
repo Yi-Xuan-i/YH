@@ -97,4 +97,22 @@
         order by l.id desc
     </select>
 
+    <select id="selectFavoriteVideoByUserId" resultType="com.yixuan.yh.video.pojo.entity.multi.VideoWithFavorite">
+        select f.id as favorite_id, video.id as video_id, creator_id, url, cover_url, description, favorites
+        from video
+        join
+        (
+        select id, video_id
+        from video_user_favorite
+        where user_id = #{userId}
+        <if test="lastMinId != null">
+            and id &lt; #{lastMinId}
+        </if>
+        order by id desc
+        limit 10
+        ) f
+        on video.id = f.video_id
+        order by f.id desc
+    </select>
+
 </mapper>

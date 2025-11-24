@@ -14,6 +14,7 @@ import com.yixuan.yh.video.mapstruct.VideoMapStruct;
 import com.yixuan.yh.video.pojo.entity.Video;
 import com.yixuan.yh.video.pojo.entity.VideoTag;
 import com.yixuan.yh.video.mapper.multi.VideoMultiMapper;
+import com.yixuan.yh.video.pojo.entity.multi.VideoWithFavorite;
 import com.yixuan.yh.video.pojo.entity.multi.VideoWithLike;
 import com.yixuan.yh.video.pojo.mq.VideoPostMessage;
 import com.yixuan.yh.video.pojo.entity.VideoUploadTask;
@@ -78,6 +79,11 @@ public class VideoServiceImpl implements VideoService {
     @Override
     public List<VideoMainResponse> getVideos() {
         return videoMultiMapper.selectMainRandom();
+    }
+
+    @Override
+    public VideoMainResponse getVideo(Long videoId) {
+        return videoMultiMapper.selectMainOne(videoId);
     }
 
     @Override
@@ -304,5 +310,39 @@ public class VideoServiceImpl implements VideoService {
         });
 
         return likeVideoResponseList;
+    }
+
+    @Override
+    public List<GetFavoriteVideoResponse> getFavoriteVideo(Long userId, Long lastMinId) {
+        // 获取数据
+        List<VideoWithFavorite> videoWithFavoriteList = videoMapper.selectFavoriteVideoByUserId(userId, lastMinId);
+        if (videoWithFavoriteList.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // 转换格式
+        List<GetFavoriteVideoResponse> favoriteVideoResponseList = videoWithFavoriteList
+                .stream()
+                .map(VideoMapStruct.INSTANCE::toGetFavoriteVideoResponse)
+                .toList();
+
+        // 提取 creatorId
+        List<Long> creatorIdList = favoriteVideoResponseList.stream()
+                .map(GetFavoriteVideoResponse::getCreatorId)
+                .toList();
+
+        // 获取对应 creatorName
+        Result<Map<Long, String>> result = userPrivateClient.getNameBatch(creatorIdList);
+        if (result.isError()) {
+            throw new YHServerException(result.getMsg());
+        }
+        Map<Long, String> idToNameMap = result.getData();
+
+        // 完善数据
+        favoriteVideoResponseList.forEach(response -> {
+            response.setCreatorName(idToNameMap.get(response.getCreatorId()));
+        });
+
+        return favoriteVideoResponseList;
     }
 }

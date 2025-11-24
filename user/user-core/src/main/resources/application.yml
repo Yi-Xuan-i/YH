@@ -76,3 +76,7 @@ mt:
   bucket-name: user
   username: mt
   password: mt
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs

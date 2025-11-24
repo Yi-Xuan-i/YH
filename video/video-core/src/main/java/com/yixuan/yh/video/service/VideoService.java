@@ -13,6 +13,8 @@ import java.util.List;
 public interface VideoService {
     List<VideoMainResponse> getVideos();
 
+    VideoMainResponse getVideo(Long videoId);
+
     List<VideoMainWithInteractionResponse> getVideosWithInteractionStatus(Long userId);
 
     String postVideoStart(Long userId, Long fileSize, Integer totalChunks);
@@ -34,4 +36,6 @@ public interface VideoService {
     List<GetRejectedVideoResponse> getRejectedVideo(Long userId, Long lastMinId);
 
     List<GetLikeVideoResponse> getLikeVideo(Long userId, Long lastMinId);
+
+    List<GetFavoriteVideoResponse> getFavoriteVideo(Long userId, Long lastMinId);
 }

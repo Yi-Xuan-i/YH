@@ -76,3 +76,7 @@ minio:
 
 milvus:
   uri: http://127.0.0.1:19530
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs

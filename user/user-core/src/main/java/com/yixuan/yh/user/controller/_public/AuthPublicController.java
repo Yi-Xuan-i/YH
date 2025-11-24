@@ -6,6 +6,7 @@ import com.yixuan.yh.common.response.Result;
 import com.yixuan.yh.user.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Auth")
 @RestController
 @RequestMapping("/public/auth")
+@Slf4j
 public class AuthPublicController {
 
     @Autowired

@@ -5,8 +5,9 @@ import com.yixuan.yh.user.mapper.UserMapper;
 import com.yixuan.yh.user.mapstruct.ProfileMapStruct;
 import com.yixuan.yh.user.pojo.entity.User;
 import com.yixuan.yh.user.pojo.request.ProfileRequest;
-import com.yixuan.yh.user.pojo.response.BasicProfileResponse;
+import com.yixuan.yh.user.pojo.response.ProfileBasicResponse;
 import com.yixuan.yh.user.pojo.response.ProfileResponse;
+import com.yixuan.yh.user.pojo.response.ProfileStatsResponse;
 import com.yixuan.yh.user.service.ProfileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -36,9 +37,14 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public BasicProfileResponse getBasicProfile(Long userId) {
-        User user = userMapper.selectBasicProfile(userId);
+    public ProfileBasicResponse getProfileBasic(Long userId) {
+        User user = userMapper.selectProfileBasic(userId);
         return ProfileMapStruct.INSTANCE.userToBasicProfileResponse(user);
+    }
+
+    @Override
+    public ProfileStatsResponse getProfileStats(Long user) {
+        return null;
     }
 
     @Override

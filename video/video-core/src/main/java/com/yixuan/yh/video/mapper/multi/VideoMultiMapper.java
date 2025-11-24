@@ -49,4 +49,10 @@ public interface VideoMultiMapper {
             ") \n" +
             "LIMIT 5;")
     List<VideoMainWithInteractionResponse> selectMainWithInteractionStatusRandom(Long userId);
+
+    @Select("SELECT video.id, creator_id, name as creatorName, avatar_url as creatorAvatar, url, description, likes, comments, favorites \n" +
+            "FROM video \n" +
+            "JOIN user on video.creator_id = user.id " +
+            "WHERE video.id = #{videoId}")
+    VideoMainResponse selectMainOne(Long videoId);
 }

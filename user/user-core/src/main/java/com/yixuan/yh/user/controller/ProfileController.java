@@ -1,10 +1,11 @@
 package com.yixuan.yh.user.controller;
 
 import com.yixuan.yh.user.pojo.request.ProfileRequest;
-import com.yixuan.yh.user.pojo.response.BasicProfileResponse;
+import com.yixuan.yh.user.pojo.response.ProfileBasicResponse;
 import com.yixuan.yh.user.pojo.response.ProfileResponse;
 import com.yixuan.yh.common.response.Result;
 import com.yixuan.yh.common.utils.UserContext;
+import com.yixuan.yh.user.pojo.response.ProfileStatsResponse;
 import com.yixuan.yh.user.service.ProfileService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,8 +31,14 @@ public class ProfileController {
 
     @Operation(summary = "获取个人基本信息（主要用于主页渲染）")
     @GetMapping("/basic")
-    public Result<BasicProfileResponse> getBasicProfile() {
-        return Result.success(profileService.getBasicProfile(UserContext.getUser()));
+    public Result<ProfileBasicResponse> getProfileBasic() {
+        return Result.success(profileService.getProfileBasic(UserContext.getUser()));
+    }
+
+    @Operation(summary = "获取个人简介（统计数据）")
+    @GetMapping("/stats")
+    public Result<ProfileStatsResponse> getProfileStats() {
+        return Result.success(profileService.getProfileStats(UserContext.getUser()));
     }
 
     @Operation(summary = "上传（修改）头像")

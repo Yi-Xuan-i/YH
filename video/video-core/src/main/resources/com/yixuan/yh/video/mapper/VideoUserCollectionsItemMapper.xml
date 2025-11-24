@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yixuan.yh.video.mapper.VideoUserCollectionsItemMapper">
+
+    <select id="selectCollectionsItem" resultType="com.yixuan.yh.video.pojo.entity.multi.VideoCollectionsWithVideo">
+        select video_user_collections_item.id, collections_id, video_id, cover_url, url, description, creator_id from video_user_collections_item
+        join video on video_user_collections_item.video_id = video.id
+    </select>
+</mapper>

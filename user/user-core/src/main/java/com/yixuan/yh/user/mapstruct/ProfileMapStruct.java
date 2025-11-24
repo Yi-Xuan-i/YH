@@ -1,7 +1,7 @@
 package com.yixuan.yh.user.mapstruct;
 
 import com.yixuan.yh.user.pojo.entity.User;
-import com.yixuan.yh.user.pojo.response.BasicProfileResponse;
+import com.yixuan.yh.user.pojo.response.ProfileBasicResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -9,5 +9,5 @@ import org.mapstruct.factory.Mappers;
 public interface ProfileMapStruct {
     ProfileMapStruct INSTANCE = Mappers.getMapper(ProfileMapStruct.class);
 
-    BasicProfileResponse userToBasicProfileResponse(User user);
+    ProfileBasicResponse userToBasicProfileResponse(User user);
 }

@@ -1,6 +1,7 @@
 package com.yixuan.yh.video.mapper;
 
 import com.yixuan.yh.video.pojo.entity.Video;
+import com.yixuan.yh.video.pojo.entity.multi.VideoWithFavorite;
 import com.yixuan.yh.video.pojo.entity.multi.VideoWithLike;
 import com.yixuan.yh.video.pojo.request.VideoInteractionBatchRequest;
 import com.yixuan.yh.videoprocessor.mq.VideoCommentIncrMessage;
@@ -43,4 +44,6 @@ public interface VideoMapper {
     boolean selectIsExistById(Long videoId);
 
     List<VideoWithLike> selectLikeVideoByUserId(Long userId, Long lastMinId);
+
+    List<VideoWithFavorite> selectFavoriteVideoByUserId(Long userId, Long lastMinId);
 }

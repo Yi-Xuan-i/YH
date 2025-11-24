@@ -2,6 +2,7 @@ package com.yixuan.yh.video.controller;
 
 import com.yixuan.yh.common.response.Result;
 import com.yixuan.yh.common.utils.UserContext;
+import com.yixuan.yh.video.pojo.response.GetCollectionsItemResponse;
 import com.yixuan.yh.video.pojo.request.PostCollectionsRequest;
 import com.yixuan.yh.video.pojo.request.PutCollectionsRequest;
 import com.yixuan.yh.video.pojo.response.GetCollectionsResponse;
@@ -25,6 +26,12 @@ public class CollectionsController {
     @GetMapping
     public Result<List<GetCollectionsResponse>> getCollections(@RequestParam(required = false) Long lastMinId) {
         return Result.success(collectionsService.getCollections(UserContext.getUser(), lastMinId));
+    }
+
+    @Operation(summary = "获取收藏夹中的视频")
+    @GetMapping("/item/{collectionsId}")
+    public Result<List<GetCollectionsItemResponse>> getCollectionsItemList(@PathVariable Long collectionsId) {
+        return Result.success(collectionsService.getCollectionsItemList(UserContext.getUser(), collectionsId));
     }
 
     @Operation(summary = "创建收藏夹")

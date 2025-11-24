@@ -29,4 +29,10 @@ public class VideoPublicController {
     public Result<List<VideoMainResponse>> getVideos() {
         return Result.success(videoService.getVideos());
     }
+
+    @Operation(summary = "获取指定视频数据")
+    @GetMapping
+    public Result<VideoMainResponse> getVideo(@RequestParam Long videoId) {
+        return Result.success(videoService.getVideo(videoId));
+    }
 }
