@@ -30,11 +30,7 @@ public class VideoUserFavoriteCache {
             if (result.equals(RedisConstant.InteractionLua.NOT_EXIST.getValue())) {
                 result = videoUserFavoriteMapper.isFavorite(userId, videoId) ? 1L : 0L;
                 stringRedisTemplate.opsForHash().put(key, videoId.toString(), String.valueOf(result));
-            } else if (result.equals(RedisConstant.InteractionLua.ERROR.getValue())) {
-                return false;
-            } else {
-                return true;
-            }
+            } else return !result.equals(RedisConstant.InteractionLua.ERROR.getValue());
         }
     }
 
@@ -47,11 +43,7 @@ public class VideoUserFavoriteCache {
             if (result.equals(RedisConstant.InteractionLua.NOT_EXIST.getValue())) {
                 result = videoUserFavoriteMapper.isFavorite(userId, videoId) ? 1L : 0L;
                 stringRedisTemplate.opsForHash().put(key, videoId.toString(), String.valueOf(result));
-            } else if (result.equals(RedisConstant.InteractionLua.ERROR.getValue())) {
-                return false;
-            } else {
-                return true;
-            }
+            } else return !result.equals(RedisConstant.InteractionLua.ERROR.getValue());
         }
     }
 
