@@ -22,10 +22,6 @@ if current_value == "0" then
     new_value = "1"
 elseif current_value == "1" then
     new_value = "0"
-else
-    -- 如果当前值不是"0"或"1"，保持不变（或根据需求处理）
-    new_value = current_value
-end
 
 redis.call('HSET', KEYS[1], ARGV[1], new_value)
 

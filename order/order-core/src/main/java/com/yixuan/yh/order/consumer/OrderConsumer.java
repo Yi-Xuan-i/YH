@@ -41,7 +41,6 @@ public class OrderConsumer {
     public void handleOrderExpiration(OrderExpirationMessage orderExpirationMessage) throws AlipayApiException {
         // 更新订单状态
         if (orderService.putToCancelIfUnpaid(orderExpirationMessage.getOrderId())) {
-            System.out.println("归还库存！");
             // 归还占用库存
             Result<Void> result = productPrivateClient.putReservedStock(orderExpirationMessage.getSkuId(), Map.of("quantity", orderExpirationMessage.getQuantity()));
             if (result.isError()) {

@@ -21,6 +21,10 @@ spring:
       username: nacos
       password: nacos
       server-addr: 106.13.105.230:8848
+      config:
+        namespace: dev
+      discovery:
+        namespace: ${spring.cloud.nacos.config.namespace}
     openfeign:
       httpclient:
         enabled: true # 开启 Feign 对 httpClient 的支持
@@ -46,9 +50,8 @@ logging:
     org.springframework.jdbc.support.JdbcTransactionManager: debug
 
 mt:
-  console-url: http://127.0.0.1:19998
-  core-url: http://127.0.0.1:19999
-  bucket-name: product
+  console-url: http://43.139.55.171:19998
+  core-url: http://43.139.55.171:19999
+  bucket-name: user
   username: mt
   password: mt
-
