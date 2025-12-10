@@ -2,16 +2,8 @@ server:
   port: 10089
   servlet:
     context-path: /order
-  tomcat:
-    threads:
-      max: 5
-      min-spare: 2
-    max-connections: 50
 
 spring:
-  mvc:
-    servlet:
-      path: /api
   application:
     name: orderService
   profiles:
@@ -20,7 +12,7 @@ spring:
     nacos:
       username: nacos
       password: nacos
-      server-addr: 106.13.105.230:8848
+      server-addr: nacos:8848
       config:
         namespace: dev
       discovery:
@@ -35,35 +27,3 @@ spring:
     import:
       - nacos:common-dev.yaml?group=DEFAULT_GROUP&refreshEnabled=true
       - nacos:order-dev.yaml?group=DEFAULT_GROUP&refreshEnabled=true
-  servlet:
-    multipart:
-      max-file-size: 5000MB
-      max-request-size: 7000MB
-  #      enabled: false
-
-#mybatis:
-#  configuration:
-#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-#    map-underscore-to-camel-case: true # 开启驼峰命名自动映射
-
-mybatis-plus:
-  type-aliases-package: com.yixuan.yh.order.pojo
-  mapper-locations: "classpath*:/com/yixuan/yh/**/mapper/*.xml"
-  configuration:
-    map-underscore-to-camel-case: true
-    cache-enabled: false
-  global-config:
-    db-config:
-      id-type: assign_id # id 为雪花算法生成
-      update-strategy: not_null
-
-logging:
-  level:
-    org.springframework.jdbc.support.JdbcTransactionManager: debug
-
-mt:
-  console-url: http://47.121.24.225:19998
-  core-url: http://47.121.24.225:19999
-  bucket-name: video
-  username: mt
-  password: mt

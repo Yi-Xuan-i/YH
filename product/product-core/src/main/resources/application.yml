@@ -2,16 +2,8 @@ server:
   port: 10090
   servlet:
     context-path: /product
-  tomcat:
-    threads:
-      max: 5
-      min-spare: 2
-    max-connections: 50
 
 spring:
-  mvc:
-    servlet:
-      path: /api
   application:
     name: productService
   profiles:
@@ -20,7 +12,7 @@ spring:
     nacos:
       username: nacos
       password: nacos
-      server-addr: 106.13.105.230:8848
+      server-addr: nacos:8848
       config:
         namespace: dev
       discovery:
@@ -34,24 +26,4 @@ spring:
   config:
     import:
       - nacos:common-dev.yaml?group=DEFAULT_GROUP&refreshEnabled=true
-  servlet:
-    multipart:
-      max-file-size: 5000MB
-      max-request-size: 7000MB
-#      enabled: false
-
-mybatis:
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-    map-underscore-to-camel-case: true # 开启驼峰命名自动映射
-
-logging:
-  level:
-    org.springframework.jdbc.support.JdbcTransactionManager: debug
-
-mt:
-  console-url: http://43.139.55.171:19998
-  core-url: http://43.139.55.171:19999
-  bucket-name: user
-  username: mt
-  password: mt
+      - nacos:product-dev.yaml?group=DEFAULT_GROUP&refreshEnabled=true

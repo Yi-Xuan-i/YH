@@ -2,16 +2,8 @@ server:
   port: 10091
   servlet:
     context-path: /video
-  tomcat:
-    threads:
-      max: 5
-      min-spare: 2
-    max-connections: 50
 
 spring:
-  mvc:
-    servlet:
-      path: /api
   application:
     name: videoService
   profiles:
@@ -20,7 +12,7 @@ spring:
     nacos:
       username: nacos
       password: nacos
-      server-addr: 106.13.105.230:8848
+      server-addr: nacos:8848
       config:
         namespace: dev
       discovery:
@@ -34,49 +26,4 @@ spring:
   config:
     import:
       - nacos:common-dev.yaml?group=DEFAULT_GROUP&refreshEnabled=true
-
-  servlet:
-    multipart:
-      max-file-size: 5000MB
-      max-request-size: 7000MB
-#      enabled: false
-
-#mybatis:
-#  configuration:
-#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-#    map-underscore-to-camel-case: true # 开启驼峰命名自动映射
-mybatis-plus:
-  type-aliases-package: com.yixuan.yh.video.pojo
-  mapper-locations: "classpath*:/com/yixuan/yh/**/mapper/*.xml"
-  configuration:
-    map-underscore-to-camel-case: true
-    cache-enabled: false
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-  global-config:
-    db-config:
-      id-type: assign_id # id 为雪花算法生成
-      update-strategy: not_null
-
-logging:
-  level:
-    org.springframework.jdbc.support.JdbcTransactionManager: debug
-
-mt:
-  console-url: http://43.139.55.171:19998
-  core-url: http://43.139.55.171:19999
-  bucket-name: video
-  username: mt
-  password: mt
-
-minio:
-  minio-url: http://127.0.0.1:9000
-  secret-key: minioadmin
-  access-key: minioadmin
-  bucket: video
-
-milvus:
-  uri: http://127.0.0.1:19530
-
-springdoc:
-  api-docs:
-    path: /v3/api-docs
+      - nacos:video-dev.yaml?group=DEFAULT_GROUP&refreshEnabled=true

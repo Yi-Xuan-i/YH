@@ -6,14 +6,10 @@ spring:
   profiles:
     active: dev
   cloud:
-    gateway:
-      httpclient:
-        websocket:
-          max-frame-payload-length: 120000000
     nacos:
       username: nacos
       password: nacos
-      server-addr: 106.13.105.230:8848
+      server-addr: nacos:8848
       config:
         namespace: dev
       discovery:
@@ -22,20 +18,3 @@ spring:
     import:
       - nacos:gateway-dev.yaml?group=DEFAULT_GROUP&refreshEnabled=true
       - nacos:common-dev.yaml?group=DEFAULT_GROUP&refreshEnabled=true
-
-logging:
-  level:
-    reactor:
-      netty: DEBUG
-    io:
-      netty: DEBUG
-
-knife4j:
-  gateway:
-    enabled: true
-    strategy: discover  # 服务发现模式
-    discover:
-      enabled: true
-      version: openapi3  # 子服务规范: openapi3 或 swagger2
-      excluded-services:
-        - gateway

@@ -1,23 +1,7 @@
 server:
   port: 10094
-  #  servlet:
-  #    context-path: /ai
-  ssl:
-    enabled: false
-    key-store-type: PKCS12
-    key-store: classpath:keystore.p12
-    key-store-password: yixuan
-    key-alias: mydomain
-  tomcat:
-    threads:
-      max: 5
-      min-spare: 2
-    max-connections: 50
 
 spring:
-  #  mvc:
-  #    servlet:
-  #      path: /api
   application:
     name: aiService
   profiles:
@@ -26,10 +10,13 @@ spring:
     base-path: /ai/api
   cloud:
     nacos:
-      server-addr: 106.13.105.230:8848
+      username: nacos
+      password: nacos
+      server-addr: nacos:8848
       config:
-        file-extension: yaml # 配置文件名后缀
-        shared-configs: # 共享配置
+        namespace: dev
+      discovery:
+        namespace: ${spring.cloud.nacos.config.namespace}
     openfeign:
       httpclient:
         enabled: true # 开启 Feign 对 httpClient 的支持
@@ -40,31 +27,3 @@ spring:
     import:
       - nacos:common-dev.yaml?group=DEFAULT_GROUP&refreshEnabled=true
       - nacos:ai-dev.yaml?group=DEFAULT_GROUP&refreshEnabled=true
-  servlet:
-    multipart:
-      max-file-size: 5MB
-      max-request-size: 10MB
-
-#mybatis:
-#  configuration:
-#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-#    map-underscore-to-camel-case: true # 开启驼峰命名自动映射
-
-#mybatis-plus:
-#  type-aliases-package: com.yixuan.yh.ai.pojo
-#  mapper-locations: "classpath*:/com/yixuan/yh/**/mapper/*.xml"
-#  configuration:
-#    map-underscore-to-camel-case: true
-#    cache-enabled: false
-#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-#  global-config:
-#    db-config:
-#      id-type: assign_id # id 为雪花算法生成
-#      update-strategy: not_null
-
-logging:
-  level:
-#    reactor: debug
-#    org.springframework.web.reactive: debug
-    org.springframework.r2dbc: debug
-    org.springframework.r2dbc.core.DefaultDatabaseClient: trace
