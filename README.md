@@ -119,6 +119,9 @@ sequenceDiagram
   <img src="https://gitee.com/YXXHYH/yh-be/raw/master/.file/product-detail.png" alt="商品详情" width="700" />  
 </div>
 
+## 🔧 项目部署（待更新）
+数据库脚本在.file/sql下
+
 ---
 - 前端：https://gitee.com/YXXHYH/yh-fe
 - 管理后台：https://gitee.com/YXXHYH/yh-admin-fe
