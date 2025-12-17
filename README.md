@@ -1,6 +1,6 @@
 # <div align="center">YH - 智能短视频平台</div>
 <div align="center">
-<img src="https://gitee.com/YXXHYH/yh-be/raw/master/file/yh.png" alt="YH-Logo" width="50" height="50" />
+<img src="https://gitee.com/YXXHYH/yh-be/raw/master/.file/yh.png" alt="YH-Logo" width="50" height="50" />
 </div>
 
 ## 🌟 项目概述
@@ -47,16 +47,6 @@ sequenceDiagram
 ## 🎯 技术架构
 
 ### 🛠 后端技术栈
-```mermaid
-pie
-    title 后端技术分布
-    "Spring Boot/Cloud" : 35
-    "Spring AI/WebFlux" : 25
-    "MybatisPlus" : 15
-    "分布式服务" : 15
-    "其他" : 10
-```
-
 | 组件              | 技术选型                          | 用途                     |
 |-------------------|----------------------------------|--------------------------|
 | 核心框架          | Spring Boot 3.x + Spring Cloud   | 微服务基础架构           |
@@ -111,22 +101,22 @@ pie
 ## 📷 前端页面展示
 <div align="center">
   <!-- 首页 -->
-  <img src="https://gitee.com/YXXHYH/yh-be/raw/master/file/home.png" alt="首页" width="700" />
+  <img src="https://gitee.com/YXXHYH/yh-be/raw/master/.file/home.png" alt="首页" width="700" />
 
   <!-- 直播 -->
-  <img src="https://gitee.com/YXXHYH/yh-be/raw/master/file/live-anchor.png" alt="直播" width="700" />
+  <img src="https://gitee.com/YXXHYH/yh-be/raw/master/.file/live-anchor.png" alt="直播" width="700" />
 
   <!-- 创作者平台 -->
-  <img src="https://gitee.com/YXXHYH/yh-be/raw/master/file/creator.png" alt="创作者平台" width="700" />
+  <img src="https://gitee.com/YXXHYH/yh-be/raw/master/.file/creator.png" alt="创作者平台" width="700" />
 
   <!-- AI文字聊天 -->
-  <img src="https://gitee.com/YXXHYH/yh-be/raw/master/file/ai.png" alt="AI文字聊天" width="700" />
+  <img src="https://gitee.com/YXXHYH/yh-be/raw/master/.file/ai.png" alt="AI文字聊天" width="700" />
 
   <!-- AI语音聊天 -->
-  <img src="https://gitee.com/YXXHYH/yh-be/raw/master/file/voice-chat.png" alt="AI语音聊天" width="700" />
+  <img src="https://gitee.com/YXXHYH/yh-be/raw/master/.file/voice-chat.png" alt="AI语音聊天" width="700" />
 
   <!-- 商品详情 -->
-  <img src="https://gitee.com/YXXHYH/yh-be/raw/master/file/product-detail.png" alt="商品详情" width="700" />  
+  <img src="https://gitee.com/YXXHYH/yh-be/raw/master/.file/product-detail.png" alt="商品详情" width="700" />  
 </div>
 
 ---
