@@ -120,8 +120,8 @@ sequenceDiagram
 </div>
 
 ## 🔧 项目部署（待更新）
-数据库脚本在.file/sql下
-
+- 数据库脚本在.file/sql下
+- nacos配置文件在.file/config下
 ---
 - 前端：https://gitee.com/YXXHYH/yh-fe
 - 管理后台：https://gitee.com/YXXHYH/yh-admin-fe
