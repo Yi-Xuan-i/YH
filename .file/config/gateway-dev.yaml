@@ -1,0 +1,63 @@
+spring:
+    cloud:
+        gateway:
+            httpclient:
+              websocket:
+                max-frame-payload-length: 120000000
+            routes:
+                - id: userService1
+                  uri: lb://userService
+                  predicates:
+                    - Path=/user/**
+                - id: videoService1
+                  uri: lb://videoService
+                  predicates:
+                    - Path=/video/**
+                - id: productService1
+                  uri: lb://productService
+                  predicates:
+                    - Path=/product/**
+                - id: orderService1
+                  uri: lb://orderService
+                  predicates:
+                    - Path=/order/**
+                - id: liveService1
+                  uri: lb://liveService
+                  predicates:
+                    - Path=/live/**
+                - id: aiService1
+                  uri: lb://aiService
+                  predicates:
+                    - Path=/ai/**
+                - id: chatService1
+                  uri: lb://chatService
+                  predicates:
+                    - Path=/chat/**
+                - id: adminService1
+                  uri: lb://adminService
+                  predicates:
+                    - Path=/admin/**
+
+gateway:
+    auth:
+        excludePaths:
+            - /*/api/public/**
+            - /admin/**
+            - /*/v3/api-docs/**
+
+logging:
+  level:
+    reactor:
+      netty: DEBUG
+    io:
+      netty: DEBUG
+
+knife4j:
+  gateway:
+    enabled: true
+    strategy: discover  # 服务发现模式
+    discover:
+      enabled: true
+      version: openapi3  # 子服务规范: openapi3 或 swagger2
+      excluded-services:
+        - gateway

@@ -1,0 +1,18 @@
+mybatis-plus:
+  type-aliases-package: com.yixuan.yh.product.pojo
+  mapper-locations: "classpath*:/com/yixuan/yh/**/mapper/*.xml"
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: assign_id # id 为雪花算法生成
+      update-strategy: not_null
+
+mt:
+  console-url: http://43.139.55.171:19998
+  core-url: http://43.139.55.171:19999
+  bucket-name: product
+  username: mt
+  password: mt

@@ -1,0 +1,23 @@
+spring:
+  elasticsearch:
+    uris: http://es7:9200
+    socket-keep-alive: true
+
+mt:
+  console-url: http://mt:19998
+  core-url: http://mt:19999
+  bucket-name: product
+  username: mt
+  password: mt
+
+mybatis-plus:
+  type-aliases-package: com.yixuan.yh.live.pojo
+  mapper-locations: "classpath*:/com/yixuan/yh/**/mapper/*.xml"
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: assign_id # id 为雪花算法生成
+      update-strategy: not_null

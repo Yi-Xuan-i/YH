@@ -1,0 +1,34 @@
+spring:
+  servlet:
+    multipart:
+      max-file-size: 5000MB
+      max-request-size: 7000MB
+#      enabled: false
+
+mybatis-plus:
+  type-aliases-package: com.yixuan.yh.video.pojo
+  mapper-locations: "classpath*:/com/yixuan/yh/**/mapper/*.xml"
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: assign_id # id 为雪花算法生成
+      update-strategy: not_null
+
+mt:
+  console-url: http://43.139.55.171:19998
+  core-url: http://43.139.55.171:19999
+  bucket-name: video
+  username: mt
+  password: mt
+
+minio:
+  minio-url: http://127.0.0.1:9000
+  secret-key: minioadmin
+  access-key: minioadmin
+  bucket: video
+
+milvus:
+  uri: http://127.0.0.1:19530

@@ -1,0 +1,63 @@
+server:
+  tomcat:
+    threads:
+      max: 5
+      min-spare: 2
+    max-connections: 50
+
+jwt:
+  sign-key: yxyyxhyh
+  expire: 66666666
+
+spring:
+  mvc:
+    servlet:
+      path: /api
+  datasource:
+    url: jdbc:mysql://110.41.182.125/new_yh?allowMultiQueries=true
+    username: root
+    password: wisdom123456789
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      keep-alive: true
+      test-while-idle: true
+      min-idle: 1
+      validation-query: select 1
+      time-between-eviction-runs-millis: 20000
+  cloud:
+    sentinel:
+      transport:
+        dashboard: 43.139.55.171:10085  # Sentinel控制台地址
+        port: 8719  # 与控制台交互的端口（默认为8719）
+  data:
+    redis:
+      host: 110.41.182.125
+      port: 6379
+      password: qq2434462503
+  rabbitmq:
+    host: 106.13.105.230
+    port: 5672
+    virtual-host: /
+    username: guest
+    password: guest
+      
+seata:
+  registry:
+    type: nacos
+    nacos:
+      server-addr: 106.13.105.230:8848
+      namespace: ""
+      group: DEFAULT_GROUP
+      application: seataServer
+      username: nacos
+      password: nacos
+  data-source-proxy-mode: AT
+  tx-service-group: yx # 事务组名称
+  service:
+    vgroup-mapping: # 事务组与tc集群的映射关系
+      yx: "default"
+
+logging:
+  level:
+    org.springframework.jdbc.support.JdbcTransactionManager: debug
