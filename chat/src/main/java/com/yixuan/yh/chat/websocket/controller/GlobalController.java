@@ -9,13 +9,12 @@ import com.yixuan.yh.chat.websocket.pojo.ChatReceiveMessage;
 import com.yixuan.yh.chat.websocket.pojo.ChatSendMessage;
 import com.yixuan.yh.common.utils.SnowflakeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
-import java.util.Map;
 
 @Controller
 public class GlobalController {
@@ -31,11 +30,11 @@ public class GlobalController {
 
     @MessageMapping("/global/chat")
     public void handleChatMessage(
-            ChatSendMessage sendMessage, @Header("simpSessionAttributes") Map<String, Object> attributes) {
+            ChatSendMessage sendMessage, Principal principal) {
 
         // 获取会话双方id
         ChatConversation conversation = chatConversationMapper.selectBothIdById(sendMessage.getConversationId());
-        Long senderId = (Long) attributes.get("id");
+        Long senderId = Long.parseLong(principal.getName());
 
         // 判断会话是否属于该用户（并获取“编号”）
         ConversationUserNumber senderNumber;
@@ -72,6 +71,7 @@ public class GlobalController {
         receiveMessage.setSenderId(senderId);
         receiveMessage.setContent(sendMessage.getContent());
         receiveMessage.setSentTime(LocalDateTime.now());
-        simpMessagingTemplate.convertAndSend("/queue/user." + receiverId, receiveMessage);
+
+        simpMessagingTemplate.convertAndSendToUser(receiverId.toString(), "/queue/notify", receiveMessage);
     }
 }

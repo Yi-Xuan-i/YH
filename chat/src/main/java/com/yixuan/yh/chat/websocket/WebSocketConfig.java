@@ -1,9 +1,7 @@
 package com.yixuan.yh.chat.websocket;
 
-import com.yixuan.yh.chat.inter.HandshakeInterceptor;
-import com.yixuan.yh.chat.inter.UserSubscriptionInterceptor;
+import com.yixuan.yh.chat.websocket.inter.StompHandshakeHandler;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.*;
 
@@ -11,23 +9,16 @@ import org.springframework.web.socket.config.annotation.*;
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-    private final UserSubscriptionInterceptor userSubscriptionInterceptor;
-
-    public WebSocketConfig(UserSubscriptionInterceptor userSubscriptionInterceptor) {
-        this.userSubscriptionInterceptor = userSubscriptionInterceptor;
-    }
-
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/me/ws") // WebSocket连接端点
-                .addInterceptors(new HandshakeInterceptor())
+                .setHandshakeHandler(new StompHandshakeHandler())
                 .setAllowedOriginPatterns("*");
     }
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        // 使用RabbitMQ作为外部Broker
-        registry.enableStompBrokerRelay("/queue")
+        registry.enableStompBrokerRelay( "/topic", "/queue") // 以这为前缀的直接发送给消息代理（不经过“controller”）
                 .setRelayHost("106.13.105.230")
                 .setRelayPort(61613) // RabbitMQ STOMP端口
                 .setSystemLogin("guest")
@@ -35,11 +26,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 .setClientLogin("guest")
                 .setClientPasscode("guest");
 
-        registry.setApplicationDestinationPrefixes("/app");
-    }
-
-    @Override
-    public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(userSubscriptionInterceptor);
+        registry.setUserDestinationPrefix("/user"); // 订阅用户前缀
+        registry.setApplicationDestinationPrefixes("/app"); // controller 前缀
     }
 }
