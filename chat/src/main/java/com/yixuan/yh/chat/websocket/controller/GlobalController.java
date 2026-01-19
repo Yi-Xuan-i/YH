@@ -72,6 +72,6 @@ public class GlobalController {
         receiveMessage.setContent(sendMessage.getContent());
         receiveMessage.setSentTime(LocalDateTime.now());
 
-        simpMessagingTemplate.convertAndSendToUser(receiverId.toString(), "/queue/notify", receiveMessage);
+        simpMessagingTemplate.convertAndSendToUser(receiverId.toString(), "/queue/chat", receiveMessage);
     }
 }
