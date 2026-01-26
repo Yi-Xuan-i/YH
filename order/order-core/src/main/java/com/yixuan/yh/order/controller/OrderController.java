@@ -22,7 +22,7 @@ public class OrderController {
 
     @Operation(summary = "生成订单")
     @PostMapping
-    public Result<PostOrderResponse> postOrder(@RequestBody PostOrderRequest postOrderRequest) throws BadRequestException, AlipayApiException {
+    public Result<PostOrderResponse> postOrder(@RequestBody PostOrderRequest postOrderRequest) throws AlipayApiException {
         return Result.success(orderService.postOrder(UserContext.getUser(), postOrderRequest));
     }
 

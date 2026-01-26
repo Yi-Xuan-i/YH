@@ -10,6 +10,7 @@ import com.alipay.api.request.AlipayTradeQueryRequest;
 import com.alipay.api.response.AlipayTradeCloseResponse;
 import com.alipay.api.response.AlipayTradePrecreateResponse;
 import com.alipay.api.response.AlipayTradeQueryResponse;
+import com.yixuan.yh.common.exception.YHServerException;
 import com.yixuan.yh.common.response.Result;
 import com.yixuan.yh.common.utils.SnowflakeUtils;
 import com.yixuan.yh.order.mapper.OrderItemMapper;
@@ -23,7 +24,6 @@ import com.yixuan.yh.order.service.OrderService;
 import com.yixuan.yh.product.feign.ProductPrivateClient;
 import com.yixuan.yh.product.pojo.response.PartOfOrderResponse;
 import io.seata.spring.annotation.GlobalTransactional;
-import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -49,14 +49,11 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @GlobalTransactional
-    public PostOrderResponse postOrder(Long userId, PostOrderRequest postOrderRequest) throws BadRequestException, AlipayApiException {
+    public PostOrderResponse postOrder(Long userId, PostOrderRequest postOrderRequest) throws AlipayApiException {
 
         Long orderId = snowflakeUtils.nextId();
         // 获取订单需要用到商品数据（并预占库存）
         Result<PartOfOrderResponse> result = productPrivateClient.getPartOfOrder(orderId, postOrderRequest.getProductId(), postOrderRequest.getSkuId(), postOrderRequest.getQuantity());
-        if (result.isError()) {
-            throw new BadRequestException(result.getMsg());
-        }
         PartOfOrderResponse partOfOrderResponse = result.getData();
 
         // order
@@ -100,7 +97,7 @@ public class OrderServiceImpl implements OrderService {
         if (response.isSuccess()) {
             return new PostOrderResponse(orderId, response.getQrCode());
         } else {
-            throw new BadRequestException("服务器异常！");
+            throw new YHServerException("获取支付二维码失败！");
         }
     }
 

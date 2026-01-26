@@ -6,7 +6,7 @@ import com.yixuan.yh.order.pojo.response.PostOrderResponse;
 import org.apache.coyote.BadRequestException;
 
 public interface OrderService {
-    PostOrderResponse postOrder(Long userId, PostOrderRequest postOrderRequest) throws BadRequestException, AlipayApiException;
+    PostOrderResponse postOrder(Long userId, PostOrderRequest postOrderRequest) throws AlipayApiException;
 
     Boolean getIsPaid(Long orderId);
 
