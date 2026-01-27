@@ -1,9 +1,7 @@
 package com.yixuan.yh.video.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.yixuan.yh.common.exception.YHClientException;
-import com.yixuan.yh.common.exception.YHServerException;
 import com.yixuan.yh.common.response.Result;
 import com.yixuan.yh.common.utils.SnowflakeUtils;
 import com.yixuan.yh.user.feign.UserPrivateClient;
@@ -42,6 +40,14 @@ public class CollectionsServiceImpl implements CollectionsService {
 
     @Override
     public List<GetCollectionsItemResponse> getCollectionsItemList(Long userId, Long collectionsId) {
+        // 查询收藏夹所属用户
+        Long ownerId = videoUserCollectionsMapper.selectUserIdById(collectionsId);
+
+        // 判断收藏夹是否存在
+        if (ownerId == null) {
+            throw new YHClientException("该收藏夹不存在！");
+        }
+
         // 鉴权（当前收藏夹是否属于当前用户）
         if (!videoUserCollectionsMapper.selectUserIdById(collectionsId).equals(userId)) {
             throw new YHClientException("你没有权限！");
@@ -51,10 +57,12 @@ public class CollectionsServiceImpl implements CollectionsService {
         List<VideoCollectionsWithVideo> videoCollectionsWithVideoList = videoUserCollectionsItemMapper.selectCollectionsItemList(collectionsId);
 
         // 查询补充数据
-        Result<Map<Long, String>> result = userPrivateClient.getNameBatch(videoCollectionsWithVideoList.stream().map(VideoCollectionsWithVideo::getCreatorId).toList());
-        if (result.isError()) {
-            throw new YHServerException("服务器异常！");
-        }
+        Result<Map<Long, String>> result = userPrivateClient.getNameBatch(videoCollectionsWithVideoList.
+                stream()
+                .map(VideoCollectionsWithVideo::getCreatorId)
+                .toList()
+        );
+
         Map<Long, String> creatorIdToNameMap = result.getData();
 
         // 转换格式
