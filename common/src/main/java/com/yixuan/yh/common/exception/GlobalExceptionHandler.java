@@ -18,37 +18,46 @@ public class GlobalExceptionHandler {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(YHClientException.class)
-    public Result<String> ex(YHClientException ex) {
-        return Result.error(ex.getMessage());
+    public Result<Void> ex(YHClientException e) {
+        log.info("业务异常: [Code: {}] [UserMsg: {}] [Detail: {}]",
+                e.getErrorCode().getCode(),
+                e.getErrorCode().getMsg(),
+                e.getLogMessage());
+
+        return Result.error(e.getErrorCode() != null ? e.getErrorCode().getMsg() : e.getLogMessage()); // 兼容旧异常类
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(YHServerException.class)
-    public Result<String> ex(YHServerException ex) {
-        log.error("服务器异常", ex);
-        return Result.error(ex.getMessage());
+    public Result<Void> ex(YHServerException e) {
+        log.error("系统异常: [Code: {}] [UserMsg: {}] [Detail: {}]",
+                e.getErrorCode().getCode(),
+                e.getErrorCode().getMsg(),
+                e.getLogMessage(),
+                e);
+
+        return Result.error(e.getErrorCode() != null ? e.getErrorCode().getMsg() : e.getLogMessage()); // 兼容旧异常类
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Result<String> ex(MethodArgumentNotValidException ex) {
-        BindingResult bindingResult = ex.getBindingResult();
-        // 解析异常信息
+    public Result<Void> ex(MethodArgumentNotValidException e) {
+        BindingResult bindingResult = e.getBindingResult();
         List<String> errors = new ArrayList<>();
         bindingResult.getFieldErrors().forEach(item -> {
             errors.add(item.getDefaultMessage());
         });
-        // 错误信息拼接
         String errorMessage = String.join("，", errors);
-        // 返回错误信息
+
         return Result.error(errorMessage);
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class) // 捕获所有异常
-    public Result<String> ex(Exception ex) {
-        log.error("服务器未知异常", ex);
-        return Result.error(ex.getMessage());
+    public Result<Void> ex(Exception e) {
+        log.error("系统未知异常", e);
+
+        return Result.error(e.getMessage());
     }
 
 }
