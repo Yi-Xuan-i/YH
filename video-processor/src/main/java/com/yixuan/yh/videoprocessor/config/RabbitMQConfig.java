@@ -22,9 +22,9 @@ public class RabbitMQConfig {
         factory.setConnectionFactory(connectionFactory);
         factory.setBatchListener(true); // 启用批量监听
         factory.setConsumerBatchEnabled(true); // 消费者批量拉取
-        factory.setBatchSize(500); // 每批最多处理10条
+        factory.setBatchSize(500); // 每批最多处理500条
         factory.setReceiveTimeout(5000L); // 关键！超时时间5秒（即使未满batchSize）
-        factory.setPrefetchCount(100); // 预取数量需足够大
+        factory.setPrefetchCount(500); // 预取数量需足够大
         factory.setMessageConverter(jsonMessageConverter);
         return factory;
     }
