@@ -1,3 +1,6 @@
+create database yh;
+use yh;
+
 create table admin
 (
     id               bigint unsigned                    not null
