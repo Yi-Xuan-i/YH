@@ -38,11 +38,7 @@ public class AuthFilter implements GlobalFilter, Ordered {
         HttpHeaders requestHeaders = request.getHeaders();
         HttpHeaders responseHeaders = response.getHeaders();
 
-        if (isExcludedPath(request.getPath().value())) {
-            return chain.filter(exchange);
-        }
-
-        // 拦截 WebSocket 握手请求
+        // 拦截 WebSocket 握手请求特殊处理
         if (exchange.getRequest().getHeaders().containsKey("Upgrade")) {
             String token = exchange.getRequest().getQueryParams().getFirst("token");
             Claims claims;
@@ -57,12 +53,14 @@ public class AuthFilter implements GlobalFilter, Ordered {
         }
 
         String token = requestHeaders.getFirst(HttpHeaders.AUTHORIZATION);
-        Claims claims;
+        Claims claims = null;
         // 认证令牌失败
         if (
-                token == null ||
-                !token.startsWith("Bearer ") ||
-                (claims = parseToken(token)) == null
+                (token == null ||
+                        !token.startsWith("Bearer ") ||
+                        (claims = parseToken(token)) == null)
+                        &&
+                        !isExcludedPath(request.getPath().value())
         ) {
             // 设置状态码和响应类型
             response.setStatusCode(HttpStatus.UNAUTHORIZED);
@@ -75,9 +73,11 @@ public class AuthFilter implements GlobalFilter, Ordered {
         }
 
         // 取出令牌的用户信息, 携带在请求头传递给其它微服务。
-        Long id = (Long) claims.get("id");
-        exchange = exchange.mutate().
-                request(builder -> builder.header("id", id.toString())).build();
+        if (claims != null) {
+            Long id = (Long) claims.get("id");
+            exchange = exchange.mutate().
+                    request(builder -> builder.header("id", id.toString())).build();
+        }
 
         return chain.filter(exchange);
     }
