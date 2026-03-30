@@ -2,6 +2,7 @@ package com.yixuan.yh.video.mapstruct;
 
 import com.yixuan.yh.video.pojo.entity.Video;
 import com.yixuan.yh.video.pojo.entity.multi.VideoWithFavorite;
+import com.yixuan.yh.video.pojo.entity.multi.VideoWithInteractionStatus;
 import com.yixuan.yh.video.pojo.entity.multi.VideoWithLike;
 import com.yixuan.yh.video.pojo.response.*;
 import org.mapstruct.Mapper;
@@ -18,4 +19,5 @@ public interface VideoMapStruct {
     GetRejectedVideoResponse toGetRejectedVideoResponse(Video video);
     GetLikeVideoResponse toGetLikeVideoResponse(VideoWithLike videoWithLike);
     GetFavoriteVideoResponse toGetFavoriteVideoResponse(VideoWithFavorite videoWithFavorite);
+    VideoMainResponse toVideoMainResponse(VideoWithInteractionStatus videoWithInteractionStatus);
 }

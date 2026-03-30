@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yixuan.yh.video.mapper.multi.VideoMultiMapper">
+
+    <select id="selectMainRandom"
+            resultType="com.yixuan.yh.video.pojo.entity.multi.VideoWithInteractionStatus">
+        SELECT
+        v.id,
+        v.creator_id,
+        u.name AS creatorName,
+        u.avatar_url AS creatorAvatar,
+        v.url,
+        v.description,
+        v.likes,
+        v.comments,
+        v.favorites,
+        <choose>
+            <when test="userId != null">
+                IF(vul.user_id IS NOT NULL, 1, 0)
+            </when>
+            <otherwise>0</otherwise>
+        </choose>
+        AS is_like,
+        <choose>
+            <when test="userId != null">
+                IF(vuf.user_id IS NOT NULL, 1, 0)
+            </when>
+            <otherwise>0</otherwise>
+        </choose>
+        AS is_favorite
+        FROM video v
+        JOIN user u ON v.creator_id = u.id
+
+        <if test="userId != null">
+            LEFT JOIN video_user_like vul ON (
+            v.id = vul.video_id
+            AND vul.user_id = #{userId}
+            AND vul.status = 'FRONT'
+            )
+            LEFT JOIN video_user_favorite vuf ON (
+            v.id = vuf.video_id
+            AND vuf.user_id = #{userId}
+            AND vuf.status = 'FRONT'
+            )
+        </if>
+
+        WHERE v.id >= (
+        SELECT MIN(id) + FLOOR(RAND() * (MAX(id) - MIN(id)))
+        FROM video
+        )
+        LIMIT 5
+    </select>
+</mapper>

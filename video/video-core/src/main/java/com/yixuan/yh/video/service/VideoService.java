@@ -11,11 +11,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 public interface VideoService {
-    List<VideoMainResponse> getVideos();
+    List<VideoMainResponse> getVideos(Long userId);
 
     VideoMainResponse getVideo(Long videoId);
-
-    List<VideoMainWithInteractionResponse> getVideosWithInteractionStatus(Long userId);
 
     String postVideoStart(Long userId, Long fileSize, Integer totalChunks);
 
@@ -23,7 +21,7 @@ public interface VideoService {
 
     void postVideoEnd(Long uploadId) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException;
 
-    void postVideoMessage(Long userId, PostVideoMessageRequest postVideoMessageRequest) throws IOException, InterruptedException;
+    void postVideoMessage(Long userId, PostVideoMessageRequest postVideoMessageRequest) throws Exception;
 
     void putVideoStatusToPublished(Long videoId);
 

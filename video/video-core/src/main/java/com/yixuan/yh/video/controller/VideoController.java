@@ -47,15 +47,9 @@ public class VideoController {
 
     @Operation(summary = "正式上传视频（提交视频关联信息）")
     @PostMapping
-    public Result<Void> postVideoMessage(@ModelAttribute PostVideoMessageRequest postVideoMessageRequest) throws IOException, InterruptedException {
+    public Result<Void> postVideoMessage(@ModelAttribute PostVideoMessageRequest postVideoMessageRequest) throws Exception {
         videoService.postVideoMessage(UserContext.getUser(), postVideoMessageRequest);
         return Result.success();
-    }
-
-    @Operation(summary = "获取视频（已登入）")
-    @GetMapping("/list")
-    public Result<List<VideoMainWithInteractionResponse>> getVideosWithInteractionStatus() {
-        return Result.success(videoService.getVideosWithInteractionStatus(UserContext.getUser()));
     }
 
     @Operation(summary = "获取自己已发布的视频")

@@ -22,6 +22,7 @@ if current_value == "0" then
     new_value = "1"
 elseif current_value == "1" then
     new_value = "0"
+end
 
 redis.call('HSET', KEYS[1], ARGV[1], new_value)
 

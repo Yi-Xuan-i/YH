@@ -23,28 +23,28 @@ public class VideoConsumer {
 
     @RabbitListener(queuesToDeclare = @Queue(name = "video.post.queue"))
     public void handleVideoPostMessage(VideoPostMessage videoPostMessage) {
-
-        /* 查重与特征保存 */
-        // 依靠主键唯一性确保幂等
-        String url = "http://127.0.0.1:10100/check_duplicate";
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        HttpEntity<VideoPostMessage> request = new HttpEntity<>(videoPostMessage, headers);
-
-        ResponseEntity<Result> response = restTemplate.postForEntity(url, request, Result.class);
-        Result<Long> result = response.getBody();
-        if (response.getStatusCode().isError()) {
-            throw new RuntimeException("Video “check duplicate” service error!");
-        }
-
-        /* 查重成功，则代表视频要变成“上架” */
-        if (result.isError()) {
-            Result<Void> putVideoStatusResult = videoPrivateClient.putVideoStatusToPublished(videoPostMessage.getVideoId());
-            if (putVideoStatusResult.isError()) {
-                throw new RuntimeException("Video “check duplicate” service error!");
-            }
-        }
+//
+//        /* 查重与特征保存 */
+//        // 依靠主键唯一性确保幂等
+//        String url = "http://127.0.0.1:10100/check_duplicate";
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.APPLICATION_JSON);
+//
+//        HttpEntity<VideoPostMessage> request = new HttpEntity<>(videoPostMessage, headers);
+//
+//        ResponseEntity<Result> response = restTemplate.postForEntity(url, request, Result.class);
+//        Result<Long> result = response.getBody();
+//        if (response.getStatusCode().isError()) {
+//            throw new RuntimeException("Video “check duplicate” service error!");
+//        }
+//
+//        /* 查重成功，则代表视频要变成“上架” */
+//        if (result.isError()) {
+//            Result<Void> putVideoStatusResult = videoPrivateClient.putVideoStatusToPublished(videoPostMessage.getVideoId());
+//            if (putVideoStatusResult.isError()) {
+//                throw new RuntimeException("Video “check duplicate” service error!");
+//            }
+//        }
 
     }
 }

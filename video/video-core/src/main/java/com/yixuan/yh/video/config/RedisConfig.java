@@ -13,7 +13,7 @@ public class RedisConfig {
         // 配置类
         Config config = new Config();
         config.useSingleServer()
-                .setAddress("redis://110.41.182.125:6379")
+                .setAddress("redis://redis:6379")
                 .setPassword("qq2434462503")
                 .setConnectionPoolSize(6)
                 .setConnectionMinimumIdleSize(2)

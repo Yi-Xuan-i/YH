@@ -15,6 +15,7 @@ import com.yixuan.yh.video.pojo.entity.Video;
 import com.yixuan.yh.video.pojo.entity.VideoTag;
 import com.yixuan.yh.video.mapper.multi.VideoMultiMapper;
 import com.yixuan.yh.video.pojo.entity.multi.VideoWithFavorite;
+import com.yixuan.yh.video.pojo.entity.multi.VideoWithInteractionStatus;
 import com.yixuan.yh.video.pojo.entity.multi.VideoWithLike;
 import com.yixuan.yh.video.pojo.mq.VideoPostMessage;
 import com.yixuan.yh.video.pojo.entity.VideoUploadTask;
@@ -77,34 +78,33 @@ public class VideoServiceImpl implements VideoService {
     private UserPrivateClient userPrivateClient;
 
     @Override
-    public List<VideoMainResponse> getVideos() {
-        return videoMultiMapper.selectMainRandom();
+    public List<VideoMainResponse> getVideos(Long userId) {
+        List<VideoWithInteractionStatus> videoWithInteractionStatusList = videoMultiMapper.selectMainRandom(userId);
+
+        // 转换
+        List<VideoMainResponse> videoMainResponseList = videoWithInteractionStatusList.stream().map(VideoMapStruct.INSTANCE::toVideoMainResponse).toList();
+
+        if (userId != null) {
+            // 获取关注状态
+            List<Long> followeeIdList = videoMainResponseList.stream().map(VideoMainResponse::getCreatorId).toList();
+            List<Integer> sortedIndices = IntStream.range(0, followeeIdList.size())
+                    .boxed()
+                    .sorted(Comparator.comparingLong(followeeIdList::get))
+                    .toList();
+            List<Long> sortedFolloweeIdList = sortedIndices.stream().map(followeeIdList::get).toList();
+
+            List<Boolean> followStatusList = userFollowPrivateClient.getFollowStatus(userId, sortedFolloweeIdList).getData();
+            for (int i = 0; i < followStatusList.size(); i++) {
+                videoMainResponseList.get(sortedIndices.get(i)).setIsFollowed(followStatusList.get(i));
+            }
+        }
+
+        return videoMainResponseList;
     }
 
     @Override
     public VideoMainResponse getVideo(Long videoId) {
         return videoMultiMapper.selectMainOne(videoId);
-    }
-
-    @Override
-    public List<VideoMainWithInteractionResponse> getVideosWithInteractionStatus(Long userId) {
-//        getRecommendedVideos(userId);
-        List<VideoMainWithInteractionResponse> videoMainResponseList = videoMultiMapper.selectMainWithInteractionStatusRandom(userId);
-
-        // 获取关注状态
-        List<Long> followeeIdList = videoMainResponseList.stream().map(VideoMainWithInteractionResponse::getCreatorId).toList();
-        List<Integer> sortedIndices = IntStream.range(0, followeeIdList.size())
-                .boxed()
-                .sorted(Comparator.comparingLong(followeeIdList::get))
-                .toList();
-        List<Long> sortedFolloweeIdList = sortedIndices.stream().map(followeeIdList::get).toList();
-
-        List<Boolean> followStatusList = userFollowPrivateClient.getFollowStatus(userId, sortedFolloweeIdList).getData();
-        for (int i = 0; i < followStatusList.size(); i++) {
-            videoMainResponseList.get(sortedIndices.get(i)).setIsFollowed(followStatusList.get(i));
-        }
-
-        return videoMainResponseList;
     }
 
     @Override
@@ -161,10 +161,10 @@ public class VideoServiceImpl implements VideoService {
 
     @Override
     @Transactional
-    public void postVideoMessage(Long userId, PostVideoMessageRequest postVideoMessageRequest) throws IOException, InterruptedException {
+    public void postVideoMessage(Long userId, PostVideoMessageRequest postVideoMessageRequest) throws Exception {
 
-        String videoUrl = mtClient.upload(postVideoMessageRequest.getVideo());
-        String coverUrl = mtClient.upload(postVideoMessageRequest.getCover());
+        String videoUrl = minioUtils.upload(postVideoMessageRequest.getVideo());
+        String coverUrl = minioUtils.upload(postVideoMessageRequest.getCover());
         Video video = new Video();
         video.setId(snowflakeUtils.nextId());
         video.setCreatorId(userId);

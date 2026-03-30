@@ -1,4 +1,4 @@
-package com.yixuan.yh.video.pojo.response;
+package com.yixuan.yh.video.pojo.entity.multi;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class VideoMainWithInteractionResponse {
+public class VideoWithInteractionStatus {
     Long Id;
     Long creatorId;
     String creatorName;
@@ -17,7 +17,6 @@ public class VideoMainWithInteractionResponse {
     Long likes;
     Long comments;
     Long favorites;
-    Boolean isFollowed;
     Boolean isLike;
     Boolean isFavorite;
 }
