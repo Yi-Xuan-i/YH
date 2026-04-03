@@ -30,6 +30,7 @@
         <jwt.version>0.9.1</jwt.version>
         <jaxb.version>2.3.1</jaxb.version>
         <minio.version>8.5.5</minio.version>
+        <aws.version>2.25.27</aws.version>
         <elasticsearch.version>7.17.23</elasticsearch.version>
         <springdoc.version>2.2.0</springdoc.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
@@ -116,6 +117,19 @@
                 <groupId>io.minio</groupId>
                 <artifactId>minio</artifactId>
                 <version>${minio.version}</version>
+            </dependency>
+            <!-- aws -->
+            <dependency>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>bom</artifactId>
+                <version>${aws.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>s3</artifactId>
+                <version>${aws.version}</version>
             </dependency>
             <!-- es -->
             <dependency>
