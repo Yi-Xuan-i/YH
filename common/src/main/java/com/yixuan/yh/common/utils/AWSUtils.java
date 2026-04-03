@@ -15,10 +15,7 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.S3Configuration;
 import software.amazon.awssdk.services.s3.model.*;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
-import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
-import software.amazon.awssdk.services.s3.presigner.model.PresignedUploadPartRequest;
-import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
-import software.amazon.awssdk.services.s3.presigner.model.UploadPartPresignRequest;
+import software.amazon.awssdk.services.s3.presigner.model.*;
 
 import java.io.IOException;
 import java.net.URI;
@@ -124,6 +121,29 @@ public class AWSUtils {
         PresignedPutObjectRequest presignedRequest = presigner.presignPutObject(presignRequest);
 
         // 4. 返回完整 URL
+        return presignedRequest.url().toString();
+    }
+
+    /**
+     * 生成获取对象（下载/预览）的预签名 URL
+     */
+    public String presignGetObject(String key, int durationMinutes) {
+        // 1. 构造底层的 GetObject 请求
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .bucket(bucket)
+                .key(key)
+                .build();
+
+        // 2. 包装为预签名请求，并设置过期时间
+        GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+                .signatureDuration(Duration.ofMinutes(durationMinutes))
+                .getObjectRequest(getObjectRequest)
+                .build();
+
+        // 3. 执行预签名操作
+        PresignedGetObjectRequest presignedRequest = presigner.presignGetObject(presignRequest);
+
+        // 4. 返回 URL（如果是私有视频，前端拿到此 URL 直接放进 <video src="..."> 即可）
         return presignedRequest.url().toString();
     }
 
