@@ -18,6 +18,7 @@
 
     <!--版本属性-->
     <properties>
+        <java.version>21</java.version>
         <springcloud.version>2023.0.0</springcloud.version>
         <springcloudalibaba.version>2023.0.3.3</springcloudalibaba.version>
         <mysql.version>8.2.0</mysql.version>
@@ -35,6 +36,7 @@
         <springdoc.version>2.2.0</springdoc.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <jasypt.version>3.0.4</jasypt.version>
+        <xxljob.version>3.4.0</xxljob.version>
     </properties>
 
     <!--统一管理依赖版本,不会直接依赖,还需要在子工程中引入所需依赖(无需指定版本)-->
@@ -170,6 +172,12 @@
                 <groupId>com.github.ulisesbocchio</groupId>
                 <artifactId>jasypt-spring-boot-starter</artifactId>
                 <version>${jasypt.version}</version>
+            </dependency>
+            <!-- xxl-job -->
+            <dependency>
+                <groupId>com.xuxueli</groupId>
+                <artifactId>xxl-job-core</artifactId>
+                <version>${xxljob.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
