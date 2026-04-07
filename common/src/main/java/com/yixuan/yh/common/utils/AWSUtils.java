@@ -64,7 +64,7 @@ public class AWSUtils {
     }
 
     /**
-     * 直接上传
+     * 上传对象
      */
     public String putObject(MultipartFile file) throws IOException {
         String key = generateKey();
@@ -86,6 +86,18 @@ public class AWSUtils {
     }
 
     /**
+     * 删除对象
+     */
+    public void deleteObject(String key) {
+        DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
+                .bucket(bucket)
+                .key(key)
+                .build();
+
+        client.deleteObject(deleteObjectRequest);
+    }
+
+    /**
      * 创建分片上传
      */
     public String createMultipartUpload(String key, String contentType) {
@@ -103,7 +115,7 @@ public class AWSUtils {
     /**
      * 生成普通上传（单文件）的预签名 URL
      */
-    public String presignPutObject(String key, String contentType) {
+    public String presignPutObject(String key, String contentType, Duration expireTime) {
         // 1. 构造底层的 PutObject 请求
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucket)
@@ -113,7 +125,7 @@ public class AWSUtils {
 
         // 2. 包装为预签名请求，设置过期时间
         PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
-                .signatureDuration(Duration.ofMinutes(10))
+                .signatureDuration(expireTime)
                 .putObjectRequest(putObjectRequest)
                 .build();
 
@@ -150,7 +162,7 @@ public class AWSUtils {
     /**
      * 批量生成分片上传的预签名 URL
      */
-    public Map<Integer, String> presignUploadPart(String key, String uploadId, List<Integer> partNumbers) {
+    public Map<Integer, String> presignUploadPart(String key, String uploadId, List<Integer> partNumbers, Duration expireTime) {
         Map<Integer, String> urlMap = new HashMap<>();
 
         for (Integer partNumber : partNumbers) {
@@ -164,7 +176,7 @@ public class AWSUtils {
 
             // 2. 包装为预签名请求，设置过期时间
             UploadPartPresignRequest presignRequest = UploadPartPresignRequest.builder()
-                    .signatureDuration(Duration.ofMinutes(15))
+                    .signatureDuration(expireTime)
                     .uploadPartRequest(uploadPartRequest)
                     .build();
 
@@ -275,7 +287,7 @@ public class AWSUtils {
     /**
      * 清理分片数据
      */
-    public void abortUpload(String key, String uploadId) {
+    public void abortMultipartUpload(String key, String uploadId) {
         AbortMultipartUploadRequest abortRequest = AbortMultipartUploadRequest.builder()
                 .bucket(bucket)
                 .key(key)
@@ -284,6 +296,19 @@ public class AWSUtils {
 
         // 执行后，会清理与该 uploadId 相关的所有碎片数据
         client.abortMultipartUpload(abortRequest);
+    }
+
+    /**
+     * 查询对象是否存在
+     */
+    public boolean isObjectExist(String key) {
+        try {
+            client.headObject(builder -> builder.bucket(bucket).key(key));
+            return true;
+        } catch (NoSuchKeyException e) { // 其它异常抛出
+            // 明确的对象不存在
+            return false;
+        }
     }
 
     public String generateAccessUrl(String key) {
