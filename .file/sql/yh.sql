@@ -165,6 +165,21 @@ create table merchant
 )
     comment '商家信息表' charset = utf8mb3;
 
+create table message_outbox
+(
+    id              bigint unsigned  not null
+        primary key,
+    business_id     bigint unsigned  null,
+    exchange_name   varchar(64)      null,
+    routing_key     varchar(64)      null,
+    message_body    text             null,
+    status          tinyint unsigned null,
+    retry_count     tinyint unsigned null,
+    next_retry_time datetime         null,
+    created_at      datetime         null,
+    updated_at      datetime         null
+);
+
 create table `order`
 (
     order_id         bigint unsigned                                                                                                not null comment '订单号'
@@ -271,6 +286,14 @@ create table student
     age   int          not null
 );
 
+create table test
+(
+    id     int auto_increment
+        primary key,
+    name   varchar(10) null,
+    status tinyint     null
+);
+
 create table undo_log
 (
     id            bigint auto_increment
@@ -364,17 +387,18 @@ create table user_preferences
 
 create table video
 (
-    id           bigint unsigned                                                                    not null
+    id          bigint unsigned          not null
         primary key,
-    creator_id   bigint unsigned                                                                    null,
-    url          varchar(256)                                                                       not null,
-    cover_url    varchar(256)                                                                       not null,
-    description  varchar(256)                                                                       not null,
-    likes        int unsigned                                             default '0'               null,
-    comments     int unsigned                                             default '0'               null,
-    favorites    int unsigned                                             default '0'               null,
-    status       enum ('UPLOADED', 'PROCESSING', 'REJECTED', 'PUBLISHED') default 'UPLOADED'        not null,
-    created_time datetime                                                 default CURRENT_TIMESTAMP null
+    creator_id  bigint unsigned          null,
+    url         varchar(256)             not null,
+    cover_url   varchar(256)             null,
+    description varchar(256)             null,
+    likes       int unsigned default '0' null,
+    comments    int unsigned default '0' null,
+    favorites   int unsigned default '0' null,
+    status      tinyint      default 0   not null,
+    created_at  datetime                 null,
+    updated_at  datetime                 null
 )
     charset = utf8mb3;
 
@@ -394,8 +418,8 @@ create table video_tag
 
 create table video_tag_mp
 (
-    video_id bigint not null,
-    tag_id   bigint not null,
+    video_id bigint unsigned not null,
+    tag_id   bigint unsigned not null,
     primary key (video_id, tag_id)
 )
     charset = utf8mb3;
@@ -404,14 +428,19 @@ create table video_upload_task
 (
     id           bigint unsigned                            not null comment '上传id'
         primary key,
+    upload_id    varchar(200)                               null,
     user_id      bigint unsigned                            not null,
-    file_size    bigint unsigned                            not null comment '文件总大小(字节)',
+    `key`        varchar(100)                               not null,
     total_chunks int unsigned                               not null comment '总分块数',
-    chunk_bitmap blob                                       not null comment '分块位图',
+    upload_type  tinyint unsigned                           null,
     status       tinyint unsigned default '0'               null comment '0=上传中,1=已完成,2=已过期',
+    expire_at    datetime                                   null,
     created_at   datetime         default CURRENT_TIMESTAMP null,
     updated_at   datetime         default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP
 );
+
+create index video_upload_task_upload_id_index
+    on video_upload_task (upload_id);
 
 create table video_user_collections
 (
@@ -486,9 +515,10 @@ create table video_user_like
     user_id  bigint                 not null,
     video_id bigint                 not null,
     status   enum ('FRONT', 'BACK') not null,
-    constraint video_user_like_pk_2
-        unique (user_id asc, id desc)
+    constraint video_id_user_id_pk
+        unique (user_id, video_id)
 );
 
-create index video_user_like_video_id_user_id_index
-    on video_user_like (video_id, user_id);
+create index video_user_like_pk_2
+    on video_user_like (user_id asc, id desc);
+

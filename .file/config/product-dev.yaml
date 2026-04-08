@@ -11,8 +11,8 @@ mybatis-plus:
       update-strategy: not_null
 
 mt:
-  console-url: http://43.139.55.171:19998
-  core-url: http://43.139.55.171:19999
+  console-url: http://mt:19998
+  core-url: http://mt:19999
   bucket-name: product
   username: mt
   password: mt

@@ -1,0 +1,37 @@
+spring:
+  ai:
+    openai:
+      api-key: ${api-key}
+      base-url: https://dashscope.aliyuncs.com/compatible-mode/
+      embedding:
+        api-key: ${spring.ai.openai.api-key}
+        base-url: ${spring.ai.openai.base-url}
+        # base-url: http://localhost:11434
+        options:
+          model: text-embedding-v4
+          # model: qwen3-embedding:4b
+          dimensions: 768
+    alibaba:
+      mcp:
+        nacos:
+          server-addr: nacos:8848
+          username: nacos
+          password: nacos
+          namespace: dev
+          registry:
+            enabled: true
+    mcp:
+      server:
+        type: async
+        sse-endpoint: /sse
+        sse-message-endpoint: /mcp
+    vectorstore:
+      milvus:
+        client:
+          host: milvus
+          port: 19530
+        collection-name: yh_rag_collection
+        initialize-schema: true
+        embedding-dimension: 768
+        index-type: IVF_FLAT
+        metric-type: L2

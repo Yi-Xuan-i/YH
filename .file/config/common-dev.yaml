@@ -14,9 +14,9 @@ spring:
     servlet:
       path: /api
   datasource:
-    url: jdbc:mysql://110.41.182.125/new_yh?allowMultiQueries=true
-    username: root
-    password: wisdom123456789
+    url: jdbc:mysql://mysql/yh?allowMultiQueries=true
+    username: yh
+    password: Qq2434462503.
     driver-class-name: com.mysql.cj.jdbc.Driver
     # type: com.alibaba.druid.pool.DruidDataSource
     druid:
@@ -28,25 +28,30 @@ spring:
   cloud:
     sentinel:
       transport:
-        dashboard: 43.139.55.171:10085  # Sentinel控制台地址
+        dashboard: sentinel:10085  # Sentinel控制台地址
         port: 8719  # 与控制台交互的端口（默认为8719）
+    openfeign:
+      httpclient:
+        enabled: true # 开启 Feign 对 httpClient 的支持
   data:
     redis:
-      host: 110.41.182.125
+      host: redis
       port: 6379
       password: qq2434462503
   rabbitmq:
-    host: 106.13.105.230
+    host: rabbitmq
     port: 5672
     virtual-host: /
     username: guest
     password: guest
+    publisher-confirm-type: correlated
+    publisher-returns: true
       
 seata:
   registry:
     type: nacos
     nacos:
-      server-addr: 106.13.105.230:8848
+      server-addr: nacos:8848
       namespace: ""
       group: DEFAULT_GROUP
       application: seataServer

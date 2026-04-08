@@ -1,8 +1,8 @@
 spring:
   r2dbc:
-    url: r2dbc:mysql://110.41.182.125:3306/new_yh
-    username: root
-    password: wisdom123456789
+    url: r2dbc:mysql://mysql:3306/yh
+    username: yh
+    password: Qq2434462503.
     pool:
       enabled: true
       initial-size: 1
@@ -11,13 +11,33 @@ spring:
       max-idle-time: 30000
   ai:
     openai:
-      api-key: b09d15b8-25ef-44e1-99d4-8e367939dd95
+      api-key: ${api-key}
       base-url: https://ark.cn-beijing.volces.com/api/v3/
+      # base-url: http://localhost:11434/v1
       chat:
         options:
           model: deepseek-r1-250528
+          # model: qwen3:4b
           temperature: 0.8
         completions-path: /chat/completions
+      embedding:
+        api-key: ${api-key}
+        base-url: https://dashscope.aliyuncs.com/compatible-mode/
+        # base-url: http://localhost:11434
+        options:
+          model: text-embedding-v4
+          # model: qwen3-embedding:4b
+          dimensions: 768
+    vectorstore:
+      milvus:
+        client:
+          host: milvus
+          port: 19530
+        collection-name: yh_rag_collection
+        initialize-schema: true
+        embedding-dimension: 768
+        index-type: IVF_FLAT
+        metric-type: L2
     mcp:
       client:
         type: ASYNC
@@ -25,5 +45,6 @@ spring:
           connections:
             server1:
               url: http://127.0.0.1:11111/
+              # url: http://mcpService
         toolcallback:
           enabled: true

@@ -4,6 +4,18 @@ spring:
       max-file-size: 5000MB
       max-request-size: 7000MB
 #      enabled: false
+  # datasource:
+  #   url: jdbc:mysql://mysql/yh_video?allowMultiQueries=true
+  #   username: yh
+  #   password: Qq2434462503.
+  #   driver-class-name: com.mysql.cj.jdbc.Driver
+  #   # type: com.alibaba.druid.pool.DruidDataSource
+  #   druid:
+  #     keep-alive: true
+  #     test-while-idle: true
+  #     min-idle: 1
+  #     validation-query: select 1
+  #     time-between-eviction-runs-millis: 20000
 
 mybatis-plus:
   type-aliases-package: com.yixuan.yh.video.pojo
@@ -18,17 +30,33 @@ mybatis-plus:
       update-strategy: not_null
 
 mt:
-  console-url: http://43.139.55.171:19998
-  core-url: http://43.139.55.171:19999
+  console-url: http://mt:19998
+  core-url: http://mt:19999
   bucket-name: video
   username: mt
   password: mt
 
 minio:
-  minio-url: http://127.0.0.1:9000
+  minio-url: http://minio:9000
   secret-key: minioadmin
   access-key: minioadmin
   bucket: video
 
+
+aws:
+  url: http://minio:9000
+  secret-key: minioadmin
+  access-key: minioadmin
+  bucket: video
+
+xxl:
+  job:
+    admin:
+      addresses: http://xxljob:12001/xxl-job-admin
+    executor:
+      appname: video
+      port: 11112
+    access-token: 123456
+
 milvus:
-  uri: http://127.0.0.1:19530
+  uri: http://milvus:19530
