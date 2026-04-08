@@ -4,12 +4,6 @@ spring:
   application:
     name: mcpService
   cloud:
-    openfeign:
-      httpclient:
-        enabled: true # 开启 Feign 对 httpClient 的支持
-    #    loadbalancer:
-    #      nacos:
-    #        enabled: true
     nacos:
       server-addr: nacos:8848
       username: nacos

@@ -17,12 +17,6 @@ spring:
         namespace: dev
       discovery:
         namespace: ${spring.cloud.nacos.config.namespace}
-    openfeign:
-      httpclient:
-        enabled: true # 开启 Feign 对 httpClient 的支持
-    #    loadbalancer:
-    #      nacos:
-    #        enabled: true
   config:
     import:
       - nacos:common-dev.yaml?group=DEFAULT_GROUP&refreshEnabled=true
