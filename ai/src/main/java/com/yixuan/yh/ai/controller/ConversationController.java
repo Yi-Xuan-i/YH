@@ -23,7 +23,7 @@ public class ConversationController {
 
     @Operation(summary = "创建会话")
     @PostMapping
-    Mono<Result<Long>> postConversation() {
+    Mono<Result<String>> postConversation() {
         return ReactiveUserContext.getUserId().flatMap(id -> conversationService.postConversation(id)
                 .map(Result::success));
     }

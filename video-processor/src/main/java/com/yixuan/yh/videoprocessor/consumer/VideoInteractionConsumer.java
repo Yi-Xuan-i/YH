@@ -5,7 +5,7 @@ import com.yixuan.yh.video.pojo.mq.VideoCommentMessage;
 import com.yixuan.yh.video.pojo.mq.VideoInteractionMessage;
 import com.yixuan.yh.video.pojo.request.VideoInteractionBatchRequest;
 import com.yixuan.yh.videoprocessor.constant.RabbitMQConstant;
-import com.yixuan.yh.videoprocessor.mq.VideoCommentIncrMessage;
+import com.yixuan.yh.video.pojo.mq.VideoCommentIncrMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.core.ExchangeTypes;
 import org.springframework.amqp.rabbit.annotation.Exchange;

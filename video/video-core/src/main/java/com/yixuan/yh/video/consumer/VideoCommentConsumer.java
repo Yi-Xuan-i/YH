@@ -2,7 +2,7 @@ package com.yixuan.yh.video.consumer;
 
 import com.yixuan.yh.video.mapper.VideoMapper;
 import com.yixuan.yh.video.mapper.VideoUserCommentMapper;
-import com.yixuan.yh.videoprocessor.mq.VideoCommentIncrMessage;
+import com.yixuan.yh.video.pojo.mq.VideoCommentIncrMessage;
 import org.springframework.amqp.rabbit.annotation.Exchange;
 import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.QueueBinding;

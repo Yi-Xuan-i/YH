@@ -26,7 +26,7 @@ public class ConversationServiceImpl implements ConversationService {
     private SnowflakeUtils snowflakeUtils;
 
     @Override
-    public Mono<Long> postConversation(Long userId) {
+    public Mono<String> postConversation(Long userId) {
         Conversation conversation = new Conversation();
         conversation.setConversationId(snowflakeUtils.nextId());
         conversation.setUserId(userId);
@@ -34,7 +34,8 @@ public class ConversationServiceImpl implements ConversationService {
         conversation.setUpdatedAt(LocalDateTime.now());
         conversation.setCreatedAt(LocalDateTime.now());
         return conversationRepository.save(conversation)
-                .map(Conversation::getConversationId);
+                .map(Conversation::getConversationId)
+                .map(id -> Long.toString(id));
     }
 
     @Override

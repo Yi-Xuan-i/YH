@@ -27,3 +27,6 @@ spring:
     import:
       - nacos:common-dev.yaml?group=DEFAULT_GROUP&refreshEnabled=true
       - nacos:ai-dev.yaml?group=DEFAULT_GROUP&refreshEnabled=true
+logging:
+  level:
+    org.springframework.ai: DEBUG

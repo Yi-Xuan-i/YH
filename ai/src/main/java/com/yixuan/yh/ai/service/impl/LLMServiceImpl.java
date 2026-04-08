@@ -4,13 +4,12 @@ import com.yixuan.yh.ai.cache.ConversationMessageCache;
 import com.yixuan.yh.ai.entity.ConversationMessage;
 import com.yixuan.yh.ai.repository.ConversationRepository;
 import com.yixuan.yh.ai.service.LLMService;
-import org.apache.http.HttpException;
+import com.yixuan.yh.common.exception.YHClientException;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
 
@@ -30,11 +29,10 @@ public class LLMServiceImpl implements LLMService {
                 .flatMapMany(
                         exist -> {
                             if (!exist) {
-                                return Flux.error(new HttpException("异常！"));
+                                return Flux.error(new YHClientException("会话异常！"));
                             }
                             return conversationMessageCache.getMessage(conversationId)
                                     .collectList()
-                                    .publishOn(Schedulers.boundedElastic())
                                     .flatMapMany(historyMessages -> {
                                         // 构建历史上下文
                                         StringBuilder contextBuilder = new StringBuilder();

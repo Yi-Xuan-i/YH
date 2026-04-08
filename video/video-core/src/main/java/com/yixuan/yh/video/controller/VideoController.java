@@ -2,20 +2,17 @@ package com.yixuan.yh.video.controller;
 
 import com.yixuan.yh.common.response.Result;
 import com.yixuan.yh.common.utils.UserContext;
+import com.yixuan.yh.video.pojo.request.GetPresignUrlRequest;
 import com.yixuan.yh.video.pojo.response.*;
 import com.yixuan.yh.video.pojo.request.PostVideoMessageRequest;
 import com.yixuan.yh.video.service.VideoService;
-import io.minio.errors.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.Map;
 
 @Tag(name = "Video")
 @RestController
@@ -25,24 +22,28 @@ public class VideoController {
     @Autowired
     private VideoService videoService;
 
-    @Operation(summary = "发起上传")
-    @PostMapping("/start")
-    public Result<String> postVideoStart(Long fileSize, Integer totalChunks) {
-        return Result.success(videoService.postVideoStart(UserContext.getUser(), fileSize, totalChunks));
+    @Operation(summary = "初始化分片上传")
+    @PostMapping("/start-upload-part")
+    public Result<String> startUploadPart(Integer totalChunks) {
+        return Result.success(videoService.startUploadPart(UserContext.getUser(), totalChunks));
     }
 
-    @Operation(summary = "上传视频（上传视频文件数据）")
-    @PostMapping("/part")
-    public Result<Void> postVideo(Long uploadId, Long partNumber, MultipartFile file) throws Exception {
-        videoService.postVideo(UserContext.getUser(), uploadId, partNumber, file);
-        return Result.success();
+    @Operation(summary = "获取分片直传URL")
+    @PostMapping("/presign-upload-part")
+    public Result<Map<Integer, String>> presignUploadPart(@RequestBody GetPresignUrlRequest getPresignUrlRequest) {
+        return Result.success(videoService.presignUploadPart(UserContext.getUser(), getPresignUrlRequest));
     }
 
-    @Operation(summary = "合并视频")
+    @Operation(summary = "获取普通直传URL")
+    @PostMapping("/presign-put-object")
+    public Result<PresignPutObjectResponse> presignPutObject() {
+        return Result.success(videoService.presignPutObject(UserContext.getUser()));
+    }
+
+    @Operation(summary = "通知上传完毕")
     @PostMapping("/end")
-    public Result<Void> postVideoEnd(Long uploadId) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
-        videoService.postVideoEnd(uploadId);
-        return Result.success();
+    public Result<PostVideoEndResponse> postVideoEnd(Long taskId) {
+        return Result.success(videoService.postVideoEnd(UserContext.getUser(), taskId));
     }
 
     @Operation(summary = "正式上传视频（提交视频关联信息）")

@@ -22,7 +22,7 @@ public class VideoTagPublicController {
 
     @Operation(summary = "获取视频标签（当用户上传视频时可以选中这些视频标签）")
     @GetMapping("/simple")
-    public Result<List<GetSimpleVideoTagResponse>> getSimpleVideoTags() {
+    public Result<List<String>> getSimpleVideoTags() {
         return Result.success(videoTagService.getSimpleVideoTags());
     }
 }

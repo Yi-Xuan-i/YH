@@ -1,6 +1,7 @@
 package com.yixuan.yh.user.mapstruct;
 
 import com.yixuan.yh.user.pojo.entity.User;
+import com.yixuan.yh.user.pojo.response.ProfileResponse;
 import com.yixuan.yh.user.pojo.response.UserInfoInListResponse;
 import com.yixuan.yh.user.pojo.response.UserSearchResponse;
 import org.mapstruct.Mapper;
@@ -13,4 +14,6 @@ public interface UserMapStruct {
     UserInfoInListResponse toUserInfoInListResponse(User user);
 
     UserSearchResponse toUserSearchResponse(User user);
+
+    ProfileResponse toProfileResponse(User user);
 }

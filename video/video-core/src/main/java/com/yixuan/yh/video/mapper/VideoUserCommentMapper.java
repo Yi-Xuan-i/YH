@@ -2,7 +2,7 @@ package com.yixuan.yh.video.mapper;
 
 import com.yixuan.yh.video.pojo.entity.VideoUserComment;
 import com.yixuan.yh.video.pojo.entity.multi.CommentWithReceiver;
-import com.yixuan.yh.videoprocessor.mq.VideoCommentIncrMessage;
+import com.yixuan.yh.video.pojo.mq.VideoCommentIncrMessage;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;

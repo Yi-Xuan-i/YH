@@ -8,7 +8,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 
 public interface ConversationService {
-    Mono<Long> postConversation(Long userId);
+    Mono<String> postConversation(Long userId);
 
     Mono<List<ConversationResponse>> getConversations(Long id);
 

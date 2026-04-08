@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class VideoPostMessage {
+public class VideoReviewMessage {
     Long videoId;
     String videoUrl;
     String description;

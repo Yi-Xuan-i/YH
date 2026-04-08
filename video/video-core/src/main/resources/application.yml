@@ -27,3 +27,16 @@ spring:
     import:
       - nacos:common-dev.yaml?group=DEFAULT_GROUP&refreshEnabled=true
       - nacos:video-dev.yaml?group=DEFAULT_GROUP&refreshEnabled=true
+  rabbitmq:
+    publisher-confirm-type: correlated
+    publisher-returns: true
+
+xxl:
+  job:
+    admin:
+      addresses: http://127.0.0.1:11111/xxl-job-admin
+    executor:
+      appname: video
+      port: 11112
+    access-token: 123456
+

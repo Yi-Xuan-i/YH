@@ -1,23 +1,20 @@
 package com.yixuan.yh.video.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.yixuan.yh.video.pojo.entity.Video;
 import com.yixuan.yh.video.pojo.entity.multi.VideoWithFavorite;
 import com.yixuan.yh.video.pojo.entity.multi.VideoWithLike;
+import com.yixuan.yh.video.pojo.mq.VideoCommentIncrMessage;
 import com.yixuan.yh.video.pojo.request.VideoInteractionBatchRequest;
-import com.yixuan.yh.videoprocessor.mq.VideoCommentIncrMessage;
-import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
 @Mapper
-public interface VideoMapper {
+public interface VideoMapper extends BaseMapper<Video> {
     @Select("select * from video limit 1")
     Video selectFirst();
-
-    @Insert("insert into video (id, creator_id, url, cover_url, description) value (#{id}, #{creatorId}, #{url}, #{coverUrl}, #{description})")
-    void insert(Video video);
 
     @Select("select url from video where id = #{id}")
     String selectVideoUrlById(Long id);

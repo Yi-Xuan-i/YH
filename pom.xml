@@ -20,5 +20,6 @@
         <module>live</module>
         <module>ai</module>
         <module>chat</module>
+        <module>mcp-server</module>
     </modules>
 </project>

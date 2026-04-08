@@ -15,7 +15,7 @@ public class VideoTagServiceImpl implements VideoTagService {
     private VideoTagMapper videoTagMapper;
 
     @Override
-    public List<GetSimpleVideoTagResponse> getSimpleVideoTags() {
-        return videoTagMapper.selectSimply();
+    public List<String> getSimpleVideoTags() {
+        return videoTagMapper.selectTagsName();
     }
 }

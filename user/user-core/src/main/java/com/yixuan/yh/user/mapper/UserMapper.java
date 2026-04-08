@@ -23,7 +23,7 @@ public interface UserMapper {
     boolean selectIsPhoneNumberExist(String phoneNumber);
 
     @Select("select name, avatar_url, bio from user where id = #{userId}")
-    ProfileResponse selectProfile(Long userId);
+    User selectProfile(Long userId);
 
     @Select("select name, avatar_url from user where id = #{userId}")
     User selectProfileBasic(Long userId);

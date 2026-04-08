@@ -1,80 +1,78 @@
 package com.yixuan.yh.ai.service.impl;
 
+import com.yixuan.yh.ai.cache.ConversationMessageCache;
 import com.yixuan.yh.ai.cache.IntentResponseCache;
 import com.yixuan.yh.ai.constant.RedisKeyConstant;
+import com.yixuan.yh.ai.entity.ConversationMessage;
+import com.yixuan.yh.ai.repository.ConversationRepository;
 import com.yixuan.yh.ai.service.CustomerService;
 import com.yixuan.yh.ai.utils.ReactiveUserContext;
+import com.yixuan.yh.common.exception.YHClientException;
 import com.yixuan.yh.common.response.Result;
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
+import java.util.List;
 
 @Service
 public class CustomerServiceImpl implements CustomerService {
 
-    private final WebClient webClient = WebClient.create("http://127.0.0.1:10010");
     @Autowired
-    private ReactiveStringRedisTemplate stringRedisTemplate;
+    private ChatClient chatClient;
     @Autowired
-    private IntentResponseCache intentResponseCache;
+    private ConversationMessageCache conversationMessageCache;
+    @Autowired
+    private ConversationRepository conversationRepository;
 
     @Override
-    public Mono<String> chat(String msg) {
-        return ReactiveUserContext.getUserId()
-                .flatMap(userId -> {
-                            String key = RedisKeyConstant.CUSTOMER_SERVICE_CHAT_STATUS_KEY_PREFIX + userId;
-                            return stringRedisTemplate.opsForValue().get(key)
-                                    .switchIfEmpty(Mono.defer(() ->
-                                                    stringRedisTemplate.opsForValue().set(key, ChatStatus.NORMAL.getStringValue(), Duration.ofMinutes(10))
-                                                            .thenReturn(ChatStatus.NORMAL.getStringValue())
-                                            )
-                                    )
-                                    .flatMap(value -> {
-                                        switch (ChatStatus.fromStringValue(value)) {
-                                            case RETURN_GOODS -> {
-                                                try {
-                                                    Long.parseLong(msg);
-                                                    return stringRedisTemplate.opsForValue().set(RedisKeyConstant.CUSTOMER_SERVICE_CHAT_RETURN_GOODS_ID_KEY_PREFIX + userId, msg)
-                                                            .then(stringRedisTemplate.opsForValue().set(key, ChatStatus.RETURN_GOODS_CONFIRM.getStringValue(), Duration.ofMinutes(10))
-                                                                    .then(Mono.just("你确认要退货-" + msg + "吗？（确认退货则输入“确认”）")));
-                                                } catch (Exception e) {
-                                                    return stringRedisTemplate.opsForValue().set(key, ChatStatus.NORMAL.getStringValue(), Duration.ofMinutes(10))
-                                                            .then(normalHandler(key, msg));
-                                                }
-                                            }
-                                            case RETURN_GOODS_CONFIRM -> {
-                                                if (msg.equals("确认")) {
-                                                    return Mono.just("已经成功帮您申请退货！");
-                                                }
-                                                return stringRedisTemplate.opsForValue().set(key, ChatStatus.NORMAL.getStringValue(), Duration.ofMinutes(10))
-                                                        .then(normalHandler(key, msg));
-                                            }
-                                            default -> {
-                                                return normalHandler(key, msg);
-                                            }
+    public Flux<String> chat(Long userId, Long conversationId, String msg) {
+        return conversationRepository.existsByConversationIdAndUserId(conversationId, userId)
+                .flatMapMany(
+                        exist -> {
+                            if (!exist) {
+                                return Flux.error(new YHClientException("会话异常！"));
+                            }
+                            return conversationMessageCache.getMessage(conversationId)
+                                    .collectList()
+                                    .flatMapMany(historyMessages -> {
+                                        // 构建历史上下文
+                                        StringBuilder contextBuilder = new StringBuilder();
+                                        contextBuilder.append("system： 你是一个商城智能客服。\n");
+                                        for (int i = historyMessages.size() - 1; i >= 0; i--) {
+                                            ConversationMessage message = historyMessages.get(i);
+                                            contextBuilder.append(message.getRole())
+                                                    .append(": ")
+                                                    .append(message.getContent())
+                                                    .append("\n");
                                         }
+                                        contextBuilder.append("user: ").append(msg).append("\n");
 
+                                        StringBuilder fullResponse = new StringBuilder();
+                                        return chatClient.prompt(contextBuilder.toString())
+                                                .stream()
+                                                .content()
+                                                .map(text -> {
+                                                    fullResponse.append(text);
+                                                    return text;
+                                                })
+                                                .concatWith(
+                                                        Mono.defer(() ->
+                                                                conversationMessageCache.addMessage(
+                                                                                conversationId,
+                                                                                List.of(msg, fullResponse.toString())
+                                                                        )
+                                                                        .then(Mono.empty())
+                                                        )
+                                                );
                                     });
                         }
                 );
-    }
-
-    private Mono<String> normalHandler(String key, String msg) {
-        return webClient.get()
-                .uri("/predict?text={text}", msg)
-                .retrieve()
-                .bodyToMono(Result.class)
-                .flatMap(intent -> {
-                    if (intent.getData().equals("退货")) {
-                        return stringRedisTemplate.opsForValue().set(key, ChatStatus.RETURN_GOODS.getStringValue(), Duration.ofMinutes(10))
-                                .then(Mono.just("请输入你要退货的订单号"));
-                    }
-                    return intentResponseCache.getResponse((String) intent.getData());
-                });
     }
 
     enum ChatStatus {

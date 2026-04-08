@@ -1,6 +1,6 @@
-package com.yixuan.yh.test;
+package com.yixuan.yh.mcp;
 
-import com.yixuan.yh.test.mcp.CommonService;
+import com.yixuan.yh.mcp.server.CustomerService;
 import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.tool.method.MethodToolCallbackProvider;
 import org.springframework.boot.SpringApplication;
@@ -8,14 +8,14 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
-public class TestApplication {
+public class MCPServerApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(TestApplication.class, args);
+        SpringApplication.run(MCPServerApplication.class, args);
     }
 
     @Bean
-    public ToolCallbackProvider commonTools(CommonService commonService) {
-        return MethodToolCallbackProvider.builder().toolObjects(commonService).build();
+    public ToolCallbackProvider commonTools(CustomerService customerService) {
+        return MethodToolCallbackProvider.builder().toolObjects(customerService).build();
     }
 }

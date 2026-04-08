@@ -21,6 +21,8 @@
         <java.version>21</java.version>
         <springcloud.version>2023.0.0</springcloud.version>
         <springcloudalibaba.version>2023.0.3.3</springcloudalibaba.version>
+        <springaialibaba.version>1.0.0.2</springaialibaba.version>
+        <springai.version>1.0.0</springai.version>
         <mysql.version>8.2.0</mysql.version>
         <springmybatis.version>3.0.3</springmybatis.version>
         <mybatis.version>3.0.3</mybatis.version>
@@ -37,6 +39,7 @@
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <jasypt.version>3.0.4</jasypt.version>
         <xxljob.version>3.4.0</xxljob.version>
+        <protobuf.version>3.24.4</protobuf.version>
     </properties>
 
     <!--统一管理依赖版本,不会直接依赖,还需要在子工程中引入所需依赖(无需指定版本)-->
@@ -55,6 +58,20 @@
                 <groupId>com.alibaba.cloud</groupId>
                 <artifactId>spring-cloud-alibaba-dependencies</artifactId>
                 <version>${springcloudalibaba.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- Nacos MCP 注册支持 -->
+            <dependency>
+                <groupId>com.alibaba.cloud.ai</groupId>
+                <artifactId>spring-ai-alibaba-starter-nacos-mcp-server</artifactId>
+                <version>${springaialibaba.version}</version>
+            </dependency>
+            <!-- spring ai -->
+            <dependency>
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-bom</artifactId>
+                <version>${springai.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -178,6 +195,12 @@
                 <groupId>com.xuxueli</groupId>
                 <artifactId>xxl-job-core</artifactId>
                 <version>${xxljob.version}</version>
+            </dependency>
+            <!-- protobuf -->
+            <dependency>
+                <groupId>com.google.protobuf</groupId>
+                <artifactId>protobuf-java</artifactId>
+                <version>${protobuf.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

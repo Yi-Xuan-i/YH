@@ -7,9 +7,8 @@ import java.util.List;
 
 @Data
 public class PostVideoMessageRequest {
+    Long videoId;
     String description;
-    List<Long> addedTagList;
-    List<String> addedNewTagList;
+    List<String> addedTagList;
     MultipartFile cover;
-    MultipartFile video;
 }
