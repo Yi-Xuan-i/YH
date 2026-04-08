@@ -27,8 +27,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(YHClientException.class)
     public Result<Void> ex(YHClientException e) {
         log.warn("业务异常 | Code: {} | UserMsg: {} | Detail: {}",
-                e.getErrorCode().getCode(),
-                e.getErrorCode().getMsg(),
+                e.getErrorCode() != null ? e.getErrorCode().getCode() : "unknown",
+                e.getErrorCode() != null ? e.getErrorCode().getMsg() : "unknown",
                 e.getLogMessage());
 
         return Result.error(e.getErrorCode() != null ? e.getErrorCode().getMsg() : e.getLogMessage()); // 兼容旧异常类
