@@ -22,7 +22,7 @@
         <springcloud.version>2023.0.0</springcloud.version>
         <springcloudalibaba.version>2023.0.3.3</springcloudalibaba.version>
         <springaialibaba.version>1.0.0.2</springaialibaba.version>
-        <springai.version>1.0.0</springai.version>
+        <springai.version>1.1.4</springai.version>
         <mysql.version>8.2.0</mysql.version>
         <springmybatis.version>3.0.3</springmybatis.version>
         <mybatis.version>3.0.3</mybatis.version>
@@ -61,12 +61,6 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            <!-- Nacos MCP 注册支持 -->
-            <dependency>
-                <groupId>com.alibaba.cloud.ai</groupId>
-                <artifactId>spring-ai-alibaba-starter-nacos-mcp-server</artifactId>
-                <version>${springaialibaba.version}</version>
-            </dependency>
             <!-- spring ai -->
             <dependency>
                 <groupId>org.springframework.ai</groupId>
@@ -74,6 +68,12 @@
                 <version>${springai.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <!-- Nacos MCP 注册支持 -->
+            <dependency>
+                <groupId>com.alibaba.cloud.ai</groupId>
+                <artifactId>spring-ai-alibaba-starter-nacos-mcp-server</artifactId>
+                <version>${springaialibaba.version}</version>
             </dependency>
             <!-- mysql驱动 -->
             <dependency>

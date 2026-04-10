@@ -1,13 +1,17 @@
 package com.yixuan.yh.mcp;
 
-import com.yixuan.yh.mcp.server.CustomerService;
-import org.springframework.ai.tool.ToolCallbackProvider;
-import org.springframework.ai.tool.method.MethodToolCallbackProvider;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @SpringBootApplication
+@EnableFeignClients(basePackages = {"com.yixuan.yh.user.feign"})
 public class MCPServerApplication {
 
     public static void main(String[] args) {
@@ -15,7 +19,20 @@ public class MCPServerApplication {
     }
 
     @Bean
-    public ToolCallbackProvider commonTools(CustomerService customerService) {
-        return MethodToolCallbackProvider.builder().toolObjects(customerService).build();
+    @LoadBalanced
+    public WebClient.Builder loadBalancedBuilder() {
+        return WebClient.builder();
+    }
+
+    @Bean
+    public WebClient webClient(WebClient.Builder builder) {
+        return builder.build();
+    }
+
+    @Bean
+    public HttpMessageConverters messageConverters(ObjectMapper objectMapper) {
+        return new HttpMessageConverters(
+                new MappingJackson2HttpMessageConverter(objectMapper)
+        );
     }
 }

@@ -13,4 +13,6 @@ spring:
       config:
         namespace: dev
   config:
-    import: nacos:mcp-dev.yaml?group=DEFAULT_GROUP&refreshEnabled=true
+    import:
+      - nacos:common-dev.yaml?group=DEFAULT_GROUP&refreshEnabled=true
+      - nacos:mcp-dev.yaml?group=DEFAULT_GROUP&refreshEnabled=true

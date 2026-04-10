@@ -1,24 +1,18 @@
 package com.yixuan.yh.ai.service.impl;
 
 import com.yixuan.yh.ai.cache.ConversationMessageCache;
-import com.yixuan.yh.ai.cache.IntentResponseCache;
-import com.yixuan.yh.ai.constant.RedisKeyConstant;
 import com.yixuan.yh.ai.entity.ConversationMessage;
 import com.yixuan.yh.ai.repository.ConversationRepository;
 import com.yixuan.yh.ai.service.CustomerService;
-import com.yixuan.yh.ai.utils.ReactiveUserContext;
 import com.yixuan.yh.common.exception.YHClientException;
-import com.yixuan.yh.common.response.Result;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class CustomerServiceImpl implements CustomerService {
@@ -55,6 +49,7 @@ public class CustomerServiceImpl implements CustomerService {
 
                                         StringBuilder fullResponse = new StringBuilder();
                                         return chatClient.prompt(contextBuilder.toString())
+                                                .toolContext(Map.of("userId", userId))
                                                 .stream()
                                                 .content()
                                                 .map(text -> {
