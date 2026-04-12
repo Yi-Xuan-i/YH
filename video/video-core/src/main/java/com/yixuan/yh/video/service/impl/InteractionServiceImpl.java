@@ -150,7 +150,7 @@ public class InteractionServiceImpl implements InteractionService {
         videoCommentMessage.setRootId(rootId);
         videoCommentMessage.setContent(videoUserComment.getContent());
 
-        rabbitTemplate.convertAndSend(RabbitMQConstant.VIDEO_COMMENT_FANOUT_EXCHANGE, "", videoCommentMessage);
+        rabbitTemplate.convertAndSend(RabbitMQConstant.VIDEO_INTERACTION_TOPIC_EXCHANGE, RabbitMQConstant.VIDEO_COMMENT_QUEUE_KEY, videoCommentMessage);
 
         return videoUserComment.getId().toString();
     }

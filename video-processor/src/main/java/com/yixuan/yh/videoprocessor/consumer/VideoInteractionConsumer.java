@@ -1,18 +1,25 @@
 package com.yixuan.yh.videoprocessor.consumer;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yixuan.yh.video.feign.InteractionPrivateClient;
 import com.yixuan.yh.video.pojo.mq.VideoCommentMessage;
 import com.yixuan.yh.video.pojo.mq.VideoInteractionMessage;
 import com.yixuan.yh.video.pojo.request.VideoInteractionBatchRequest;
 import com.yixuan.yh.videoprocessor.constant.RabbitMQConstant;
 import com.yixuan.yh.video.pojo.mq.VideoCommentIncrMessage;
+import com.yixuan.yh.videoprocessor.entity.UserVideoInteraction;
+import com.yixuan.yh.videoprocessor.serivce.UserVideoInteractionService;
 import lombok.RequiredArgsConstructor;
+import org.redisson.api.*;
 import org.springframework.amqp.core.ExchangeTypes;
 import org.springframework.amqp.rabbit.annotation.Exchange;
 import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.support.AmqpHeaders;
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -26,11 +33,73 @@ public class VideoInteractionConsumer {
 
     private final RabbitTemplate rabbitTemplate;
     private final InteractionPrivateClient interactionPrivateClient;
+    private final ObjectMapper objectMapper;
+    private final RedissonClient redissonClient;
+    private final UserVideoInteractionService userVideoInteractionService;
 
     @RabbitListener(
             bindings = @QueueBinding(
-                    exchange = @Exchange(name = "video.comment.fanout", type = ExchangeTypes.FANOUT),
-                    value = @Queue(name = "video.comment.count.queue")
+                    exchange = @Exchange(name = RabbitMQConstant.VIDEO_INTERACTION_TOPIC_EXCHANGE, type = ExchangeTypes.TOPIC),
+                    key = RabbitMQConstant.VIDEO_INTERACTION_QUEUE_KEY,
+                    value = @Queue(name = RabbitMQConstant.VIDEO_INTERACTION_QUEUE)
+            ),
+            containerFactory = "batchContainerFactory"
+    )
+    public void handleVideoInteractionMessage(List<String> messageList, @Header(AmqpHeaders.RECEIVED_ROUTING_KEY) String routingKey) {
+
+        if (routingKey.equals(RabbitMQConstant.VIDEO_COMMENT_QUEUE_KEY)) {
+            List<VideoCommentMessage> videoCommentMessageList = messageList.stream().map(message -> {
+                try {
+                    return objectMapper.readValue(message, VideoCommentMessage.class);
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
+            }).toList();
+
+            List<UserVideoInteraction> userVideoInteractionList = new ArrayList<>(videoCommentMessageList.size());
+
+            for (VideoCommentMessage videoCommentMessage : videoCommentMessageList) {
+                RBatch batch = redissonClient.createBatch();
+                RScoredSortedSetAsync<String> userVideoTagSortedSet = batch.getScoredSortedSet("user:video:tag:" + videoCommentMessage.getUserId());
+
+                // 获取视频对应标签（尚未完成）
+                List<String> tag = List.of("标签");
+
+                // 给对应标签添加分数
+                tag.forEach(t -> userVideoTagSortedSet.addScoreAsync(t, 3));
+
+                // 裁剪，避免标签无限增加
+                userVideoTagSortedSet.removeRangeByRankAsync(0, -51);
+
+                batch.execute();
+
+                // 长期记录
+                UserVideoInteraction userVideoInteraction = new UserVideoInteraction();
+                userVideoInteraction.setUserId(videoCommentMessage.getUserId());
+                userVideoInteraction.setVideoId(videoCommentMessage.getVideoId());
+                userVideoInteraction.setType(UserVideoInteraction.InteractionType.COMMENT);
+                userVideoInteractionList.add(userVideoInteraction);
+            }
+
+            // 批量插入长期记录
+            userVideoInteractionService.saveBatch(userVideoInteractionList);
+
+        } else if (routingKey.equals(RabbitMQConstant.VIDEO_LIKE_QUEUE_KEY) || routingKey.equals(RabbitMQConstant.VIDEO_FAVORITE_QUEUE_KEY)) {
+            List<VideoInteractionMessage> videoInteractionMessageList = messageList.stream().map(message -> {
+                try {
+                    return objectMapper.readValue(message, VideoInteractionMessage.class);
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
+            }).toList();
+        }
+    }
+
+    @RabbitListener(
+            bindings = @QueueBinding(
+                    exchange = @Exchange(name = RabbitMQConstant.VIDEO_INTERACTION_TOPIC_EXCHANGE, type = ExchangeTypes.TOPIC),
+                    key = RabbitMQConstant.VIDEO_COMMENT_QUEUE_KEY,
+                    value = @Queue(name = RabbitMQConstant.VIDEO_COMMENT_QUEUE)
             ),
             containerFactory = "batchContainerFactory"
     )
@@ -80,7 +149,14 @@ public class VideoInteractionConsumer {
         rabbitTemplate.convertAndSend(RabbitMQConstant.VIDEO_COMMENT_DIRECT_EXCHANGE, RabbitMQConstant.VIDEO_COMMENT_INCR_QUEUE, new VideoCommentIncrMessage(commentIncrList, replyIncrList));
     }
 
-    @RabbitListener(queuesToDeclare = @Queue(name = "video.like.queue"), containerFactory = "batchContainerFactory")
+    @RabbitListener(
+            bindings = @QueueBinding(
+                    exchange = @Exchange(name = RabbitMQConstant.VIDEO_INTERACTION_TOPIC_EXCHANGE, type = ExchangeTypes.TOPIC),
+                    key = RabbitMQConstant.VIDEO_LIKE_QUEUE_KEY,
+                    value = @Queue(name = RabbitMQConstant.VIDEO_LIKE_QUEUE)
+            ),
+            containerFactory = "batchContainerFactory"
+    )
     public void handleVideoLikeMessage(List<VideoInteractionMessage> videoInteractionMessageList) {
         // 发起请求
         if (interactionPrivateClient.likeBatch(createInteractionBatchRequest(videoInteractionMessageList)).isError()) {
@@ -88,7 +164,14 @@ public class VideoInteractionConsumer {
         }
     }
 
-    @RabbitListener(queuesToDeclare = @Queue(name = "video.favorite.queue"), containerFactory = "batchContainerFactory")
+    @RabbitListener(
+            bindings = @QueueBinding(
+                    exchange = @Exchange(name = RabbitMQConstant.VIDEO_INTERACTION_TOPIC_EXCHANGE, type = ExchangeTypes.TOPIC),
+                    key = RabbitMQConstant.VIDEO_FAVORITE_QUEUE_KEY,
+                    value = @Queue(name = RabbitMQConstant.VIDEO_FAVORITE_QUEUE)
+            ),
+            containerFactory = "batchContainerFactory"
+    )
     public void handleVideoFavoriteMessage(List<VideoInteractionMessage> videoInteractionMessageList) {
         // 发起请求
         if (interactionPrivateClient.favoriteBatch(createInteractionBatchRequest(videoInteractionMessageList)).isError()) {
@@ -131,6 +214,5 @@ public class VideoInteractionConsumer {
 
         return videoInteractionBatchRequest;
     }
-
 
 }
