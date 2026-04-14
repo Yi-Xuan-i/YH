@@ -11,8 +11,8 @@ public class RabbitMQConstant {
     public final static String VIDEO_FAVORITE_QUEUE_KEY = "video.interaction.favorite";
     public final static String VIDEO_COMMENT_QUEUE = "video.comment.queue";
     public final static String VIDEO_COMMENT_QUEUE_KEY = "video.interaction.comment";
-    public final static String VIDEO_INTERACTION_QUEUE = "Video.interaction.queue";
-    public final static String VIDEO_INTERACTION_QUEUE_KEY = "Video.interaction.*";
+    public final static String VIDEO_INTERACTION_QUEUE = "video.interaction.queue";
+    public final static String VIDEO_INTERACTION_QUEUE_KEY = "video.interaction.*";
 
     public final static String VIDEO_COMMENT_DIRECT_EXCHANGE = "video.comment.direct";
     public final static String VIDEO_COMMENT_INCR_QUEUE = "video.comment.incr.queue";
