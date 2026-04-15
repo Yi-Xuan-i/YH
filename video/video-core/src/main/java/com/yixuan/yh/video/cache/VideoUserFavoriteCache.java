@@ -25,7 +25,7 @@ public class VideoUserFavoriteCache {
         String key = RedisConstant.VIDEO_USER_FAVORITE_KEY_PREFIX + userId;
 
         while (true) {
-            Long result = stringRedisTemplate.execute(interactionScript, Collections.singletonList(key), videoId.toString(), "1");
+            Long result = stringRedisTemplate.execute(interactionScript, Collections.singletonList(key), videoId.toString(), "1", "600");
             assert result != null;
             if (result.equals(RedisConstant.InteractionLua.NOT_EXIST.getValue())) {
                 result = videoUserFavoriteMapper.isFavorite(userId, videoId) ? 1L : 0L;

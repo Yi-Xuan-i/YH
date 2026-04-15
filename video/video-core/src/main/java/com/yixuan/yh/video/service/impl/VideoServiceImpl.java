@@ -32,6 +32,8 @@ import io.milvus.v2.service.vector.request.SearchReq;
 import io.milvus.v2.service.vector.request.data.FloatVec;
 import io.milvus.v2.service.vector.response.SearchResp;
 import org.redisson.api.RedissonClient;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -42,6 +44,7 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -286,17 +289,18 @@ public class VideoServiceImpl implements VideoService {
         // 注册事务提交后发送消息
         TransactionSynchronizationManager.registerSynchronization(
                 new TransactionSynchronization() {
+                    final byte[] body = messageOutbox.getMessageBody().getBytes(StandardCharsets.UTF_8);
+
+                    final Message message = MessageBuilder.withBody(body)
+                            .setContentType(MessageProperties.CONTENT_TYPE_JSON)
+                            .setContentEncoding("UTF-8")
+                            .build();
+
                     @Override
                     public void afterCommit() {
-                        rabbitTemplate.convertAndSend("", RabbitMQConstant.VIDEO_REVIEW_QUEUE,
-                                messageOutbox.getMessageBody(),
-                                message -> {
-                                    // 手动设置消息头为 application/json
-                                    message.getMessageProperties().setContentType(MessageProperties.CONTENT_TYPE_JSON);
-                                    return message;
-                                },
-                                new CorrelationData(messageOutbox.getId().toString())
-                        );
+                        rabbitTemplate.send("", RabbitMQConstant.VIDEO_REVIEW_QUEUE,
+                                message,
+                                new CorrelationData(messageOutbox.getId().toString()));
                     }
                 }
         );

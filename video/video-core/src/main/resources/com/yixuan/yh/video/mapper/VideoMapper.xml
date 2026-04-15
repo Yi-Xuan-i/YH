@@ -30,7 +30,7 @@
         likes,
         comments,
         favorites,
-        created_time
+        created_at
         from video
         where creator_id = #{userId}
         and status = 'PUBLISHED'
@@ -49,7 +49,7 @@
         likes,
         comments,
         favorites,
-        created_time
+        created_at
         from video
         where creator_id = #{userId}
         and status = 'PROCESSING'
@@ -68,7 +68,7 @@
         likes,
         comments,
         favorites,
-        created_time
+        created_at
         from video
         where creator_id = #{userId}
         and status = 'REJECTED'

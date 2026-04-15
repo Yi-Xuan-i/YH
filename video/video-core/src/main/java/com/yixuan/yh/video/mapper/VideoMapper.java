@@ -28,7 +28,7 @@ public interface VideoMapper extends BaseMapper<Video> {
     @Select("select status from video where id = #{id}")
     Video.VideoStatus selectVideoStatusUrlById(Long id);
 
-    @Select("select id, url, cover_url, description, likes, comments, favorites, created_time from video where creator_id = #{userId} and status = 'UPLOADED' order by created_time desc")
+    @Select("select id, url, cover_url, description, likes, comments, favorites, created_at from video where creator_id = #{userId} and status = 'UPLOADED' order by created_time desc")
     List<Video> selectUploadedVideoByUserId(Long userId);
 
     List<Video> selectPublishedVideoByUserId(Long userId, Long lastMinId);

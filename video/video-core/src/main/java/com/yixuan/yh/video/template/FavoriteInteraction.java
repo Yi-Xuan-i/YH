@@ -26,6 +26,6 @@ public class FavoriteInteraction extends InteractionTemplate {
     @Override
     protected void sendMessageToQueue(VideoInteractionMessage videoInteractionMessage) {
         // 信息发送到消息队列异步处理
-        rabbitTemplate.convertAndSend(RabbitMQConstant.VIDEO_FAVORITE_QUEUE, videoInteractionMessage);
+        rabbitTemplate.convertAndSend(RabbitMQConstant.VIDEO_INTERACTION_TOPIC_EXCHANGE, RabbitMQConstant.VIDEO_FAVORITE_QUEUE_KEY, videoInteractionMessage);
     }
 }
