@@ -3,7 +3,7 @@ package com.yixuan.yh.product.pojo.model.entity;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Data
 public class CartItem {
@@ -14,6 +14,7 @@ public class CartItem {
     private Integer quantity;
     private BigDecimal price;
     private String selectedSku;
-    private Date createdTime;
+    private LocalDateTime updatedAt;
+    private LocalDateTime createdAt;
 }
 
