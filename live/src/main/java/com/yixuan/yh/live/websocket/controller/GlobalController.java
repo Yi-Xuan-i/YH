@@ -24,7 +24,6 @@ public class GlobalController {
     public LiveMessage handleMessage(
             @DestinationVariable Long roomId,
             LiveMessage liveMessage,  @Header("simpSessionAttributes") Map<String, Object> attributes) throws JsonProcessingException, BadRequestException {
-
         return handleLiveMessageStrategyMap.get(liveMessage.getType().name()).handle(attributes, roomId, liveMessage);
     }
 }

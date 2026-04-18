@@ -40,6 +40,26 @@ public class LivePublicController {
         return 0;
     }
 
+    @Operation(summary = "srs播放回调")
+    @PostMapping("/play")
+    public int play(@RequestBody Map<String, String> body) {
+        liveService.play(Long.parseLong(body.get("stream")), body.get("client_id"));
+        return 0;
+    }
+
+    @Operation(summary = "srs停止播放回调")
+    @PostMapping("/stop")
+    public int stop(@RequestBody Map<String, String> body) {
+        liveService.stop(Long.parseLong(body.get("stream")), body.get("client_id"));
+        return 0;
+    }
+
+    @Operation(summary = "获取直播间人数")
+    @GetMapping("/online/{roomId}")
+    public Result<Integer> getOnline(@PathVariable Long roomId) {
+        return Result.success(liveService.getOnline(roomId));
+    }
+
     @Operation(summary = "搜索直播")
     @GetMapping("/search")
     public Result<List<GetLiveResponse>> getLivesByQuery(@RequestParam String query) {

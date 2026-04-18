@@ -1,6 +1,8 @@
 package com.yixuan.yh.live.document;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
@@ -27,24 +29,18 @@ public class LiveDocument {
     @Field(type = FieldType.Keyword, index = false)
     private String coverUrl;
 
-    @Field(type = FieldType.Byte)
-    private Byte status;
+    @Field(type = FieldType.Integer)
+    private Integer status;
 
     @Field(type = FieldType.Date, format = {}, pattern = "yyyy-MM-dd HH:mm:ss", index = false)
     private LocalDateTime createdTime;
 
+    @Getter
+    @AllArgsConstructor
     public enum LiveStatus {
-        LIVING((byte) 0),
-        ENDED((byte) 1);
+        LIVING(0),
+        ENDED(1);
 
-        private final byte code;
-
-        LiveStatus(byte code) {
-            this.code = code;
-        }
-
-        public byte getCode() {
-            return code;
-        }
+        private final int code;
     }
 }

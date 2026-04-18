@@ -1,6 +1,7 @@
 package com.yixuan.yh.live.service.impl;
 
-import com.yixuan.mt.client.MTClient;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.yixuan.yh.common.utils.AWSUtils;
 import com.yixuan.yh.common.utils.JwtUtils;
 import com.yixuan.yh.common.utils.SnowflakeUtils;
 import com.yixuan.yh.live.document.LiveDocument;
@@ -14,6 +15,8 @@ import com.yixuan.yh.live.service.LiveService;
 import com.yixuan.yh.user.feign.UserPrivateClient;
 import io.jsonwebtoken.Claims;
 import org.apache.coyote.BadRequestException;
+import org.redisson.api.RAtomicLong;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
@@ -42,57 +45,58 @@ public class LiveServiceImpl implements LiveService {
     @Autowired
     private SnowflakeUtils snowflakeUtils;
     @Autowired
-    private MTClient mtClient;
+    private AWSUtils awsUtils;
     @Autowired
     private ElasticsearchTemplate elasticsearchTemplate;
     @Autowired
     private ElasticsearchOperations elasticsearchOperations;
     @Autowired
     private UserPrivateClient userPrivateClient;
+    @Autowired
+    private RedissonClient redissonClient;
 
     @Override
-    @Transactional
     public String postStartLive(Long userId, StartLiveRequest startLiveRequest) throws IOException {
-
-        Long roomId = snowflakeUtils.nextId();
-
         Live live = new Live();
-        live.setRoomId(roomId);
         live.setAnchorId(userId);
+        live.setTitle(startLiveRequest.getTitle());
+        live.setCoverUrl(awsUtils.putObject(startLiveRequest.getCoverFile()));
         liveMapper.insert(live);
 
-        // 这个改放到 publish 更好
-        LiveDocument liveDocument = new LiveDocument();
-        liveDocument.setRoomId(roomId);
-        liveDocument.setAnchorId(userId);
-        liveDocument.setAnchorName(userPrivateClient.getName(userId).getData());
-        liveDocument.setTitle(startLiveRequest.getTitle());
-        liveDocument.setCoverUrl(mtClient.upload(startLiveRequest.getCoverFile()));
-        liveDocument.setStatus(LiveDocument.LiveStatus.LIVING.getCode());
-        liveDocument.setCreatedTime(LocalDateTime.now());
-        liveRepository.save(liveDocument);
-
-        return liveDocument.getRoomId().toString();
+        return live.getRoomId().toString();
     }
 
     @Override
     public void publishCallback(Long roomId, String clientId, String token) throws BadRequestException {
+        // 获取所需表数据
+        Live live = liveMapper.selectOne(new LambdaQueryWrapper<Live>()
+                .select(Live::getAnchorId, Live::getTitle, Live::getCoverUrl)
+                .eq(Live::getRoomId, roomId));
+
         // 鉴权
         Claims claims = jwtUtils.parseJwt(token);
-        Long userId = liveMapper.selectAnchorIdById(roomId);
-        if (!userId.equals(claims.get("id"))) {
+        if (!live.getAnchorId().equals(claims.get("id"))) {
             throw new BadRequestException("你没有权限！");
         }
 
+        // 更新表数据（暂时未利用 client_id）
         liveMapper.updateClientIdById(roomId, clientId);
+
+        // 插入es
+        LiveDocument liveDocument = new LiveDocument();
+        liveDocument.setRoomId(roomId);
+        liveDocument.setAnchorId(live.getAnchorId());
+        liveDocument.setAnchorName(userPrivateClient.getName(live.getAnchorId()).getData());
+        liveDocument.setTitle(live.getTitle());
+        liveDocument.setCoverUrl(live.getCoverUrl());
+        liveDocument.setStatus(LiveDocument.LiveStatus.LIVING.getCode());
+        liveDocument.setCreatedTime(LocalDateTime.now());
+        liveRepository.save(liveDocument);
     }
 
     @Override
-    public void unpublishCallback(Long roomId, String clientId) throws BadRequestException {
-        // 鉴权（这里只是简单用推流的 clientId 与结束推流的 clientId 进行对比，并不是特别可靠）
-        if (!clientId.equals(liveMapper.selectClientIdById(roomId))) {
-            throw new BadRequestException("你没有权限！");
-        }
+    public void unpublishCallback(Long roomId, String clientId) {
+        /* 无鉴权（假设该接口只暴露给 srs 服务器） */
 
         // 构建更新字段
         Map<String, Object> updateFields = Collections.singletonMap("status", LiveDocument.LiveStatus.ENDED.getCode());
@@ -103,9 +107,25 @@ public class LiveServiceImpl implements LiveService {
                 .build();
 
         // 执行部分更新
-        UpdateResponse response = elasticsearchTemplate.update(updateQuery,
+        elasticsearchTemplate.update(updateQuery,
                 IndexCoordinates.of("live"));
-        response.getResult();
+    }
+
+    @Override
+    public void play(Long roomId, String clientId) {
+        RAtomicLong rAtomicLong = redissonClient.getAtomicLong("live:online:" + roomId);
+        rAtomicLong.incrementAndGet();
+    }
+
+    @Override
+    public void stop(Long roomId, String clientId) {
+        RAtomicLong rAtomicLong = redissonClient.getAtomicLong("live:online:" + roomId);
+        rAtomicLong.decrementAndGet();
+    }
+
+    @Override
+    public Integer getOnline(Long roomId) {
+        return Math.toIntExact(redissonClient.getAtomicLong("live:online:" + roomId).get());
     }
 
     @Override
@@ -121,7 +141,11 @@ public class LiveServiceImpl implements LiveService {
         return elasticsearchOperations.search(nativeQuery, LiveDocument.class)
                 .getSearchHits()
                 .stream()
-                .map(hit -> LiveMapstruct.INSTANCE.liveDocumentToGetLiveResponse(hit.getContent()))
+                .map(hit -> {
+                    GetLiveResponse response = LiveMapstruct.INSTANCE.liveDocumentToGetLiveResponse(hit.getContent());
+                    response.setCoverUrl(awsUtils.generateAccessUrl(response.getCoverUrl()));
+                    return response;
+                })
                 .toList();
     }
 }

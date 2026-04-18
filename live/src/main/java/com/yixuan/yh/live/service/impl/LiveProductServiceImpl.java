@@ -1,6 +1,6 @@
 package com.yixuan.yh.live.service.impl;
 
-import com.yixuan.mt.client.MTClient;
+import com.yixuan.yh.common.utils.AWSUtils;
 import com.yixuan.yh.common.utils.SnowflakeUtils;
 import com.yixuan.yh.live.cache.LiveCache;
 import com.yixuan.yh.live.entity.LiveProduct;
@@ -27,7 +27,7 @@ public class LiveProductServiceImpl implements LiveProductService {
     @Autowired
     private SnowflakeUtils snowflakeUtils;
     @Autowired
-    private MTClient mtClient;
+    private AWSUtils awsUtils;
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
     @Autowired
@@ -43,7 +43,7 @@ public class LiveProductServiceImpl implements LiveProductService {
 
         LiveProduct liveProduct = LiveProductMapstruct.INSTANCE.postLiveProductRequestToLiveProduct(postLiveProductRequest);
         liveProduct.setId(snowflakeUtils.nextId());
-        liveProduct.setImageUrl(mtClient.upload(postLiveProductRequest.getImage()));
+        liveProduct.setImageUrl(awsUtils.putObject(postLiveProductRequest.getImage()));
 
         liveProductMapper.insert(liveProduct);
         messagingTemplate.convertAndSend("/topic/room." + postLiveProductRequest.getRoomId(), new LiveMessage(LiveMessage.MessageType.PRODUCT, liveProduct.getId()));

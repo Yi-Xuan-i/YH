@@ -14,5 +14,11 @@ public interface LiveService {
 
     void unpublishCallback(Long roomId, String clientId) throws BadRequestException;
 
+    void play(Long roomId, String clientId);
+
+    void stop(Long roomId, String clientId);
+
+    Integer getOnline(Long roomId);
+
     List<GetLiveResponse> getLivesByQuery(String query);
 }
