@@ -1,4 +1,5 @@
 com.yixuan.yh.common.config.CommonConfig
+com.yixuan.yh.common.config.PropertiesConfig
 com.yixuan.yh.common.config.JacksonConfig
 com.yixuan.yh.common.config.XxlJobConfig
 com.yixuan.yh.common.config.CommonFieldFillHandler
@@ -6,4 +7,5 @@ com.yixuan.yh.common.utils.JwtUtils
 com.yixuan.yh.common.utils.MinioUtils
 com.yixuan.yh.common.utils.AWSUtils
 com.yixuan.yh.common.utils.SnowflakeUtils
+com.yixuan.yh.common.utils.SRSUtils
 com.yixuan.yh.common.exception.GlobalExceptionHandler

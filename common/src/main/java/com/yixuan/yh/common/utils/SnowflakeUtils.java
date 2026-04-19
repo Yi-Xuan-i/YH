@@ -5,9 +5,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-@Component
-@ConfigurationProperties(prefix = "snowflake")
 @Lazy
+@ConfigurationProperties(prefix = "snowflake")
 public class SnowflakeUtils {
 
     // ==============================Fields===========================================

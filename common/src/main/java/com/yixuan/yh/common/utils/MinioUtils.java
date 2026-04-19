@@ -19,10 +19,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-@Component
+@Lazy
 @Data
 @ConfigurationProperties(prefix = "minio")
-@Lazy
 public class MinioUtils {
 
     private String minioUrl;

@@ -8,7 +8,6 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
-@Configuration
 @Order(1)
 public class CommonConfig implements WebMvcConfigurer {
     @Override

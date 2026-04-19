@@ -23,10 +23,9 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 
-@Component
+@Lazy
 @Data
 @ConfigurationProperties(prefix = "aws")
-@Lazy
 public class AWSUtils {
 
     private String url;
