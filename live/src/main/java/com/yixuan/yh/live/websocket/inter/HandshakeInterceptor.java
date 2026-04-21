@@ -1,4 +1,4 @@
-package com.yixuan.yh.live.inter;
+package com.yixuan.yh.live.websocket.inter;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.server.ServerHttpRequest;
@@ -26,7 +26,7 @@ public class HandshakeInterceptor extends HttpSessionHandshakeInterceptor {
             Long id = Long.valueOf(httpRequest.getHeader("id"));
 
             // 将数据保存到attributes
-            attributes.put("id", id);
+            attributes.put("userId", id);
         }
         return super.beforeHandshake(request, response, wsHandler, attributes);
     }

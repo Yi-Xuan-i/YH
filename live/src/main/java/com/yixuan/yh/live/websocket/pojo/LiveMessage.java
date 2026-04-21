@@ -13,7 +13,8 @@ public class LiveMessage {
     public enum MessageType {
         CHAT(0),
         PRODUCT(1),
-        EXPLAIN(2);
+        EXPLAIN(2),
+        ONLINE(3);
 
         private final int code;
 

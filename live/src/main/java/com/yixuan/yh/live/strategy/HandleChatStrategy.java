@@ -20,7 +20,7 @@ public class HandleChatStrategy implements HandleLiveMessageStrategy {
 
     @Override
     public LiveMessage handle(Map<String, Object> attributes, Long roomId, LiveMessage liveMessage) throws JsonProcessingException {
-        Long userId = (Long) attributes.get("id");
+        Long userId = (Long) attributes.get("userId");
 
         ChatSendMessage chatSendMessage = new ChatSendMessage();
         chatSendMessage.setId(userId);

@@ -15,7 +15,6 @@ import com.yixuan.yh.live.service.LiveService;
 import com.yixuan.yh.user.feign.UserPrivateClient;
 import io.jsonwebtoken.Claims;
 import org.apache.coyote.BadRequestException;
-import org.redisson.api.RAtomicLong;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
@@ -25,7 +24,6 @@ import org.springframework.data.elasticsearch.core.document.Document;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.data.elasticsearch.core.query.*;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -92,6 +90,9 @@ public class LiveServiceImpl implements LiveService {
         liveDocument.setStatus(LiveDocument.LiveStatus.LIVING.getCode());
         liveDocument.setCreatedTime(LocalDateTime.now());
         liveRepository.save(liveDocument);
+
+        // 房间加入 redis 房间集合
+        redissonClient.getSet("live:room").add(roomId);
     }
 
     @Override
@@ -109,23 +110,23 @@ public class LiveServiceImpl implements LiveService {
         // 执行部分更新
         elasticsearchTemplate.update(updateQuery,
                 IndexCoordinates.of("live"));
+
+        // 房间离开 redis 房间集合
+        redissonClient.getSet("live:online:" + roomId).delete();
+        redissonClient.getSet("live:room").remove(roomId);
     }
 
     @Override
     public void play(Long roomId, String clientId) {
-        RAtomicLong rAtomicLong = redissonClient.getAtomicLong("live:online:" + roomId);
-        rAtomicLong.incrementAndGet();
     }
 
     @Override
     public void stop(Long roomId, String clientId) {
-        RAtomicLong rAtomicLong = redissonClient.getAtomicLong("live:online:" + roomId);
-        rAtomicLong.decrementAndGet();
     }
 
     @Override
     public Integer getOnline(Long roomId) {
-        return Math.toIntExact(redissonClient.getAtomicLong("live:online:" + roomId).get());
+        return Math.toIntExact(redissonClient.getSet("live:online:" + roomId).size());
     }
 
     @Override
