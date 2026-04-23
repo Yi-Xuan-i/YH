@@ -8,7 +8,6 @@
         select count(*) from user_follow where follower_id = #{followerId} and followee_id in
             <foreach collection="followeeIdList" open="(" close=")" separator="," item="followeeId">
                 #{followeeId}
-            </foreach>
-        order by followee_id;
+            </foreach>;
     </select>
 </mapper>

@@ -8,15 +8,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class VideoWithInteractionStatus {
-    Long Id;
-    Long creatorId;
-    String creatorName;
-    String creatorAvatar;
-    String description;
-    String url;
-    Long likes;
-    Long comments;
-    Long favorites;
-    Boolean isLike;
-    Boolean isFavorite;
+    private Long id;
+    private Long creatorId;
+    private String description;
+    private String url;
+    private Long likes;
+    private Long comments;
+    private Long favorites;
+    private Boolean isLike;
+    private Boolean isFavorite;
 }

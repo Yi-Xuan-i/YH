@@ -3,6 +3,8 @@ package com.yixuan.yh.video.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.yixuan.yh.common.exception.YHClientException;
 import com.yixuan.yh.common.exception.YHServerException;
 import com.yixuan.yh.common.response.Result;
@@ -11,6 +13,7 @@ import com.yixuan.yh.common.utils.SnowflakeUtils;
 import com.yixuan.yh.user.feign.UserFollowPrivateClient;
 import com.yixuan.yh.user.feign.UserPreferencesPrivateClient;
 import com.yixuan.yh.user.feign.UserPrivateClient;
+import com.yixuan.yh.user.pojo.response.UserInfoInListResponse;
 import com.yixuan.yh.video.constant.RabbitMQConstant;
 import com.yixuan.yh.video.mapper.*;
 import com.yixuan.yh.video.mapstruct.VideoMapStruct;
@@ -31,7 +34,6 @@ import io.milvus.v2.client.MilvusClientV2;
 import io.milvus.v2.service.vector.request.SearchReq;
 import io.milvus.v2.service.vector.request.data.FloatVec;
 import io.milvus.v2.service.vector.response.SearchResp;
-import org.redisson.api.RedissonClient;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.core.MessageProperties;
@@ -49,11 +51,18 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @Service
 public class VideoServiceImpl implements VideoService {
 
+    private final Cache<Long, UserInfoInListResponse> userInfoCache = Caffeine.newBuilder()
+            .expireAfterWrite(Duration.ofMinutes(5))
+            .maximumSize(100)
+            .build();
+    private final Cache<String, Boolean> followStatusCache = Caffeine.newBuilder()
+            .expireAfterWrite(Duration.ofMinutes(5))
+            .maximumSize(1000)
+            .build();
     @Autowired
     private VideoMapper videoMapper;
     @Autowired
@@ -62,8 +71,6 @@ public class VideoServiceImpl implements VideoService {
     private VideoTagMpMapper videoTagMpMapper;
     @Autowired
     private RabbitTemplate rabbitTemplate;
-    @Autowired
-    private RedissonClient redissonClient;
     @Autowired
     private SnowflakeUtils snowflakeUtils;
     @Autowired
@@ -89,7 +96,7 @@ public class VideoServiceImpl implements VideoService {
     public List<VideoMainResponse> getVideos(Long userId) {
         List<VideoWithInteractionStatus> videoWithInteractionStatusList = videoMultiMapper.selectMainRandom(userId);
 
-        // 转换
+        /* 转换 */
         List<VideoMainResponse> videoMainResponseList = videoWithInteractionStatusList.stream()
                 .map(status -> {
                     VideoMainResponse response = VideoMapStruct.INSTANCE.toVideoMainResponse(status);
@@ -98,22 +105,86 @@ public class VideoServiceImpl implements VideoService {
                 })
                 .toList();
 
-        if (userId != null) {
-            // 获取关注状态
-            List<Long> followeeIdList = videoMainResponseList.stream().map(VideoMainResponse::getCreatorId).toList();
-            List<Integer> sortedIndices = IntStream.range(0, followeeIdList.size())
-                    .boxed()
-                    .sorted(Comparator.comparingLong(followeeIdList::get))
-                    .toList();
-            List<Long> sortedFolloweeIdList = sortedIndices.stream().map(followeeIdList::get).toList();
+        /* 获取 creatorId List */
+        List<Long> creatorIdList = videoMainResponseList.stream().map(VideoMainResponse::getCreatorId).distinct().toList();
 
-            List<Boolean> followStatusList = userFollowPrivateClient.getFollowStatus(userId, sortedFolloweeIdList).getData();
-            for (int i = 0; i < followStatusList.size(); i++) {
-                videoMainResponseList.get(sortedIndices.get(i)).setIsFollowed(followStatusList.get(i));
-            }
+        /* 根据 creatorId 获取对应 creatorName 和 creatorAvatar */
+        // 获取用户信息（先从缓存中获取，缓存没有再批量请求用户服务）
+        Map<Long, UserInfoInListResponse> idToUserInfoMap = fetchAndCacheUserInfo(creatorIdList);
+        // 完善数据
+        videoMainResponseList.forEach(response -> {
+            UserInfoInListResponse userInfo = idToUserInfoMap.get(response.getCreatorId());
+            response.setCreatorName(userInfo.getName());
+            response.setCreatorAvatar(awsUtils.generateAccessUrl(userInfo.getAvatarUrl()));
+        });
+
+        /* 获取关注状态 */
+        if (userId != null) {
+            // 获取关注状态（先从缓存中获取，缓存没有再批量请求用户服务）
+            Map<Long, Boolean> idToFollowStatusMap = fetchAndCacheFollowStatus(userId, creatorIdList);
+            // 完善数据
+            videoMainResponseList.forEach(response -> {
+                Boolean followStatus = idToFollowStatusMap.get(response.getCreatorId());
+                response.setIsFollowed(followStatus);
+            });
         }
 
         return videoMainResponseList;
+    }
+
+    private Map<Long, UserInfoInListResponse> fetchAndCacheUserInfo(List<Long> creatorIdList) {
+        // 没有缓存的id
+        List<Long> noCacheIdList = new ArrayList<>();
+        Map<Long, UserInfoInListResponse> idToUserInfoMap = new HashMap<>();
+        for (Long creatorId : creatorIdList) {
+            UserInfoInListResponse userInfo = userInfoCache.getIfPresent(creatorId);
+            if (userInfo != null) {
+                idToUserInfoMap.put(creatorId, userInfo);
+            } else {
+                noCacheIdList.add(creatorId);
+            }
+        }
+        // 批量获取没有缓存的id对应的用户信息
+        if (!noCacheIdList.isEmpty()) {
+            Result<List<UserInfoInListResponse>> result = userPrivateClient.getUserInfoInList(noCacheIdList);
+            List<UserInfoInListResponse> userInfoList = result.getData();
+            for (UserInfoInListResponse userInfo : userInfoList) {
+                idToUserInfoMap.put(userInfo.getId(), userInfo);
+                userInfoCache.put(userInfo.getId(), userInfo);
+            }
+        }
+        return idToUserInfoMap;
+    }
+
+    private Map<Long, Boolean> fetchAndCacheFollowStatus(Long userId, List<Long> creatorIdList) {
+        /* 不推荐使用本地缓存，一致性要求还是高一点的（后续修改） */
+
+        // 没有缓存的id
+        List<Long> noCacheIdList = new ArrayList<>();
+        Map<Long, Boolean> idToFollowStatusMap = new HashMap<>();
+        for (Long creatorId : creatorIdList) {
+            String key = userId + ":" + creatorId;
+            Boolean followStatus = followStatusCache.getIfPresent(key);
+            if (followStatus != null) {
+                idToFollowStatusMap.put(creatorId, followStatus);
+            } else {
+                noCacheIdList.add(creatorId);
+
+            }
+        }
+        // 批量获取没有缓存的id对应的关注状态
+        if (!noCacheIdList.isEmpty()) {
+            Result<List<Boolean>> result = userFollowPrivateClient.getFollowStatus(userId, noCacheIdList);
+            List<Boolean> followStatusList = result.getData();
+            for (int i = 0; i < noCacheIdList.size(); i++) {
+                Long creatorId = noCacheIdList.get(i);
+                Boolean followStatus = followStatusList.get(i);
+                idToFollowStatusMap.put(creatorId, followStatus);
+                String key = userId + ":" + creatorId;
+                followStatusCache.put(key, followStatus);
+            }
+        }
+        return idToFollowStatusMap;
     }
 
     @Override
@@ -184,7 +255,8 @@ public class VideoServiceImpl implements VideoService {
         }
 
         if (videoUploadTask.getUploadType() == VideoUploadTask.UploadType.MULTIPART) {
-            List<Integer> uploadedPartNumberList = awsUtils.completeMultipartUpload(videoUploadTask.getKey(), videoUploadTask.getUploadId(), videoUploadTask.getTotalChunks());
+            List<Integer> uploadedPartNumberList = awsUtils.completeMultipartUpload(videoUploadTask.getKey(), videoUploadTask.getUploadId(),
+                    videoUploadTask.getTotalChunks());
 
             // 代表实际上仍有分片未上传
             if (!uploadedPartNumberList.isEmpty()) {
@@ -259,6 +331,7 @@ public class VideoServiceImpl implements VideoService {
         }
 
         /* 上传封面（使用固定key解决文件上传幂等问题 ） */
+        /* 优化可改为直传或者拆分出当前数据库事务 */
         awsUtils.putObject(coverObjectKey, postVideoMessageRequest.getCover());
 
         /* 补充视频数据 */

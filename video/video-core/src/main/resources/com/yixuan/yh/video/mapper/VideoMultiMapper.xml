@@ -9,8 +9,6 @@
         SELECT
         v.id,
         v.creator_id,
-        u.name AS creatorName,
-        u.avatar_url AS creatorAvatar,
         v.url,
         v.description,
         v.likes,
@@ -31,7 +29,6 @@
         </choose>
         AS is_favorite
         FROM video v
-        JOIN user u ON v.creator_id = u.id
 
         <if test="userId != null">
             LEFT JOIN video_user_like vul ON (
