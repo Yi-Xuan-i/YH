@@ -1,6 +1,6 @@
 package com.yixuan.yh.user.service.impl;
 
-import com.yixuan.mt.client.MTClient;
+import com.yixuan.yh.common.utils.AWSUtils;
 import com.yixuan.yh.user.mapper.MerchantMapper;
 import com.yixuan.yh.user.mapstruct.MerchantMapStruct;
 import com.yixuan.yh.user.pojo.entity.Merchant;
@@ -20,7 +20,7 @@ public class MerchantServiceImpl implements MerchantService {
     private MerchantMapper merchantMapper;
 
     @Autowired
-    private MTClient mtClient;
+    private AWSUtils awsUtils;
 
     @Override
     public void postMerchant(Long userId, PostMerchantRequest postMerchantRequest) throws IOException {
@@ -34,7 +34,7 @@ public class MerchantServiceImpl implements MerchantService {
         merchant.setMerchantId(userId);
         merchant.setName(postMerchantRequest.getName());
         merchant.setContactPhone(postMerchantRequest.getContactPhone());
-        merchant.setAvatarUrl(mtClient.upload(postMerchantRequest.getAvatar()));
+        merchant.setAvatarUrl(awsUtils.putObject(postMerchantRequest.getAvatar()));
 
         merchantMapper.insert(merchant);
     }
