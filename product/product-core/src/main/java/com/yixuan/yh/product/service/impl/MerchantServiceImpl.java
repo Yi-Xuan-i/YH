@@ -1,6 +1,6 @@
 package com.yixuan.yh.product.service.impl;
 
-import com.yixuan.mt.client.MTClient;
+import com.yixuan.yh.common.utils.AWSUtils;
 import com.yixuan.yh.common.utils.SnowflakeUtils;
 import com.yixuan.yh.product.mapper.*;
 import com.yixuan.yh.product.mapper.multi.SkuMapper;
@@ -46,7 +46,7 @@ public class MerchantServiceImpl implements MerchantService {
     @Autowired
     private SkuSpecMapper skuSpecMapper;
     @Autowired
-    private MTClient mtClient;
+    private AWSUtils awsUtils;
     @Autowired
     private SnowflakeUtils snowflakeUtils;
     @Autowired
@@ -170,7 +170,7 @@ public class MerchantServiceImpl implements MerchantService {
         Product product = MerchantMapStruct.INSTANCE.putProductBasicInfoRequestToProduct(putProductBasicInfoRequest);
         product.setProductId(productId);
         if (putProductBasicInfoRequest.getCover() != null) {
-            product.setCoverUrl(mtClient.upload(putProductBasicInfoRequest.getCover()));
+            product.setCoverUrl(awsUtils.putObject(putProductBasicInfoRequest.getCover()));
         }
         productMapper.updateBasicInfo(product);
     }
@@ -181,7 +181,7 @@ public class MerchantServiceImpl implements MerchantService {
         product.setProductId(snowflakeUtils.nextId());
         product.setMerchantId(merchantId);
         if (putProductBasicInfoRequest.getCover() != null) {
-            product.setCoverUrl(mtClient.upload(putProductBasicInfoRequest.getCover()));
+            product.setCoverUrl(awsUtils.putObject(putProductBasicInfoRequest.getCover()));
         }
         productMapper.insertBasicInfo(product);
     }
@@ -212,7 +212,7 @@ public class MerchantServiceImpl implements MerchantService {
 
         ProductCarousel productCarousel = new ProductCarousel();
         productCarousel.setId(snowflakeUtils.nextId());
-        productCarousel.setUrl(mtClient.upload(postCarouselRequest.getCarouselFile()));
+        productCarousel.setUrl(awsUtils.putObject(postCarouselRequest.getCarouselFile()));
         productCarousel.setProductId(productId);
 
         productCarouselMapper.insert(productCarousel);
