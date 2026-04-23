@@ -36,10 +36,9 @@
             AND vul.user_id = #{userId}
             AND vul.status = 'FRONT'
             )
-            LEFT JOIN video_user_favorite vuf ON (
+            LEFT JOIN video_user_collections_item vuf ON (
             v.id = vuf.video_id
             AND vuf.user_id = #{userId}
-            AND vuf.status = 'FRONT'
             )
         </if>
 

@@ -1,26 +1,25 @@
 package com.yixuan.yh.video.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.yixuan.yh.common.exception.YHServerException;
 import com.yixuan.yh.common.response.Result;
 import com.yixuan.yh.common.utils.SnowflakeUtils;
 import com.yixuan.yh.user.feign.UserPrivateClient;
 import com.yixuan.yh.user.pojo.response.UserInfoInListResponse;
 import com.yixuan.yh.video.constant.RabbitMQConstant;
-import com.yixuan.yh.video.mapper.VideoUserCommentMapper;
-import com.yixuan.yh.video.mapper.VideoUserFavoriteMapper;
-import com.yixuan.yh.video.mapper.VideoUserLikeMapper;
+import com.yixuan.yh.video.mapper.*;
 import com.yixuan.yh.video.mapstruct.InteractionMapStruct;
 import com.yixuan.yh.video.pojo._enum.InteractionStatus;
-import com.yixuan.yh.video.mapper.VideoMapper;
-import com.yixuan.yh.video.pojo.entity.VideoUserComment;
-import com.yixuan.yh.video.pojo.entity.VideoUserFavorite;
-import com.yixuan.yh.video.pojo.entity.VideoUserLike;
+import com.yixuan.yh.video.pojo.entity.*;
 import com.yixuan.yh.video.pojo.entity.multi.CommentWithReceiver;
 import com.yixuan.yh.video.pojo.mq.VideoCommentMessage;
 import com.yixuan.yh.video.pojo.request.PostCommentRequest;
 import com.yixuan.yh.video.pojo.request.VideoInteractionBatchRequest;
 import com.yixuan.yh.video.pojo.response.GetDirectCommentResponse;
 import com.yixuan.yh.video.pojo.response.GetReplyCommentResponse;
+import com.yixuan.yh.video.service.CollectionsItemService;
+import com.yixuan.yh.video.service.CollectionsService;
 import com.yixuan.yh.video.service.InteractionService;
 import com.yixuan.yh.video.template.FavoriteInteraction;
 import com.yixuan.yh.video.template.LikeInteraction;
@@ -30,10 +29,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
@@ -48,7 +45,7 @@ public class InteractionServiceImpl implements InteractionService {
     @Autowired
     private VideoUserLikeMapper videoUserLikeMapper;
     @Autowired
-    private VideoUserFavoriteMapper videoUserFavoriteMapper;
+    private CollectionsService collectionsService;
     @Autowired
     private SnowflakeUtils snowflakeUtils;
     @Autowired
@@ -57,6 +54,8 @@ public class InteractionServiceImpl implements InteractionService {
     private UserPrivateClient userPrivateClient;
     @Autowired
     private RabbitTemplate rabbitTemplate;
+    @Autowired
+    private CollectionsItemService collectionsItemService;
 
     @Override
     public void like(Long userId, Long videoId) throws Exception {
@@ -90,7 +89,7 @@ public class InteractionServiceImpl implements InteractionService {
                             videoUserLike.setId(snowflakeUtils.nextId());
                             videoUserLike.setVideoId(record.getVideoId());
                             videoUserLike.setUserId(record.getUserId());
-                            videoUserLike.setStatus(record.getStatus().equals(VideoInteractionBatchRequest.Record.Status.LIKE) ? InteractionStatus.FRONT : InteractionStatus.BACK);
+                            videoUserLike.setStatus(record.getStatus());
 
                             return videoUserLike;
                         })
@@ -101,21 +100,72 @@ public class InteractionServiceImpl implements InteractionService {
     @Override
     @Transactional
     public void favoriteBatch(VideoInteractionBatchRequest videoInteractionBatchRequest) {
+        /* 更新视频收藏数 */
         videoMapper.updateFavoriteBatch(videoInteractionBatchRequest.getInteractionIncrList());
-        videoUserFavoriteMapper.insertBatch(
+        /* 新增/删除用户收藏记录 */
+        // 获取默认收藏夹
+        Map<Long, Long> userToDefaultCollectionsMap = collectionsService.getDefaultCollectionsIdBatch(
                 videoInteractionBatchRequest.getInteractionRecordList()
                         .stream()
-                        .map(record -> {
-                            VideoUserFavorite videoUserFavorite = new VideoUserFavorite();
-                            videoUserFavorite.setId(snowflakeUtils.nextId());
-                            videoUserFavorite.setVideoId(record.getVideoId());
-                            videoUserFavorite.setUserId(record.getUserId());
-                            videoUserFavorite.setStatus(record.getStatus().equals(VideoInteractionBatchRequest.Record.Status.LIKE) ? InteractionStatus.FRONT : InteractionStatus.BACK);
-
-                            return videoUserFavorite;
-                        })
+                        .map(VideoInteractionBatchRequest.Record::getUserId)
+                        .distinct()
                         .toList()
         );
+        // 划分新增/删除记录
+        List<Long> insertCollectionsIdList = new ArrayList<>();
+        List<VideoUserCollectionsItem> toInsertList = videoInteractionBatchRequest.getInteractionRecordList()
+                .stream()
+                .filter(record -> record.getStatus() == InteractionStatus.FRONT)
+                .map(record -> {
+                    Long collectionsId = userToDefaultCollectionsMap.get(record.getUserId());
+                    insertCollectionsIdList.add(collectionsId);
+
+                    VideoUserCollectionsItem item = new VideoUserCollectionsItem();
+                    item.setCollectionsId(collectionsId);
+                    item.setVideoId(record.getVideoId());
+                    item.setUserId(record.getUserId());
+                    return item;
+                })
+                .toList();
+        List<Long> deleteCollectionsIdList = new ArrayList<>();
+        List<VideoUserCollectionsItem> toDeleteList = videoInteractionBatchRequest.getInteractionRecordList()
+                .stream()
+                .filter(record -> record.getStatus() == InteractionStatus.BACK)
+                .map(record -> {
+                    Long collectionsId = userToDefaultCollectionsMap.get(record.getUserId());
+                    deleteCollectionsIdList.add(collectionsId);
+
+                    VideoUserCollectionsItem item = new VideoUserCollectionsItem();
+                    item.setCollectionsId(collectionsId);
+                    item.setVideoId(record.getVideoId());
+                    item.setUserId(record.getUserId());
+                    return item;
+                })
+                .toList();
+        // 执行数据库操作
+        if (!toInsertList.isEmpty()) {
+            collectionsService.update(new LambdaUpdateWrapper<VideoUserCollections>()
+                    .setSql("item_count = item_count + 1")
+                    .in(VideoUserCollections::getId, insertCollectionsIdList)
+            );
+            collectionsItemService.saveBatch(toInsertList);
+        }
+        if (!toDeleteList.isEmpty()) {
+            collectionsService.update(new LambdaUpdateWrapper<VideoUserCollections>()
+                    .setSql("item_count = item_count - 1")
+                    .in(VideoUserCollections::getId, deleteCollectionsIdList)
+            );
+            collectionsItemService.remove(new LambdaQueryWrapper<VideoUserCollectionsItem>()
+                    .apply("(collections_id, video_id, user_id) IN " +
+                            toDeleteList.stream()
+                                    .map(item -> String.format("(%d, %d, %d)",
+                                            item.getCollectionsId(), item.getVideoId(), item.getUserId()))
+                                    .collect(Collectors.joining(", ", "(", ")"))
+                    )
+            );
+        }
+
+
     }
 
     @Override

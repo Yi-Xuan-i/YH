@@ -1,6 +1,5 @@
 package com.yixuan.yh.video.service;
 
-import com.yixuan.yh.video.pojo.entity.multi.CommentWithReceiver;
 import com.yixuan.yh.video.pojo.request.PostCommentRequest;
 import com.yixuan.yh.video.pojo.request.VideoInteractionBatchRequest;
 import com.yixuan.yh.video.pojo.response.GetDirectCommentResponse;

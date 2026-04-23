@@ -29,7 +29,7 @@ public class InteractionController {
         return Result.success();
     }
 
-    @Operation(summary = "取消关注")
+    @Operation(summary = "取消点赞")
     @DeleteMapping("/like/{videoId}")
     public Result<Void> unlike(@PathVariable Long videoId) throws Exception {
         interactionService.unlike(UserContext.getUser(), videoId);

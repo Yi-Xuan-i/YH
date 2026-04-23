@@ -1,8 +1,11 @@
 package com.yixuan.yh.video.cache;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.yixuan.yh.video.constant.RedisConstant;
+import com.yixuan.yh.video.mapper.VideoUserCollectionsItemMapper;
 import com.yixuan.yh.video.mapper.VideoUserFavoriteMapper;
 import com.yixuan.yh.video.pojo._enum.InteractionStatus;
+import com.yixuan.yh.video.pojo.entity.VideoUserCollectionsItem;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -20,6 +23,8 @@ public class VideoUserFavoriteCache {
     private VideoUserFavoriteMapper videoUserFavoriteMapper;
     @Autowired
     private RedisScript<Long> interactionScript;
+    @Autowired
+    private VideoUserCollectionsItemMapper videoUserCollectionsItemMapper;
 
     public boolean tryFavorite(Long userId, Long videoId) {
         String key = RedisConstant.VIDEO_USER_FAVORITE_KEY_PREFIX + userId;
@@ -28,7 +33,11 @@ public class VideoUserFavoriteCache {
             Long result = stringRedisTemplate.execute(interactionScript, Collections.singletonList(key), videoId.toString(), "1", "600");
             assert result != null;
             if (result.equals(RedisConstant.InteractionLua.NOT_EXIST.getValue())) {
-                result = videoUserFavoriteMapper.isFavorite(userId, videoId) ? 1L : 0L;
+                result = videoUserCollectionsItemMapper.selectCount(new LambdaQueryWrapper<VideoUserCollectionsItem>()
+                        .eq(VideoUserCollectionsItem::getUserId, userId)
+                        .eq(VideoUserCollectionsItem::getVideoId, videoId)
+                        .last("LIMIT 1")
+                ) > 0 ? 1L : 0L;
                 stringRedisTemplate.opsForHash().put(key, videoId.toString(), String.valueOf(result));
             } else return !result.equals(RedisConstant.InteractionLua.ERROR.getValue());
         }

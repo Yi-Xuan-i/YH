@@ -2,7 +2,6 @@ package com.yixuan.yh.video.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.yixuan.yh.video.pojo.entity.VideoUserCollections;
-import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
@@ -15,7 +14,4 @@ public interface VideoUserCollectionsMapper extends BaseMapper<VideoUserCollecti
 
     @Select("select user_id from video_user_collections where id = #{collectionsId}")
     Long selectUserIdById(Long collectionsId);
-
-    @Insert("insert into video_user_collections (id, user_id, name, update_at, created_at) values(#{id}, #{userId}, #{name}, #{updateAt}, #{createdAt})")
-    int insert(VideoUserCollections videoUserCollections);
 }

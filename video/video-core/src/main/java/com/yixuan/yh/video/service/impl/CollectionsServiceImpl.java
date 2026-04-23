@@ -1,6 +1,8 @@
 package com.yixuan.yh.video.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yixuan.yh.common.exception.YHClientException;
 import com.yixuan.yh.common.response.Result;
 import com.yixuan.yh.common.utils.SnowflakeUtils;
@@ -17,14 +19,16 @@ import com.yixuan.yh.video.pojo.response.GetCollectionsResponse;
 import com.yixuan.yh.video.service.CollectionsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class CollectionsServiceImpl implements CollectionsService {
+public class CollectionsServiceImpl extends ServiceImpl<VideoUserCollectionsMapper, VideoUserCollections> implements CollectionsService {
 
     private final VideoUserCollectionsMapper videoUserCollectionsMapper;
     private final SnowflakeUtils snowflakeUtils;
@@ -78,7 +82,7 @@ public class CollectionsServiceImpl implements CollectionsService {
         VideoUserCollections videoUserCollections = CollectionsMapStruct.INSTANCE.toVideoUserCollections(postCollectionsRequest);
         videoUserCollections.setId(snowflakeUtils.nextId());
         videoUserCollections.setUserId(userId);
-        videoUserCollections.setUpdateAt(LocalDateTime.now());
+        videoUserCollections.setUpdatedAt(LocalDateTime.now());
         videoUserCollections.setCreatedAt(LocalDateTime.now());
 
         videoUserCollectionsMapper.insert(videoUserCollections);
@@ -100,5 +104,30 @@ public class CollectionsServiceImpl implements CollectionsService {
     @Override
     public void deleteCollections(Long collectionsId) {
         videoUserCollectionsMapper.deleteById(collectionsId);
+    }
+
+    @Override
+    @Transactional
+    public Map<Long, Long> getDefaultCollectionsIdBatch(List<Long> list) {
+        List<VideoUserCollections> videoUserCollectionsList = videoUserCollectionsMapper.selectList(new LambdaQueryWrapper<VideoUserCollections>()
+                        .select(VideoUserCollections::getId, VideoUserCollections::getUserId)
+                        .eq(VideoUserCollections::getName, "默认收藏夹")
+                        .in(VideoUserCollections::getUserId, list));
+        // 如果没有默认收藏夹，则创建。
+        List<Long> userIdWithDefaultCollections = videoUserCollectionsList.stream().map(VideoUserCollections::getUserId).toList();
+        List<Long> userIdWithoutDefaultCollections = list.stream().filter(userId -> !userIdWithDefaultCollections.contains(userId)).toList();
+        List<VideoUserCollections> videoUserCollectionsToInsert = userIdWithoutDefaultCollections.stream().map(userId -> {
+            VideoUserCollections videoUserCollections = new VideoUserCollections();
+            videoUserCollections.setUserId(userId);
+            videoUserCollections.setName("默认收藏夹");
+            return videoUserCollections;
+        }).toList();
+        if (!videoUserCollectionsToInsert.isEmpty()) {
+            saveBatch(videoUserCollectionsToInsert);
+            videoUserCollectionsList.addAll(videoUserCollectionsToInsert);
+        }
+
+        // 转换格式
+        return videoUserCollectionsList.stream().collect(Collectors.toMap(VideoUserCollections::getUserId, VideoUserCollections::getId));
     }
 }
