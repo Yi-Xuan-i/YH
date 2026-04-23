@@ -15,12 +15,16 @@ public class VideoCommentIncrMessage {
     private List<ReplyIncr> replyIncrList;
 
     @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class CommentIncr {
         Long videoId;
         Integer incrNumber;
     }
 
     @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class ReplyIncr {
         Long rootId;
         Integer incrNumber;

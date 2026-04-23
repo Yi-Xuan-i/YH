@@ -1,5 +1,6 @@
 package com.yixuan.yh.video.pojo.request;
 
+import com.yixuan.yh.video.pojo._enum.InteractionStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,23 +16,19 @@ public class VideoInteractionBatchRequest {
     List<Incr> interactionIncrList;
 
     @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class Record {
         Long userId;
         Long videoId;
-        Status status;
-
-        public enum Status {
-            LIKE(1),
-            UNLIKE(-1);
-
-            Status(int i) {
-            }
-        }
+        InteractionStatus status;
     }
 
     @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class Incr {
         Long videoId;
-        Long incrNumber;
+        Integer incrNumber;
     }
 }
