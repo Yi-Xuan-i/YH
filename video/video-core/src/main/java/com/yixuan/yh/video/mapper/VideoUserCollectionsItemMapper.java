@@ -9,5 +9,5 @@ import java.util.List;
 
 @Mapper
 public interface VideoUserCollectionsItemMapper extends BaseMapper<VideoUserCollectionsItem> {
-    List<VideoCollectionsWithVideo> selectCollectionsItemList(Long collectionsId);
+    List<VideoCollectionsWithVideo> selectCollectionsItemList(Long collectionsId, Long lastMinId);
 }

@@ -13,13 +13,13 @@ import java.util.Map;
 public interface CollectionsService extends IService<VideoUserCollections> {
     List<GetCollectionsResponse> getCollections(Long userId, Long lastMinId);
 
-    List<GetCollectionsItemResponse> getCollectionsItemList(Long userId, Long collectionsId);
+    List<GetCollectionsItemResponse> getCollectionsItemList(Long userId, Long collectionsId, Long lastMinId);
 
     String postCollections(Long userId, PostCollectionsRequest postCollectionsRequest);
 
     void putCollections(Long collectionsId, PutCollectionsRequest putCollectionsRequest);
 
-    void deleteCollections(Long collectionsId);
+    void deleteCollections(Long userId, Long collectionsId);
 
     Map<Long, Long> getDefaultCollectionsIdBatch(List<Long> list);
 }

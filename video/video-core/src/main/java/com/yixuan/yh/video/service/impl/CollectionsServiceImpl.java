@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yixuan.yh.common.exception.YHClientException;
 import com.yixuan.yh.common.response.Result;
+import com.yixuan.yh.common.utils.AWSUtils;
 import com.yixuan.yh.common.utils.SnowflakeUtils;
 import com.yixuan.yh.user.feign.UserPrivateClient;
 import com.yixuan.yh.video.mapper.VideoUserCollectionsItemMapper;
@@ -20,8 +21,10 @@ import com.yixuan.yh.video.service.CollectionsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -34,6 +37,7 @@ public class CollectionsServiceImpl extends ServiceImpl<VideoUserCollectionsMapp
     private final SnowflakeUtils snowflakeUtils;
     private final VideoUserCollectionsItemMapper videoUserCollectionsItemMapper;
     private final UserPrivateClient userPrivateClient;
+    private final AWSUtils awsUtils;
 
     @Override
     public List<GetCollectionsResponse> getCollections(Long userId, Long lastMinId) {
@@ -43,7 +47,7 @@ public class CollectionsServiceImpl extends ServiceImpl<VideoUserCollectionsMapp
     }
 
     @Override
-    public List<GetCollectionsItemResponse> getCollectionsItemList(Long userId, Long collectionsId) {
+    public List<GetCollectionsItemResponse> getCollectionsItemList(Long userId, Long collectionsId, Long lastMinId) {
         // 查询收藏夹所属用户
         Long ownerId = videoUserCollectionsMapper.selectUserIdById(collectionsId);
 
@@ -53,12 +57,15 @@ public class CollectionsServiceImpl extends ServiceImpl<VideoUserCollectionsMapp
         }
 
         // 鉴权（当前收藏夹是否属于当前用户）
-        if (!videoUserCollectionsMapper.selectUserIdById(collectionsId).equals(userId)) {
+        if (!ownerId.equals(userId)) {
             throw new YHClientException("你没有权限！");
         }
 
         // 查询数据
-        List<VideoCollectionsWithVideo> videoCollectionsWithVideoList = videoUserCollectionsItemMapper.selectCollectionsItemList(collectionsId);
+        List<VideoCollectionsWithVideo> videoCollectionsWithVideoList = videoUserCollectionsItemMapper.selectCollectionsItemList(collectionsId, lastMinId);
+        if (videoCollectionsWithVideoList.isEmpty()) {
+            return Collections.emptyList();
+        }
 
         // 查询补充数据
         Result<Map<Long, String>> result = userPrivateClient.getNameBatch(videoCollectionsWithVideoList.
@@ -72,8 +79,13 @@ public class CollectionsServiceImpl extends ServiceImpl<VideoUserCollectionsMapp
         // 转换格式
         return videoCollectionsWithVideoList
                 .stream()
-                .map(CollectionsMapStruct.INSTANCE::toGetCollectionsItemResponse)
-                .peek(getCollectionsItemResponse -> getCollectionsItemResponse.setCreatorName(creatorIdToNameMap.get(getCollectionsItemResponse.getCreatorId())))
+                .map(v -> {
+                    GetCollectionsItemResponse response = CollectionsMapStruct.INSTANCE.toGetCollectionsItemResponse(v);
+                    response.setCreatorName(creatorIdToNameMap.get(response.getCreatorId()));
+                    response.setUrl(awsUtils.generateAccessUrl(v.getUrl()));
+                    response.setCoverUrl(awsUtils.generateAccessUrl(v.getCoverUrl()));
+                    return response;
+                })
                 .toList();
     }
 
@@ -102,7 +114,24 @@ public class CollectionsServiceImpl extends ServiceImpl<VideoUserCollectionsMapp
     }
 
     @Override
-    public void deleteCollections(Long collectionsId) {
+    public void deleteCollections(Long userId, Long collectionsId) {
+        // 获取所需数据
+        VideoUserCollections collections = videoUserCollectionsMapper.selectOne(new LambdaQueryWrapper<VideoUserCollections>()
+                .select(VideoUserCollections::getUserId, VideoUserCollections::getName)
+                .eq(VideoUserCollections::getId, collectionsId));
+        // 判断收藏夹是否存在
+        if (collections == null) {
+            throw new YHClientException("该收藏夹不存在！");
+        }
+        // 鉴权（当前收藏夹是否属于当前用户）
+        if (!collections.getUserId().equals(userId)) {
+            throw new YHClientException("你没有权限！");
+        }
+        // 默认收藏夹不允许删除
+        if ("默认收藏夹".equals(collections.getName())) {
+            throw new YHClientException("默认收藏夹不允许删除！");
+        }
+        // 删除收藏夹
         videoUserCollectionsMapper.deleteById(collectionsId);
     }
 
@@ -110,9 +139,9 @@ public class CollectionsServiceImpl extends ServiceImpl<VideoUserCollectionsMapp
     @Transactional
     public Map<Long, Long> getDefaultCollectionsIdBatch(List<Long> list) {
         List<VideoUserCollections> videoUserCollectionsList = videoUserCollectionsMapper.selectList(new LambdaQueryWrapper<VideoUserCollections>()
-                        .select(VideoUserCollections::getId, VideoUserCollections::getUserId)
-                        .eq(VideoUserCollections::getName, "默认收藏夹")
-                        .in(VideoUserCollections::getUserId, list));
+                .select(VideoUserCollections::getId, VideoUserCollections::getUserId)
+                .eq(VideoUserCollections::getName, "默认收藏夹")
+                .in(VideoUserCollections::getUserId, list));
         // 如果没有默认收藏夹，则创建。
         List<Long> userIdWithDefaultCollections = videoUserCollectionsList.stream().map(VideoUserCollections::getUserId).toList();
         List<Long> userIdWithoutDefaultCollections = list.stream().filter(userId -> !userIdWithDefaultCollections.contains(userId)).toList();

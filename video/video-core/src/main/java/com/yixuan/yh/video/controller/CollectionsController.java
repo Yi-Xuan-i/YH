@@ -30,8 +30,8 @@ public class CollectionsController {
 
     @Operation(summary = "获取收藏夹中的视频")
     @GetMapping("/item/{collectionsId}")
-    public Result<List<GetCollectionsItemResponse>> getCollectionsItemList(@PathVariable Long collectionsId) {
-        return Result.success(collectionsService.getCollectionsItemList(UserContext.getUser(), collectionsId));
+    public Result<List<GetCollectionsItemResponse>> getCollectionsItemList(@PathVariable Long collectionsId, @RequestParam(required = false) Long lastMinId) {
+        return Result.success(collectionsService.getCollectionsItemList(UserContext.getUser(), collectionsId, lastMinId));
     }
 
     @Operation(summary = "创建收藏夹")
@@ -50,7 +50,7 @@ public class CollectionsController {
     @Operation(summary = "删除收藏夹")
     @DeleteMapping("/{collectionsId}")
     public Result<Void> deleteCollections(@PathVariable Long collectionsId) {
-        collectionsService.deleteCollections(collectionsId);
+        collectionsService.deleteCollections(UserContext.getUser(), collectionsId);
         return Result.success();
     }
 
