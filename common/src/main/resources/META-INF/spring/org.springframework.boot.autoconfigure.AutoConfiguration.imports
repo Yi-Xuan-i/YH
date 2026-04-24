@@ -2,6 +2,7 @@ com.yixuan.yh.common.config.CommonConfig
 com.yixuan.yh.common.config.PropertiesConfig
 com.yixuan.yh.common.config.JacksonConfig
 com.yixuan.yh.common.config.XxlJobConfig
+com.yixuan.yh.common.config.RedissonConfig
 com.yixuan.yh.common.config.CommonFieldFillHandler
 com.yixuan.yh.common.utils.JwtUtils
 com.yixuan.yh.common.utils.MinioUtils
