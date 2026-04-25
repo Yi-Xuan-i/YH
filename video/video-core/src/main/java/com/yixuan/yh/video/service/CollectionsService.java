@@ -17,7 +17,7 @@ public interface CollectionsService extends IService<VideoUserCollections> {
 
     String postCollections(Long userId, PostCollectionsRequest postCollectionsRequest);
 
-    void putCollections(Long collectionsId, PutCollectionsRequest putCollectionsRequest);
+    void putCollections(Long userId, Long collectionsId, PutCollectionsRequest putCollectionsRequest);
 
     void deleteCollections(Long userId, Long collectionsId);
 

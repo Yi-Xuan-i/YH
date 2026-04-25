@@ -43,7 +43,7 @@ public class CollectionsController {
     @Operation(summary = "修改收藏夹")
     @PutMapping("/{collectionsId}")
     public Result<Void> putCollections(@PathVariable Long collectionsId, @RequestBody PutCollectionsRequest putCollectionsRequest) {
-        collectionsService.putCollections(collectionsId, putCollectionsRequest);
+        collectionsService.putCollections(UserContext.getUser(), collectionsId, putCollectionsRequest);
         return Result.success();
     }
 

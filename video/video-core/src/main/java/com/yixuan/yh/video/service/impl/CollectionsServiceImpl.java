@@ -103,7 +103,22 @@ public class CollectionsServiceImpl extends ServiceImpl<VideoUserCollectionsMapp
     }
 
     @Override
-    public void putCollections(Long collectionsId, PutCollectionsRequest putCollectionsRequest) {
+    public void putCollections(Long userId, Long collectionsId, PutCollectionsRequest putCollectionsRequest) {
+        // 获取所需数据
+        VideoUserCollections collections = videoUserCollectionsMapper.selectOne(new LambdaQueryWrapper<VideoUserCollections>()
+                .select(VideoUserCollections::getUserId)
+                .eq(VideoUserCollections::getId, collectionsId));
+
+        // 判断收藏夹是否存在
+        if (collections == null) {
+            throw new YHClientException("该收藏夹不存在！");
+        }
+
+        // 鉴权（当前收藏夹是否属于当前用户）
+        if (!collections.getUserId().equals(userId)) {
+            throw new YHClientException("你没有权限！");
+        }
+
         // 转换格式
         VideoUserCollections videoUserCollections = CollectionsMapStruct.INSTANCE.toVideoUserCollections(putCollectionsRequest);
         videoUserCollections.setId(collectionsId);
@@ -119,18 +134,22 @@ public class CollectionsServiceImpl extends ServiceImpl<VideoUserCollectionsMapp
         VideoUserCollections collections = videoUserCollectionsMapper.selectOne(new LambdaQueryWrapper<VideoUserCollections>()
                 .select(VideoUserCollections::getUserId, VideoUserCollections::getName)
                 .eq(VideoUserCollections::getId, collectionsId));
+
         // 判断收藏夹是否存在
         if (collections == null) {
             throw new YHClientException("该收藏夹不存在！");
         }
+
         // 鉴权（当前收藏夹是否属于当前用户）
         if (!collections.getUserId().equals(userId)) {
             throw new YHClientException("你没有权限！");
         }
+
         // 默认收藏夹不允许删除
         if ("默认收藏夹".equals(collections.getName())) {
             throw new YHClientException("默认收藏夹不允许删除！");
         }
+
         // 删除收藏夹
         videoUserCollectionsMapper.deleteById(collectionsId);
     }
