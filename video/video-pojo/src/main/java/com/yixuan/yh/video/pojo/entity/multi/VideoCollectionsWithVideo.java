@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class VideoCollectionsWithVideo {
     private Long id;
-    private Long collectionId;
+    private Long collectionsId;
     private Long videoId;
     private String coverUrl;
     private String url;

@@ -13,7 +13,7 @@ public class GetCollectionsItemResponse {
     @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
     @JsonSerialize(using = ToStringSerializer.class)
-    private Long collectionId;
+    private Long collectionsId;
     @JsonSerialize(using = ToStringSerializer.class)
     private Long videoId;
     private String coverUrl;
