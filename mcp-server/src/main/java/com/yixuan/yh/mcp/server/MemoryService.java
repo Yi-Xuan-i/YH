@@ -21,9 +21,6 @@ public class MemoryService {
 
     @McpTool(name = "archival_memory_insert", description = "将重要的事实、知识或用户长期偏好存入归档记忆库（硬盘）")
     public Mono<Boolean> archivalMemoryInsert(@McpToolParam(description = "需要存入的记忆") String memory) {
-        System.out.println("------------------");
-        System.out.println(memory);
-        System.out.println("------------------");
         return Mono.fromCallable(() -> {
             Document document = new Document(memory);
             vectorStore.add(List.of(document));
@@ -34,29 +31,22 @@ public class MemoryService {
 
     @McpTool(name = "archival_memory_search", description = "当主内存中找不到相关信息时，搜索归档记忆库（硬盘）中的历史事实")
     public Mono<String> archivalMemorySearch(@McpToolParam(description = "搜索词") String query) {
-        System.out.println("------------------");
-        System.out.println(query);
-        System.out.println("------------------");
         return Mono.fromCallable(() -> {
             SearchRequest request = SearchRequest.builder()
                     .query(query)
                     .topK(3)
-//                    .similarityThreshold(0.85)
+                    .similarityThreshold(0.85)
                     .build();
 
             List<Document> docs = vectorStore.similaritySearch(request);
 
             if (docs.isEmpty()) {
-                System.out.println("无");
                 return "未找到相关的历史记忆。";
             }
 
-            String result = docs.stream()
+            return docs.stream()
                     .map(Document::getText)
                     .collect(Collectors.joining("\n---\n", "找到以下相关历史记录：\n", ""));
-            System.out.println(result);
-
-            return result;
         }).subscribeOn(Schedulers.boundedElastic());
     }
 
