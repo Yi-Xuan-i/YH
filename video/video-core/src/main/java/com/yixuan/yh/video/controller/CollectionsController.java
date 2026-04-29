@@ -2,6 +2,7 @@ package com.yixuan.yh.video.controller;
 
 import com.yixuan.yh.common.response.Result;
 import com.yixuan.yh.common.utils.UserContext;
+import com.yixuan.yh.video.pojo.request.DeleteCollectionsItemRequest;
 import com.yixuan.yh.video.pojo.response.GetCollectionsItemResponse;
 import com.yixuan.yh.video.pojo.request.PostCollectionsRequest;
 import com.yixuan.yh.video.pojo.request.PutCollectionsRequest;
@@ -51,6 +52,13 @@ public class CollectionsController {
     @DeleteMapping("/{collectionsId}")
     public Result<Void> deleteCollections(@PathVariable Long collectionsId) {
         collectionsService.deleteCollections(UserContext.getUser(), collectionsId);
+        return Result.success();
+    }
+
+    @Operation(summary = "批量删除收藏夹项")
+    @DeleteMapping("/item")
+    public Result<Void> deleteCollectionsItemBatch(@RequestBody DeleteCollectionsItemRequest deleteCollectionsItemRequest) {
+        collectionsService.deleteCollectionsItemBatch(UserContext.getUser(), deleteCollectionsItemRequest);
         return Result.success();
     }
 

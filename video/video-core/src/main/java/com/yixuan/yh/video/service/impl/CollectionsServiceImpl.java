@@ -12,7 +12,9 @@ import com.yixuan.yh.video.mapper.VideoUserCollectionsItemMapper;
 import com.yixuan.yh.video.mapper.VideoUserCollectionsMapper;
 import com.yixuan.yh.video.mapstruct.CollectionsMapStruct;
 import com.yixuan.yh.video.pojo.entity.VideoUserCollections;
+import com.yixuan.yh.video.pojo.entity.VideoUserCollectionsItem;
 import com.yixuan.yh.video.pojo.entity.multi.VideoCollectionsWithVideo;
+import com.yixuan.yh.video.pojo.request.DeleteCollectionsItemRequest;
 import com.yixuan.yh.video.pojo.request.PostCollectionsRequest;
 import com.yixuan.yh.video.pojo.request.PutCollectionsRequest;
 import com.yixuan.yh.video.pojo.response.GetCollectionsItemResponse;
@@ -21,7 +23,6 @@ import com.yixuan.yh.video.service.CollectionsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -177,5 +178,31 @@ public class CollectionsServiceImpl extends ServiceImpl<VideoUserCollectionsMapp
 
         // 转换格式
         return videoUserCollectionsList.stream().collect(Collectors.toMap(VideoUserCollections::getUserId, VideoUserCollections::getId));
+    }
+
+    @Override
+    public void deleteCollectionsItemBatch(Long userId, DeleteCollectionsItemRequest deleteCollectionsItemRequest) {
+        // 查询数据
+        List<VideoUserCollectionsItem> videoUserCollectionsItemList = videoUserCollectionsItemMapper.selectBatchIds(deleteCollectionsItemRequest.getIds());
+
+        // 是否为空
+        if (videoUserCollectionsItemList.isEmpty()) {
+            return;
+        }
+
+        // 鉴权（当前收藏夹项是否属于当前用户）
+        for (VideoUserCollectionsItem v : videoUserCollectionsItemList) {
+            if (!v.getUserId().equals(userId)) {
+                throw new YHClientException("你没有权限！");
+            }
+        }
+
+        // 删除数据
+        videoUserCollectionsItemMapper.deleteBatchIds(deleteCollectionsItemRequest.getIds());
+
+        // 更新项数
+        videoUserCollectionsMapper.update(null, new LambdaUpdateWrapper<VideoUserCollections>()
+                .setSql("item_count = item_count - 1")
+                .in(VideoUserCollections::getId, videoUserCollectionsItemList.stream().map(VideoUserCollectionsItem::getCollectionsId).toList()));
     }
 }

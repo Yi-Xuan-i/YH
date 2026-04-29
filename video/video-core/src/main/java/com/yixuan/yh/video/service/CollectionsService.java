@@ -2,6 +2,7 @@ package com.yixuan.yh.video.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.yixuan.yh.video.pojo.entity.VideoUserCollections;
+import com.yixuan.yh.video.pojo.request.DeleteCollectionsItemRequest;
 import com.yixuan.yh.video.pojo.request.PostCollectionsRequest;
 import com.yixuan.yh.video.pojo.request.PutCollectionsRequest;
 import com.yixuan.yh.video.pojo.response.GetCollectionsItemResponse;
@@ -22,4 +23,6 @@ public interface CollectionsService extends IService<VideoUserCollections> {
     void deleteCollections(Long userId, Long collectionsId);
 
     Map<Long, Long> getDefaultCollectionsIdBatch(List<Long> list);
+
+    void deleteCollectionsItemBatch(Long userId, DeleteCollectionsItemRequest deleteCollectionsItemRequest);
 }
