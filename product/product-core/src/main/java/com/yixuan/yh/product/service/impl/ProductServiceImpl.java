@@ -1,6 +1,7 @@
 package com.yixuan.yh.product.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yixuan.yh.common.utils.AWSUtils;
 import com.yixuan.yh.product.constant.RabbitMQConstant;
 import com.yixuan.yh.product.constant.RedisConstant;
 import com.yixuan.yh.product.constant.RedisLuaResultConstant;
@@ -8,6 +9,7 @@ import com.yixuan.yh.product.mapper.ProductCarouselMapper;
 import com.yixuan.yh.product.mapper.ProductMapper;
 import com.yixuan.yh.product.mapper.ProductSkuMapper;
 import com.yixuan.yh.product.mapper.multi.SkuMapper;
+import com.yixuan.yh.product.mapstruct.ProductMapStruct;
 import com.yixuan.yh.product.mq.OrderExpirationMessage;
 import com.yixuan.yh.product.pojo.model.entity.Product;
 import com.yixuan.yh.product.pojo.model.entity.ProductSku;
@@ -57,12 +59,18 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private RedissonClient redissonClient;
     @Autowired
+    private AWSUtils awsUtils;
+    @Autowired
     @Qualifier("reserveStockScript")
     private RedisScript<Long> reserveStockScript;
 
     @Override
     public List<ProductSummaryResponse> getProducts() {
-        return productMapper.selectList();
+        return productMapper.selectList().stream().map(product -> {
+            ProductSummaryResponse response = ProductMapStruct.INSTANCE.toProductSummaryResponse(product);
+            response.setCoverUrl(awsUtils.generateAccessUrl(response.getCoverUrl()));
+            return response;
+        }).toList();
     }
 
     @Override
@@ -74,7 +82,8 @@ public class ProductServiceImpl implements ProductService {
         }
 
         // 查询商品轮播图
-        List<String> carouselList = productCarouselMapper.selectUrlByProductId(productId);
+        List<String> carouselList = productCarouselMapper.selectUrlByProductId(productId)
+                .stream().map(awsUtils::generateAccessUrl).toList();
 
         // 查询商品SKU
         List<ProductSku> productSkuList = productSkuMapper.selectByProductId(productId);

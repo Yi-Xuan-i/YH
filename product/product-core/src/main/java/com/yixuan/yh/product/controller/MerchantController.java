@@ -26,16 +26,34 @@ public class MerchantController {
     @Autowired
     private MerchantService merchantService;
 
-    @Operation(summary = "获取自己店铺的商品")
+    @Operation(summary = "获取自己店铺的商品（不区分状态）")
     @GetMapping
     public Result<List<ProductManageItemResponse>> getMerchantProduct() {
         return Result.success(merchantService.getMerchantProduct(UserContext.getUser()));
+    }
+
+    @Operation(summary = "获取自己店铺的销售中商品（用于直播间展示商品列表能够让主播挑选上品上架到直播间）")
+    @GetMapping("/on-sale")
+    public Result<List<ProductManageItemResponse>> geOnSaleProductForLive() {
+        return Result.success(merchantService.getMerchantOnSaleProduct(UserContext.getUser()));
     }
 
     @Operation(summary = "获取商品编辑信息")
     @GetMapping("/edit/{productId}")
     public Result<ProductEditResponse> getMerchantProductEditData(@PathVariable Long productId) {
         return Result.success(merchantService.getMerchantProductEditData(productId));
+    }
+
+    @Operation(summary = "获取上传视频的预签名URL（编辑器）")
+    @GetMapping("/edit/upload-video/presigned-url")
+    public Result<String> getEditUploadVideoPresignedUrl() {
+        return Result.success(merchantService.getEditUploadVideoPresignedUrl(UserContext.getUser()));
+    }
+
+    @Operation(summary = "获取上传图片的预签名URL（编辑器）")
+    @GetMapping("/edit/upload-image/presigned-url")
+    public Result<String> getEditUploadImagePresignedUrl() {
+        return Result.success(merchantService.getEditUploadImagePresignedUrl(UserContext.getUser()));
     }
 
     @Operation(summary = "新增店铺商品")

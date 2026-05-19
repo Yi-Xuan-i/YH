@@ -1,5 +1,7 @@
 package com.yixuan.yh.product.pojo.response;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.yixuan.yh.product.pojo.model.entity.ProductCarousel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,6 +29,7 @@ public class ProductEditResponse {
     @Data
     @AllArgsConstructor
     public static class SkuDetailDTO {
+        @JsonSerialize(using = ToStringSerializer.class)
         private Long skuId;
         private BigDecimal price;
         private Integer stock;
@@ -38,7 +41,9 @@ public class ProductEditResponse {
         public static class SpecPair {
             private String key;
             private String value;
+            @JsonSerialize(using = ToStringSerializer.class)
             private Long keyId;
+            @JsonSerialize(using = ToStringSerializer.class)
             private Long valueId;
         }
     }

@@ -14,7 +14,13 @@ import java.util.List;
 public interface MerchantService {
     List<ProductManageItemResponse> getMerchantProduct(Long user);
 
+    List<ProductManageItemResponse> getMerchantOnSaleProduct(Long userId);
+
     ProductEditResponse getMerchantProductEditData(Long productId);
+
+    String getEditUploadVideoPresignedUrl(Long userId);
+
+    String getEditUploadImagePresignedUrl(Long userId);
 
     void postSkuSpec(PostSkuSpecRequest postSkuSpecRequest);
 

@@ -1,5 +1,7 @@
 package com.yixuan.yh.product.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.yixuan.yh.common.exception.YHClientException;
 import com.yixuan.yh.common.utils.AWSUtils;
 import com.yixuan.yh.common.utils.SnowflakeUtils;
 import com.yixuan.yh.product.mapper.*;
@@ -23,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -57,18 +60,35 @@ public class MerchantServiceImpl implements MerchantService {
         return productMapper.selectMerchantProducts(user);
     }
 
+
+    @Override
+    public List<ProductManageItemResponse> getMerchantOnSaleProduct(Long userId) {
+//        productMapper.selectList(new LambdaQueryWrapper<Product>()
+//                .select(Product::getProductId, Product::getTitle, Product::getCoverUrl, Product::getPrice, Product::getSalesVolume)
+//                .eq(Product::getMerchantId, userId)
+//                .eq(Product::getStatus, Product.ProductStatus.ON_SALE));
+        return null;
+    }
+
     @Override
     public ProductEditResponse getMerchantProductEditData(Long productId) {
-        ProductEditResponse productEditResponse = new ProductEditResponse();
         Product product = productMapper.selectEditBasicData(productId);
+        if (product == null) {
+            throw new YHClientException("商品不存在！");
+        }
+
+        ProductEditResponse productEditResponse = new ProductEditResponse();
         // 商品基本信息
         productEditResponse.setTitle(product.getTitle());
         productEditResponse.setPrice(product.getPrice());
         productEditResponse.setDescription(product.getDescription());
-        productEditResponse.setCoverUrl(product.getCoverUrl());
+        productEditResponse.setCoverUrl(awsUtils.generateAccessUrl(product.getCoverUrl()));
         // 商品轮播图
-        productEditResponse.setCarouselFileList(productCarouselMapper.selectByProductId(productId));
-
+        List<ProductCarousel> carouselList = productCarouselMapper.selectByProductId(productId);
+        carouselList.forEach(carousel -> {
+            carousel.setUrl(awsUtils.generateAccessUrl(carousel.getUrl()));
+        });
+        productEditResponse.setCarouselFileList(carouselList);
         // 商品SKU
         List<ProductSku> skuList = productSkuMapper.selectByProductId(productId);
         if (!skuList.isEmpty()) {
@@ -92,6 +112,17 @@ public class MerchantServiceImpl implements MerchantService {
         }
 
         return productEditResponse;
+    }
+
+    @Override
+    public String getEditUploadVideoPresignedUrl(Long userId) {
+        // 这里应该还要插入一条记录辅助用于清理视频或者也可以采用桶生命周期规则自动清理
+        return awsUtils.presignPutObject(awsUtils.generateKey(), "video/mp4", Duration.ofMinutes(10));
+    }
+
+    @Override
+    public String getEditUploadImagePresignedUrl(Long userId) {
+        return awsUtils.presignPutObject(awsUtils.generateKey(), "image/png", Duration.ofMinutes(10));
     }
 
     @Override

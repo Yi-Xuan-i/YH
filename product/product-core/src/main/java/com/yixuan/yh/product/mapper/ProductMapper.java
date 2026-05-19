@@ -1,5 +1,6 @@
 package com.yixuan.yh.product.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.yixuan.yh.product.pojo.model.entity.Product;
 import com.yixuan.yh.product.pojo.response.ProductManageItemResponse;
 import com.yixuan.yh.product.pojo.response.ProductSummaryResponse;
@@ -11,7 +12,7 @@ import org.apache.ibatis.annotations.Select;
 import java.util.List;
 
 @Mapper
-public interface ProductMapper {
+public interface ProductMapper extends BaseMapper<Product> {
     @Select("SELECT product_id, title, cover_url, price, sales_volume \n" +
             "FROM product \n" +
             "WHERE product_id >= (\n" +
@@ -19,7 +20,7 @@ public interface ProductMapper {
             "    FROM product\n" +
             ") \n" +
             "LIMIT 5;")
-    List<ProductSummaryResponse> selectList();
+    List<Product> selectList();
 
     @Select("select product_id, title, description, price, stock, status, sales_volume, rating, created_at, updated_at from product where merchant_id = #{userId}")
     List<ProductManageItemResponse> selectMerchantProducts(Long userId);
