@@ -1,8 +1,10 @@
 package com.yixuan.yh.product.pojo.model.entity;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -29,8 +31,6 @@ public class Product {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    @Getter
-    @AllArgsConstructor
     public enum ProductStatus {
         PENDING(1, "待审核"),
         APPROVED(2, "审核通过"),
@@ -38,7 +38,22 @@ public class Product {
         ON_SALE(4, "上架销售"),
         OFF_SHELF(5, "下架内测");
 
+        @EnumValue
         private final int code;
         private final String desc;
+
+        ProductStatus(int code, String desc) {
+            this.code = code;
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return desc;
+        }
+
+        @JsonValue
+        public int getCode() {
+            return code;
+        }
     }
 }

@@ -209,12 +209,12 @@ public class MerchantServiceImpl implements MerchantService {
     @Override
     public void postMerchantProduct(Long merchantId, PutProductBasicInfoRequest putProductBasicInfoRequest) throws IOException {
         Product product = MerchantMapStruct.INSTANCE.putProductBasicInfoRequestToProduct(putProductBasicInfoRequest);
-        product.setProductId(snowflakeUtils.nextId());
         product.setMerchantId(merchantId);
+        product.setStatus(Product.ProductStatus.OFF_SHELF); // 审核功能未实现，暂时默认新建商品为下架状态
         if (putProductBasicInfoRequest.getCover() != null) {
             product.setCoverUrl(awsUtils.putObject(putProductBasicInfoRequest.getCover()));
         }
-        productMapper.insertBasicInfo(product);
+        productMapper.insert(product);
     }
 
     @Override
