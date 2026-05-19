@@ -6,6 +6,7 @@ import com.yixuan.yh.video.pojo.request.DeleteCollectionsItemRequest;
 import com.yixuan.yh.video.pojo.response.GetCollectionsItemResponse;
 import com.yixuan.yh.video.pojo.request.PostCollectionsRequest;
 import com.yixuan.yh.video.pojo.request.PutCollectionsRequest;
+import com.yixuan.yh.video.pojo.request.TransferCollectionsItemRequest;
 import com.yixuan.yh.video.pojo.response.GetCollectionsResponse;
 import com.yixuan.yh.video.service.CollectionsService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -59,6 +60,20 @@ public class CollectionsController {
     @DeleteMapping("/item")
     public Result<Void> deleteCollectionsItemBatch(@RequestBody DeleteCollectionsItemRequest deleteCollectionsItemRequest) {
         collectionsService.deleteCollectionsItemBatch(UserContext.getUser(), deleteCollectionsItemRequest);
+        return Result.success();
+    }
+
+    @Operation(summary = "批量移动收藏夹项")
+    @PutMapping("/item/move")
+    public Result<Void> moveCollectionsItemBatch(@RequestBody TransferCollectionsItemRequest transferCollectionsItemRequest) {
+        collectionsService.moveCollectionsItemBatch(UserContext.getUser(), transferCollectionsItemRequest);
+        return Result.success();
+    }
+
+    @Operation(summary = "批量复制收藏夹项")
+    @PostMapping("/item/copy")
+    public Result<Void> copyCollectionsItemBatch(@RequestBody TransferCollectionsItemRequest transferCollectionsItemRequest) {
+        collectionsService.copyCollectionsItemBatch(UserContext.getUser(), transferCollectionsItemRequest);
         return Result.success();
     }
 

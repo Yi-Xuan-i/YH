@@ -5,6 +5,7 @@ import com.yixuan.yh.video.pojo.entity.VideoUserCollections;
 import com.yixuan.yh.video.pojo.request.DeleteCollectionsItemRequest;
 import com.yixuan.yh.video.pojo.request.PostCollectionsRequest;
 import com.yixuan.yh.video.pojo.request.PutCollectionsRequest;
+import com.yixuan.yh.video.pojo.request.TransferCollectionsItemRequest;
 import com.yixuan.yh.video.pojo.response.GetCollectionsItemResponse;
 import com.yixuan.yh.video.pojo.response.GetCollectionsResponse;
 
@@ -25,4 +26,8 @@ public interface CollectionsService extends IService<VideoUserCollections> {
     Map<Long, Long> getDefaultCollectionsIdBatch(List<Long> list);
 
     void deleteCollectionsItemBatch(Long userId, DeleteCollectionsItemRequest deleteCollectionsItemRequest);
+
+    void moveCollectionsItemBatch(Long userId, TransferCollectionsItemRequest transferCollectionsItemRequest);
+
+    void copyCollectionsItemBatch(Long userId, TransferCollectionsItemRequest transferCollectionsItemRequest);
 }
