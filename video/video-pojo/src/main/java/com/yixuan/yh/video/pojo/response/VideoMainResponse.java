@@ -11,17 +11,17 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class VideoMainResponse {
     @JsonSerialize(using = ToStringSerializer.class)
-    Long id;
+    private Long id;
     @JsonSerialize(using = ToStringSerializer.class)
-    Long creatorId;
-    String creatorName;
-    String creatorAvatar;
-    String description;
-    String url;
-    Long likes;
-    Long comments;
-    Long favorites;
-    Boolean isFollowed;
-    Boolean isLike;
-    Boolean isFavorite;
+    private Long creatorId;
+    private String creatorName;
+    private String creatorAvatar;
+    private String description;
+    private String url;
+    private Long likes;
+    private Long comments;
+    private Long favorites;
+    private Boolean isFollowed;
+    private Boolean isLike;
+    private Boolean isFavorite;
 }

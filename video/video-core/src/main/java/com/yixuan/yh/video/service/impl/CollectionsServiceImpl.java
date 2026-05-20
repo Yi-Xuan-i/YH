@@ -142,7 +142,7 @@ public class CollectionsServiceImpl extends ServiceImpl<VideoUserCollectionsMapp
     public void deleteCollections(Long userId, Long collectionsId) {
         // 获取所需数据
         VideoUserCollections collections = videoUserCollectionsMapper.selectOne(new LambdaQueryWrapper<VideoUserCollections>()
-                .select(VideoUserCollections::getUserId, VideoUserCollections::getName)
+                .select(VideoUserCollections::getUserId, VideoUserCollections::getName, VideoUserCollections::getItemCount)
                 .eq(VideoUserCollections::getId, collectionsId));
 
         // 判断收藏夹是否存在
@@ -158,6 +158,11 @@ public class CollectionsServiceImpl extends ServiceImpl<VideoUserCollectionsMapp
         // 默认收藏夹不允许删除
         if ("默认收藏夹".equals(collections.getName())) {
             throw new YHClientException("默认收藏夹不允许删除！");
+        }
+
+        // 收藏夹还有视频不允许删除
+        if (collections.getItemCount() != null && collections.getItemCount() > 0) {
+            throw new YHClientException("收藏夹内还有视频，请先删除收藏夹内的视频！");
         }
 
         // 删除收藏夹

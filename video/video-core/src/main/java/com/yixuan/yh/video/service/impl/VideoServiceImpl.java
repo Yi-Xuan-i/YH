@@ -114,8 +114,8 @@ public class VideoServiceImpl implements VideoService {
         // 完善数据
         videoMainResponseList.forEach(response -> {
             UserInfoInListResponse userInfo = idToUserInfoMap.get(response.getCreatorId());
+            response.setCreatorAvatar(userInfo.getAvatarUrl());
             response.setCreatorName(userInfo.getName());
-            response.setCreatorAvatar(awsUtils.generateAccessUrl(userInfo.getAvatarUrl()));
         });
 
         /* 获取关注状态 */
@@ -448,7 +448,12 @@ public class VideoServiceImpl implements VideoService {
     public List<GetPublishedVideoResponse> getPublishedVideo(Long userId, Long lastMinId) {
         return videoMapper.selectPublishedVideoByUserId(userId, lastMinId)
                 .stream()
-                .map(VideoMapStruct.INSTANCE::toGetPublishedVideoResponse)
+                .map(v -> {
+                    GetPublishedVideoResponse response = VideoMapStruct.INSTANCE.toGetPublishedVideoResponse(v);
+                    response.setUrl(awsUtils.generateAccessUrl(response.getUrl()));
+                    response.setCoverUrl(awsUtils.generateAccessUrl(response.getCoverUrl()));
+                    return response;
+                })
                 .toList();
     }
 
@@ -496,6 +501,8 @@ public class VideoServiceImpl implements VideoService {
 
         // 完善数据
         likeVideoResponseList.forEach(response -> {
+            response.setUrl(awsUtils.generateAccessUrl(response.getUrl()));
+            response.setCoverUrl(awsUtils.generateAccessUrl(response.getCoverUrl()));
             response.setCreatorName(idToNameMap.get(response.getCreatorId()));
         });
 
