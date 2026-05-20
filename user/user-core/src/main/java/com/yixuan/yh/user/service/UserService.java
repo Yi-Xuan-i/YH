@@ -1,6 +1,5 @@
 package com.yixuan.yh.user.service;
 
-import com.yixuan.yh.common.response.Result;
 import com.yixuan.yh.user.pojo.response.UserInfoInListResponse;
 import com.yixuan.yh.user.pojo.response.UserSearchResponse;
 
