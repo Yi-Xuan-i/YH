@@ -18,8 +18,8 @@ public interface OrderMapper extends BaseMapper<Order> {
     @Select("select payment_amount from `order` where order_id = #{orderId}")
     BigDecimal selectPaymentAmountByOrderId(Long orderId);
 
-    @Select("select order_id, user_id, merchant_id, payment_amount, order_status, delivery_address, created_time as created_at " +
-            "from `order` where user_id = #{userId} and order_status = 'UNPAID' order by created_time desc")
+    @Select("select order_id, user_id, merchant_id, payment_amount, order_status, delivery_address, created_at " +
+            "from `order` where user_id = #{userId} and order_status = 'UNPAID' order by created_at desc")
     List<Order> selectPendingPaymentByUserId(Long userId);
 
     @Update("update `order` set order_status = #{orderStatus} where order_id = #{orderId}")
