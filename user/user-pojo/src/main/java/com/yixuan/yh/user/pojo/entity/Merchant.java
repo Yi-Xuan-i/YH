@@ -1,11 +1,16 @@
 package com.yixuan.yh.user.pojo.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
+@TableName("merchant")
 @Data
 public class Merchant {
+    @TableId(type = IdType.ASSIGN_ID)
     private Long merchantId;
     private String name;
     private String contactPhone;
