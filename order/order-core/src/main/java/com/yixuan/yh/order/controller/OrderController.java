@@ -5,6 +5,7 @@ import com.yixuan.yh.common.response.Result;
 import com.yixuan.yh.common.utils.UserContext;
 import com.yixuan.yh.order.pojo.request.PostCartOrderRequest;
 import com.yixuan.yh.order.pojo.request.PostOrderRequest;
+import com.yixuan.yh.order.pojo.response.PendingPaymentOrderResponse;
 import com.yixuan.yh.order.pojo.response.PostOrderResponse;
 import com.yixuan.yh.order.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,6 +13,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Tag(name = "Order")
 @RestController
@@ -31,6 +34,12 @@ public class OrderController {
     @PostMapping("/cart")
     public Result<PostOrderResponse> postCartOrder(@RequestBody PostCartOrderRequest postCartOrderRequest) throws AlipayApiException {
         return Result.success(orderService.postCartOrder(UserContext.getUser(), postCartOrderRequest));
+    }
+
+    @Operation(summary = "获取待支付订单")
+    @GetMapping("/pending-payment")
+    public Result<List<PendingPaymentOrderResponse>> getPendingPaymentOrders() {
+        return Result.success(orderService.getPendingPaymentOrders(UserContext.getUser()));
     }
 
     @Operation(summary = "获取订单支付状态")

@@ -2,6 +2,7 @@ package com.yixuan.yh.order.service.impl;
 
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.internal.util.AlipaySignature;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.yixuan.yh.common.response.Result;
 import com.yixuan.yh.order.mapper.OrderItemMapper;
 import com.yixuan.yh.order.mapper.OrderMapper;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -65,7 +67,7 @@ public class PayServiceImpl implements PayService {
 
             List<OrderItem> orderItemList = orderItemMapper.selectByOrderId(orderId);
             if (orderItemList.isEmpty()) {
-                throw new IllegalStateException("Order item does not exist.");
+                throw new IllegalStateException("订单不存在！");
             }
 
             Map<Long, Integer> productQuantityMap = orderItemList.stream()
@@ -76,13 +78,21 @@ public class PayServiceImpl implements PayService {
 
             Result<Void> result = productPrivateClient.increaseSalesVolume(productQuantityMap);
             if (result == null || result.isError()) {
-                throw new IllegalStateException("Failed to increase product sales volume.");
+                throw new IllegalStateException("增加销量失败！");
             }
 
-            int affectedRows = orderMapper.updateStatusToPaidIfUnPaid(orderId);
+            int affectedRows = orderMapper.update(new LambdaUpdateWrapper<Order>()
+                    .set(Order::getOrderStatus, Order.OrderStatus.PAID)
+                    .eq(Order::getOrderId, orderId)
+                    .eq(Order::getOrderStatus, Order.OrderStatus.UNPAID)
+            );
             if (affectedRows == 0) {
-                throw new IllegalStateException("Order status changed while processing pay notify.");
+                throw new IllegalStateException("订单状态更新失败！");
             }
+
+            orderItemMapper.update(new LambdaUpdateWrapper<OrderItem>()
+                    .set(OrderItem::getPayTime, LocalDateTime.now())
+                    .eq(OrderItem::getOrderId, orderId));
         }
 
         return "success";

@@ -19,6 +19,7 @@ import com.yixuan.yh.order.pojo.entity.Order;
 import com.yixuan.yh.order.pojo.entity.OrderItem;
 import com.yixuan.yh.order.pojo.request.PostCartOrderRequest;
 import com.yixuan.yh.order.pojo.request.PostOrderRequest;
+import com.yixuan.yh.order.pojo.response.PendingPaymentOrderResponse;
 import com.yixuan.yh.order.pojo.response.PostOrderResponse;
 import com.yixuan.yh.order.properties.AliPayProperties;
 import com.yixuan.yh.order.service.OrderService;
@@ -31,7 +32,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -157,6 +158,29 @@ public class OrderServiceImpl implements OrderService {
         } else {
             throw new YHServerException("获取支付二维码失败！");
         }
+    }
+
+    @Override
+    public List<PendingPaymentOrderResponse> getPendingPaymentOrders(Long userId) {
+        return orderMapper.selectPendingPaymentByUserId(userId).stream()
+                .map(order -> new PendingPaymentOrderResponse(
+                        order.getOrderId(),
+                        order.getMerchantId(),
+                        order.getPaymentAmount(),
+                        order.getOrderStatus(),
+                        order.getDeliveryAddress(),
+                        order.getCreatedAt(),
+                        orderItemMapper.selectByOrderId(order.getOrderId()).stream()
+                                .map(orderItem -> new PendingPaymentOrderResponse.OrderItemResponse(
+                                        orderItem.getOrderItemId(),
+                                        orderItem.getProductId(),
+                                        orderItem.getSkuId(),
+                                        orderItem.getSku(),
+                                        orderItem.getProductName(),
+                                        orderItem.getQuantity(),
+                                        orderItem.getPrice()))
+                                .toList()))
+                .toList();
     }
 
     @Override
