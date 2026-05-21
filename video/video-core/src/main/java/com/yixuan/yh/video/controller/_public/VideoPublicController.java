@@ -3,6 +3,7 @@ package com.yixuan.yh.video.controller._public;
 import com.yixuan.yh.common.response.Result;
 import com.yixuan.yh.common.utils.UserContext;
 import com.yixuan.yh.video.pojo.response.VideoMainResponse;
+import com.yixuan.yh.video.pojo.response.VideoSearchResponse;
 import com.yixuan.yh.video.service.VideoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,5 +30,11 @@ public class VideoPublicController {
     @GetMapping
     public Result<VideoMainResponse> getVideo(@RequestParam Long videoId) {
         return Result.success(videoService.getVideo(videoId));
+    }
+
+    @Operation(summary = "搜索视频")
+    @GetMapping("/search")
+    public Result<List<VideoSearchResponse>> searchVideos(@RequestParam String keyword) {
+        return Result.success(videoService.searchVideos(keyword));
     }
 }

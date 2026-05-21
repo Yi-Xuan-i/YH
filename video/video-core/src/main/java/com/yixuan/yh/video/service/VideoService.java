@@ -12,6 +12,8 @@ public interface VideoService {
 
     VideoMainResponse getVideo(Long videoId);
 
+    List<VideoSearchResponse> searchVideos(String keyword);
+
     String startUploadPart(Long userId, Integer totalChunks);
 
     Map<Integer, String> presignUploadPart(Long userId, GetPresignUrlRequest getPresignUrlRequest);

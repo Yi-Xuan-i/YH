@@ -44,6 +44,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -192,6 +193,36 @@ public class VideoServiceImpl implements VideoService {
         VideoMainResponse videoMainResponse = videoMultiMapper.selectMainOne(videoId);
         videoMainResponse.setUrl(awsUtils.generateAccessUrl(videoMainResponse.getUrl()));
         return videoMainResponse;
+    }
+
+    @Override
+    public List<VideoSearchResponse> searchVideos(String keyword) {
+        if (!StringUtils.hasText(keyword)) {
+            return Collections.emptyList();
+        }
+
+        List<VideoSearchResponse> videoSearchResponseList =
+                videoMapper.searchPublishedVideoByDescriptionPrefix(keyword.trim());
+        if (videoSearchResponseList.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<Long> creatorIdList = videoSearchResponseList.stream()
+                .map(VideoSearchResponse::getCreatorId)
+                .distinct()
+                .toList();
+        Result<Map<Long, String>> result = userPrivateClient.getNameBatch(creatorIdList);
+        if (result.isError()) {
+            throw new YHServerException(result.getMsg());
+        }
+        Map<Long, String> idToNameMap = result.getData();
+
+        videoSearchResponseList.forEach(response -> {
+            response.setCreatorName(idToNameMap.get(response.getCreatorId()));
+            response.setUrl(awsUtils.generateAccessUrl(response.getUrl()));
+        });
+
+        return videoSearchResponseList;
     }
 
     @Override

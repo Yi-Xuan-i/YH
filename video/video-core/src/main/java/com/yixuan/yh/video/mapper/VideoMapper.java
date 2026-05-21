@@ -6,7 +6,9 @@ import com.yixuan.yh.video.pojo.entity.multi.VideoWithFavorite;
 import com.yixuan.yh.video.pojo.entity.multi.VideoWithLike;
 import com.yixuan.yh.video.pojo.mq.VideoCommentIncrMessage;
 import com.yixuan.yh.video.pojo.request.VideoInteractionBatchRequest;
+import com.yixuan.yh.video.pojo.response.VideoSearchResponse;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
@@ -43,4 +45,6 @@ public interface VideoMapper extends BaseMapper<Video> {
     List<VideoWithLike> selectLikeVideoByUserId(Long userId, Long lastMinId);
 
     List<VideoWithFavorite> selectFavoriteVideoByUserId(Long userId, Long lastMinId);
+
+    List<VideoSearchResponse> searchPublishedVideoByDescriptionPrefix(String keyword);
 }
