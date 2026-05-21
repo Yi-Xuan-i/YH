@@ -1,5 +1,7 @@
 package com.yixuan.yh.order.pojo.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
@@ -15,7 +17,10 @@ public class Order {
     private BigDecimal paymentAmount;
     private OrderStatus orderStatus;
     private String deliveryAddress;
-    private LocalDateTime createdTime;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    private LocalDateTime updatedAt;
+    @TableField(fill = FieldFill.INSERT)
+    private LocalDateTime createdAt;
 
     public enum OrderStatus {
         UNPAID,

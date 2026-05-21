@@ -2,10 +2,7 @@ package com.yixuan.yh.product.controller;
 
 import com.yixuan.yh.common.response.Result;
 import com.yixuan.yh.common.utils.UserContext;
-import com.yixuan.yh.product.pojo.request.PostCarouselRequest;
-import com.yixuan.yh.product.pojo.request.PostSkuSpecRequest;
-import com.yixuan.yh.product.pojo.request.PutProductBasicInfoRequest;
-import com.yixuan.yh.product.pojo.request.PutSkuRequest;
+import com.yixuan.yh.product.pojo.request.*;
 import com.yixuan.yh.product.pojo.response.ProductEditResponse;
 import com.yixuan.yh.product.pojo.response.ProductManageItemResponse;
 import com.yixuan.yh.product.service.MerchantService;
@@ -25,6 +22,13 @@ public class MerchantController {
 
     @Autowired
     private MerchantService merchantService;
+
+    @Operation(summary = "修改商品状态")
+    @PutMapping("/status/{productId}")
+    public Result<Void> putMerchantProductStatus(@PathVariable Long productId, @RequestBody PutProductStatusRequest putProductStatusRequest) {
+        merchantService.putMerchantProductStatus(productId, putProductStatusRequest);
+        return Result.success();
+    }
 
     @Operation(summary = "获取自己店铺的商品（不区分状态）")
     @GetMapping
@@ -84,16 +88,10 @@ public class MerchantController {
         return Result.success();
     }
 
-    @Operation(summary = "商品新增轮播图")
-    @PostMapping("/carousel/{productId}")
-    public Result<Long> postCarousel(@PathVariable Long productId, @ModelAttribute PostCarouselRequest postCarouselRequest) throws IOException {
-        return Result.success(merchantService.postCarousel(UserContext.getUser(), productId, postCarouselRequest));
-    }
-
-    @Operation(summary = "商品新增轮播图")
-    @DeleteMapping("/carousel/{productId}/{carouselId}")
-    public Result<Void> deleteCarousel(@PathVariable Long productId, @PathVariable Long carouselId) throws BadRequestException {
-        merchantService.deleteCarousel(UserContext.getUser(), productId, carouselId);
+    @Operation(summary = "设置主规格")
+    @PutMapping("/sku/main/{productId}")
+    public Result<Void> putSkuMain(@PathVariable Long productId, @RequestBody PutSkuMainRequest putSkuMainRequest) {
+        merchantService.putSkuMain(productId, putSkuMainRequest);
         return Result.success();
     }
 
@@ -104,4 +102,23 @@ public class MerchantController {
         return Result.success();
     }
 
+    @Operation(summary = "SKU新增轮播图")
+    @PostMapping("/sku/carousel/{skuId}")
+    public Result<Void> postSkuCarousel(@PathVariable Long skuId, @ModelAttribute PostSkuCarouselRequest postSkuCarouselRequest) throws IOException {
+        merchantService.postSkuCarousel(skuId, postSkuCarouselRequest);
+        return Result.success();
+    }
+
+    @Operation(summary = "SKU删除轮播图")
+    @DeleteMapping("/sku/carousel/{carouselId}")
+    public Result<Void> deleteSkuCarousel(@PathVariable Long carouselId) {
+        merchantService.deleteSkuCarousel(carouselId);
+        return Result.success();
+    }
+
+    @Operation(summary = "根据SKU获取轮播图URL列表")
+    @GetMapping("/sku/carousels/{skuId}")
+    public Result<List<String>> getSkuCarousels(@PathVariable Long skuId) {
+        return Result.success(merchantService.getSkuCarousels(skuId));
+    }
 }

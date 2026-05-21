@@ -1,6 +1,7 @@
 package com.yixuan.yh.product.service;
 
 import com.yixuan.yh.product.pojo.request.PostCartItemRequest;
+import com.yixuan.yh.product.pojo.request.PutCartItemQuantityRequest;
 import com.yixuan.yh.product.pojo.response.CartItemResponse;
 import org.apache.coyote.BadRequestException;
 
@@ -10,4 +11,6 @@ public interface CartService {
     void postCartItem(Long userId, PostCartItemRequest postCartItemRequest) throws BadRequestException;
 
     List<CartItemResponse> getCartItem(Long userId);
+
+    void putCartItemQuantity(Long userId, Long cartItemId, PutCartItemQuantityRequest putCartItemQuantityRequest);
 }

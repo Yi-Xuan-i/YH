@@ -46,6 +46,6 @@
         SELECT MIN(id) + FLOOR(RAND() * (MAX(id) - MIN(id)))
         FROM video
         )
-        LIMIT 5
+        LIMIT 10
     </select>
 </mapper>

@@ -1,9 +1,6 @@
 package com.yixuan.yh.product.service;
 
-import com.yixuan.yh.product.pojo.request.PostCarouselRequest;
-import com.yixuan.yh.product.pojo.request.PostSkuSpecRequest;
-import com.yixuan.yh.product.pojo.request.PutProductBasicInfoRequest;
-import com.yixuan.yh.product.pojo.request.PutSkuRequest;
+import com.yixuan.yh.product.pojo.request.*;
 import com.yixuan.yh.product.pojo.response.ProductEditResponse;
 import com.yixuan.yh.product.pojo.response.ProductManageItemResponse;
 import org.apache.coyote.BadRequestException;
@@ -12,6 +9,8 @@ import java.io.IOException;
 import java.util.List;
 
 public interface MerchantService {
+    void putMerchantProductStatus(Long productId, PutProductStatusRequest putProductStatusRequest);
+
     List<ProductManageItemResponse> getMerchantProduct(Long user);
 
     List<ProductManageItemResponse> getMerchantOnSaleProduct(Long userId);
@@ -24,6 +23,8 @@ public interface MerchantService {
 
     void postSkuSpec(PostSkuSpecRequest postSkuSpecRequest);
 
+    void putSkuMain(Long productId, PutSkuMainRequest putSkuMainRequest);
+
     void deleteMerchantProduct(Long productId);
 
     void putMerchantProductBasicInfo(Long productId, PutProductBasicInfoRequest putProductBasicInfoRequest) throws IOException;
@@ -32,7 +33,9 @@ public interface MerchantService {
 
     void putSku(Long userId, PutSkuRequest putSkuRequest) throws BadRequestException;
 
-    Long postCarousel(Long userId, Long productId, PostCarouselRequest postCarouselRequest) throws IOException;
+    void postSkuCarousel(Long skuId, PostSkuCarouselRequest postSkuCarouselRequest) throws IOException;
 
-    void deleteCarousel(Long userId, Long productId, Long carouselId) throws BadRequestException;
+    void deleteSkuCarousel(Long carouselId);
+
+    List<String> getSkuCarousels(Long skuId);
 }

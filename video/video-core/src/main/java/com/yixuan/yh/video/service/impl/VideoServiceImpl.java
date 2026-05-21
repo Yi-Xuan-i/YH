@@ -257,8 +257,11 @@ public class VideoServiceImpl implements VideoService {
         }
 
         if (videoUploadTask.getUploadType() == VideoUploadTask.UploadType.MULTIPART) {
-            List<Integer> uploadedPartNumberList = awsUtils.completeMultipartUpload(videoUploadTask.getKey(), videoUploadTask.getUploadId(),
-                    videoUploadTask.getTotalChunks());
+            List<Integer> uploadedPartNumberList = awsUtils.completeMultipartUpload(
+                    videoUploadTask.getKey(),
+                    videoUploadTask.getUploadId(),
+                    videoUploadTask.getTotalChunks()
+            );
 
             // 代表实际上仍有分片未上传
             if (!uploadedPartNumberList.isEmpty()) {
@@ -393,7 +396,6 @@ public class VideoServiceImpl implements VideoService {
         // 分类：已存在 / 不存在
         List<Long> existTagIdList = new ArrayList<>();
         List<String> notExistTagNameList = new ArrayList<>();
-
         for (String tagName : postVideoMessageRequest.getAddedTagList()) {
             if (existTagMap.containsKey(tagName)) {
                 existTagIdList.add(existTagMap.get(tagName));
@@ -411,11 +413,9 @@ public class VideoServiceImpl implements VideoService {
                 tag.setName(name);
                 tag.setCreatedTime(LocalDateTime.now());
                 return tag;
-            }).collect(Collectors.toList());
-
+            }).toList();
             // 批量插入
             videoTagMapper.insertBatch(newTags);
-
             // 插入后需要拿到 id
             newTagIdList = newTags.stream()
                     .map(VideoTag::getId)

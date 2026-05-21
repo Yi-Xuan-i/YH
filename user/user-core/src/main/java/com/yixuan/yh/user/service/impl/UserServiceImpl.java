@@ -48,6 +48,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserSearchResponse> search(Long userId, String query) {
-        return userMapper.selectUserByNamePrefix(userId, query);
+        List<UserSearchResponse> responseList = userMapper.selectUserByNamePrefix(userId, query);
+        responseList.forEach(r -> r.setAvatarUrl(awsUtils.generateAccessUrl(r.getAvatarUrl())));
+        return responseList;
     }
 }

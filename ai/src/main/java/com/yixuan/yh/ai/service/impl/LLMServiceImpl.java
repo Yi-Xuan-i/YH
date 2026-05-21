@@ -59,10 +59,14 @@ public class LLMServiceImpl implements LLMService {
                                                                 .toolContext(Map.of("userId", userId))
                                                                 .stream()
                                                                 .content()
+                                                                .concatWith(Flux.just("[DONE]"))
                                                 )
                                                 .subscribeOn(Schedulers.boundedElastic())
                                                 .flatMapMany(stream -> stream
                                                         .map(text -> {
+                                                            if ("[DONE]".equals(text)) {
+                                                                return text;
+                                                            }
                                                             fullResponse.append(text);
                                                             return text;
                                                         })

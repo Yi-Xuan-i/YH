@@ -11,5 +11,6 @@ public class UserSearchResponse {
     private String name;
     private String avatarUrl;
     private String bio;
+    private Integer followerCount;
     private Boolean isFollowed;
 }

@@ -3,6 +3,7 @@ package com.yixuan.yh.product.controller;
 import com.yixuan.yh.common.response.Result;
 import com.yixuan.yh.common.utils.UserContext;
 import com.yixuan.yh.product.pojo.request.PostCartItemRequest;
+import com.yixuan.yh.product.pojo.request.PutCartItemQuantityRequest;
 import com.yixuan.yh.product.pojo.response.CartItemResponse;
 import com.yixuan.yh.product.service.CartService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,5 +33,12 @@ public class CartController {
     @GetMapping
     public Result<List<CartItemResponse>> getCartItem() {
         return Result.success(cartService.getCartItem(UserContext.getUser()));
+    }
+
+    @Operation(summary = "购物车商品数量变化")
+    @PutMapping("/quantity/{cartItemId}")
+    public Result<Void> putCartItemQuantity(@PathVariable Long cartItemId, @RequestBody PutCartItemQuantityRequest putCartItemQuantityRequest) {
+        cartService.putCartItemQuantity(UserContext.getUser(), cartItemId, putCartItemQuantityRequest);
+        return Result.success();
     }
 }

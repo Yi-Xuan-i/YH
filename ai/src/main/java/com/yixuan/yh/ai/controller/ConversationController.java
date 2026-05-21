@@ -42,4 +42,11 @@ public class ConversationController {
                 .map(Result::success));
     }
 
+    @Operation(summary = "生成会话标题")
+    @PostMapping("/title/{conversationId}")
+    Mono<Result<String>> generateConversationTitle(@PathVariable Long conversationId) {
+        return ReactiveUserContext.getUserId().flatMap(id -> conversationService.generateConversationTitle(id, conversationId)
+                .map(Result::success));
+    }
+
 }

@@ -1,16 +1,22 @@
 package com.yixuan.yh.chat.entity;
 
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+@TableName("chat_conversation")
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class ChatConversation {
-    Long id;
-    Long user1Id;
-    Long user2Id;
-    Integer user1UnreadCount;
-    Integer user2UnreadCount;
-    LocalDateTime updatedTime;
-    LocalDateTime createdTime;
+    private Long id;
+    private Long user1Id;
+    private Long user2Id;
+    private Integer user1UnreadCount;
+    private Integer user2UnreadCount;
+    private LocalDateTime updatedTime;
+    private LocalDateTime createdTime;
 }

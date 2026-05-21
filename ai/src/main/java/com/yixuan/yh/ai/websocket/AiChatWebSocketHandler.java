@@ -47,7 +47,6 @@ public class AiChatWebSocketHandler implements WebSocketHandler {
                                                     .append("\n");
                                         }
                                         contextBuilder.append("user:").append(msg).append("\n");
-                                        System.out.println(contextBuilder);
 
                                         return Mono.fromCallable(() -> {
                                                     Prompt prompt = new Prompt(contextBuilder.toString());

@@ -1,5 +1,6 @@
 package com.yixuan.yh.chat.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.yixuan.yh.chat.entity.ChatConversation;
 import com.yixuan.yh.chat.entity.ChatMessage;
 import com.yixuan.yh.chat.entity.multi.RecentContact;
@@ -33,6 +34,9 @@ public class ConversationServiceImpl implements ConversationService {
     @Override
     public List<RecentContactResponse> getRecentContacts(Long userId) {
         List<RecentContact> recentContactList = chatConversationMapper.selectRecentContacts(userId);
+        if (recentContactList.isEmpty()) {
+            return new ArrayList<>();
+        }
 
         // 转换实体类
         List<RecentContactResponse> recentContactResponseList = new ArrayList<>(recentContactList.size());
@@ -78,6 +82,19 @@ public class ConversationServiceImpl implements ConversationService {
             conversationMessage.setIsUser(userId.equals(chatMessage.getSenderId()));
 
             conversationMessageResponseList.add(conversationMessage);
+        }
+
+        // 更新未读数
+        if (userId.equals(conversation.getUser1Id())) {
+           chatConversationMapper.update(new LambdaUpdateWrapper<ChatConversation>()
+                   .set(ChatConversation::getUser1UnreadCount, 0)
+                   .eq(ChatConversation::getId, conversationId)
+                   .eq(ChatConversation::getUser1Id, userId));
+        } else {
+            chatConversationMapper.update(new LambdaUpdateWrapper<ChatConversation>()
+                    .set(ChatConversation::getUser2UnreadCount, 0)
+                    .eq(ChatConversation::getId, conversationId)
+                    .eq(ChatConversation::getUser2Id, userId));
         }
 
         return conversationMessageResponseList;

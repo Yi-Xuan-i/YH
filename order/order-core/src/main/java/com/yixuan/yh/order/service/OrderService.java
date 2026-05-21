@@ -1,12 +1,15 @@
 package com.yixuan.yh.order.service;
 
 import com.alipay.api.AlipayApiException;
+import com.yixuan.yh.order.pojo.request.PostCartOrderRequest;
 import com.yixuan.yh.order.pojo.request.PostOrderRequest;
 import com.yixuan.yh.order.pojo.response.PostOrderResponse;
 import org.apache.coyote.BadRequestException;
 
 public interface OrderService {
     PostOrderResponse postOrder(Long userId, PostOrderRequest postOrderRequest) throws AlipayApiException;
+
+    PostOrderResponse postCartOrder(Long userId, PostCartOrderRequest postCartOrderRequest) throws AlipayApiException;
 
     Boolean getIsPaid(Long orderId);
 

@@ -1,19 +1,24 @@
 package com.yixuan.yh.product.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yixuan.yh.common.mybatis.BaseServiceImpl;
 import com.yixuan.yh.common.utils.AWSUtils;
 import com.yixuan.yh.product.constant.RabbitMQConstant;
 import com.yixuan.yh.product.constant.RedisConstant;
 import com.yixuan.yh.product.constant.RedisLuaResultConstant;
+import com.yixuan.yh.product.mapper.CartItemMapper;
 import com.yixuan.yh.product.mapper.ProductCarouselMapper;
 import com.yixuan.yh.product.mapper.ProductMapper;
 import com.yixuan.yh.product.mapper.ProductSkuMapper;
 import com.yixuan.yh.product.mapper.multi.SkuMapper;
-import com.yixuan.yh.product.mapstruct.ProductMapStruct;
 import com.yixuan.yh.product.mq.OrderExpirationMessage;
+import com.yixuan.yh.product.pojo.model.entity.CartItem;
 import com.yixuan.yh.product.pojo.model.entity.Product;
+import com.yixuan.yh.product.pojo.model.entity.ProductCarousel;
 import com.yixuan.yh.product.pojo.model.entity.ProductSku;
 import com.yixuan.yh.product.pojo.model.multi.SkuSpecInfo;
+import com.yixuan.yh.product.pojo.response.PartOfCartOrderResponse;
 import com.yixuan.yh.product.pojo.response.PartOfOrderResponse;
 import com.yixuan.yh.product.pojo.response.ProductDetailResponse;
 import com.yixuan.yh.product.pojo.response.ProductSummaryResponse;
@@ -30,7 +35,9 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +47,7 @@ import java.util.stream.Collectors;
 import static java.util.Collections.emptyList;
 
 @Service
-public class ProductServiceImpl implements ProductService {
+public class ProductServiceImpl extends BaseServiceImpl<ProductMapper, Product> implements ProductService {
 
     @Autowired
     private ProductMapper productMapper;
@@ -63,14 +70,36 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     @Qualifier("reserveStockScript")
     private RedisScript<Long> reserveStockScript;
+    @Autowired
+    private RestTemplate restTemplate;
+    @Autowired
+    private CartItemMapper cartItemMapper;
 
     @Override
     public List<ProductSummaryResponse> getProducts() {
-        return productMapper.selectList().stream().map(product -> {
-            ProductSummaryResponse response = ProductMapStruct.INSTANCE.toProductSummaryResponse(product);
-            response.setCoverUrl(awsUtils.generateAccessUrl(response.getCoverUrl()));
-            return response;
-        }).toList();
+        return this.selectVoList(ProductSummaryResponse.class, w -> w
+                        .eq(Product::getStatus, Product.ProductStatus.ON_SALE)
+                        .apply("product_id >= (SELECT MIN(product_id) + FLOOR(RAND() * (MAX(product_id) - MIN(product_id))) FROM product)")
+                        .last("LIMIT 5"))
+                .stream()
+                .map(response -> {
+                    // 获取主规格信息
+                    Long defaultSkuId = productMapper.selectOne(new LambdaQueryWrapper<Product>()
+                                    .select(Product::getDefaultSkuId)
+                                    .eq(Product::getProductId, response.getProductId()))
+                            .getDefaultSkuId();
+
+                    BigDecimal price = productSkuMapper.selectOne(new LambdaQueryWrapper<ProductSku>()
+                                    .select(ProductSku::getPrice)
+                                    .eq(ProductSku::getSkuId, defaultSkuId))
+                            .getPrice();
+
+                    // 完善数据
+                    response.setCoverUrl(awsUtils.generateAccessUrl(response.getCoverUrl()));
+                    response.setPrice(price);
+
+                    return response;
+                }).toList();
     }
 
     @Override
@@ -78,12 +107,8 @@ public class ProductServiceImpl implements ProductService {
         // 查询商品基础信息
         Product product = productMapper.selectPartOfDetail(productId);
         if (product == null) {
-            return null;
+            throw new RuntimeException("商品不存在！");
         }
-
-        // 查询商品轮播图
-        List<String> carouselList = productCarouselMapper.selectUrlByProductId(productId)
-                .stream().map(awsUtils::generateAccessUrl).toList();
 
         // 查询商品SKU
         List<ProductSku> productSkuList = productSkuMapper.selectByProductId(productId);
@@ -101,6 +126,12 @@ public class ProductServiceImpl implements ProductService {
                                     .skuId(productSku.getSkuId())
                                     .price(productSku.getPrice())
                                     .stock(productSku.getStock())
+                                    .carousels(productCarouselMapper.selectList(new LambdaQueryWrapper<ProductCarousel>()
+                                                    .select(ProductCarousel::getUrl)
+                                                    .eq(ProductCarousel::getSkuId, productSku.getSkuId()))
+                                            .stream()
+                                            .map(carousel -> awsUtils.generateAccessUrl(carousel.getUrl()))
+                                            .toList())
                                     .specs(specMap.getOrDefault(productSku.getSkuId(), emptyList()).stream()
                                             .map(skuSpecInfo -> new ProductDetailResponse.Spec(skuSpecInfo.getSpecKey(), skuSpecInfo.getSpecValue()))
                                             .toList())
@@ -110,9 +141,9 @@ public class ProductServiceImpl implements ProductService {
         return ProductDetailResponse.builder()
                 .productId(productId)
                 .merchantId(product.getMerchantId())
+                .defaultSkuId(product.getDefaultSkuId())
                 .title(product.getTitle())
                 .description(product.getDescription())
-                .carousels(carouselList)
                 .skus(skuList)
                 .build();
     }
@@ -157,6 +188,9 @@ public class ProductServiceImpl implements ProductService {
             throw new BadRequestException("库存不足！");
         }
 
+        // 数据库扣减库存（临时）
+        productSkuMapper.updateStock(skuId, -quantity);
+
         // 此处可以无需写入本地信息表（因为如果数据库事务回滚了，后续可以在消费前先判断orderId是否存在，存在才去处理）
         try {
             Message message = MessageBuilder
@@ -180,7 +214,63 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
+    public Map<Long, PartOfCartOrderResponse> getPartOfCartOrder(Long orderId, List<Long> cartItemIdList) {
+        // 查询所需数据
+        List<CartItem> cartItemList = cartItemMapper.selectList(new LambdaQueryWrapper<CartItem>()
+                .select(CartItem::getCartItemId, CartItem::getProductId, CartItem::getSkuId, CartItem::getQuantity, CartItem::getProductId, CartItem::getSkuId, CartItem::getSelectedSku)
+                .in(CartItem::getCartItemId, cartItemIdList));
+
+        if (cartItemList.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        // 删除购物车项
+        cartItemMapper.delete(new LambdaQueryWrapper<CartItem>()
+                .in(CartItem::getCartItemId, cartItemIdList));
+
+        // 暂时复用
+        return cartItemList.stream().collect(Collectors.toMap(
+                CartItem::getCartItemId,
+                cartItem -> {
+                    try {
+                        PartOfOrderResponse partOfOrderResponse = getPartOfOrder(orderId, cartItem.getProductId(), cartItem.getSkuId(), cartItem.getQuantity());
+                        PartOfCartOrderResponse partOfCartOrderResponse = new PartOfCartOrderResponse();
+                        partOfCartOrderResponse.setMerchantId(partOfOrderResponse.getMerchantId());
+                        partOfCartOrderResponse.setPrice(partOfOrderResponse.getPrice());
+                        partOfCartOrderResponse.setProductName(partOfOrderResponse.getProductName());
+                        partOfCartOrderResponse.setQuantity(cartItem.getQuantity());
+                        partOfCartOrderResponse.setProductId(cartItem.getProductId());
+                        partOfCartOrderResponse.setSkuId(cartItem.getSkuId());
+                        partOfCartOrderResponse.setSku(cartItem.getSelectedSku());
+                        return partOfCartOrderResponse;
+                    } catch (BadRequestException | InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+        ));
+    }
+
+    @Override
     public void putReservedStock(Long skuId, Integer quantity) {
         stringRedisTemplate.opsForValue().increment(RedisConstant.SKU_STOCK_KEY_PREFIX + skuId, quantity);
+    }
+
+    @Override
+    @Transactional
+    public void increaseSalesVolume(Map<Long, Integer> productQuantityMap) {
+        if (productQuantityMap == null || productQuantityMap.isEmpty()) {
+            return;
+        }
+
+        productQuantityMap.forEach((productId, quantity) -> {
+            if (productId == null || quantity == null || quantity <= 0) {
+                throw new IllegalArgumentException("Invalid product sales volume increment.");
+            }
+            int affectedRows = productMapper.increaseSalesVolume(productId, quantity);
+            if (affectedRows == 0) {
+                throw new IllegalArgumentException("Product does not exist.");
+            }
+        });
     }
 }

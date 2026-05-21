@@ -7,18 +7,14 @@ import com.yixuan.yh.common.utils.SnowflakeUtils;
 import com.yixuan.yh.product.mapper.*;
 import com.yixuan.yh.product.mapper.multi.SkuMapper;
 import com.yixuan.yh.product.mapstruct.MerchantMapStruct;
-import com.yixuan.yh.product.pojo.model.entity.Product;
-import com.yixuan.yh.product.pojo.model.entity.ProductCarousel;
-import com.yixuan.yh.product.pojo.model.entity.ProductSku;
-import com.yixuan.yh.product.pojo.model.entity.SkuSpec;
+import com.yixuan.yh.product.pojo.model.entity.*;
 import com.yixuan.yh.product.pojo.model.multi.SkuSpecInfo;
-import com.yixuan.yh.product.pojo.request.PostCarouselRequest;
-import com.yixuan.yh.product.pojo.request.PostSkuSpecRequest;
-import com.yixuan.yh.product.pojo.request.PutProductBasicInfoRequest;
-import com.yixuan.yh.product.pojo.request.PutSkuRequest;
+import com.yixuan.yh.product.pojo.request.*;
 import com.yixuan.yh.product.pojo.response.ProductEditResponse;
 import com.yixuan.yh.product.pojo.response.ProductManageItemResponse;
 import com.yixuan.yh.product.service.MerchantService;
+import com.yixuan.yh.product.service.SpecKeyService;
+import com.yixuan.yh.product.service.SpecValueService;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -56,6 +52,14 @@ public class MerchantServiceImpl implements MerchantService {
     private ProductCarouselMapper productCarouselMapper;
 
     @Override
+    public void putMerchantProductStatus(Long productId, PutProductStatusRequest putProductStatusRequest) {
+        Product product = new Product();
+        product.setProductId(productId);
+        product.setStatus(Product.ProductStatus.getByCode(putProductStatusRequest.getStatus()));
+        productMapper.updateById(product);
+    }
+
+    @Override
     public List<ProductManageItemResponse> getMerchantProduct(Long user) {
         return productMapper.selectMerchantProducts(user);
     }
@@ -80,15 +84,9 @@ public class MerchantServiceImpl implements MerchantService {
         ProductEditResponse productEditResponse = new ProductEditResponse();
         // 商品基本信息
         productEditResponse.setTitle(product.getTitle());
-        productEditResponse.setPrice(product.getPrice());
         productEditResponse.setDescription(product.getDescription());
         productEditResponse.setCoverUrl(awsUtils.generateAccessUrl(product.getCoverUrl()));
-        // 商品轮播图
-        List<ProductCarousel> carouselList = productCarouselMapper.selectByProductId(productId);
-        carouselList.forEach(carousel -> {
-            carousel.setUrl(awsUtils.generateAccessUrl(carousel.getUrl()));
-        });
-        productEditResponse.setCarouselFileList(carouselList);
+        productEditResponse.setDefaultSkuId(product.getDefaultSkuId());
         // 商品SKU
         List<ProductSku> skuList = productSkuMapper.selectByProductId(productId);
         if (!skuList.isEmpty()) {
@@ -104,6 +102,17 @@ public class MerchantServiceImpl implements MerchantService {
                             sku.getSkuId(),
                             sku.getPrice(),
                             sku.getStock(),
+                            productCarouselMapper.selectList(new LambdaQueryWrapper<ProductCarousel>()
+                                            .select(ProductCarousel::getId, ProductCarousel::getUrl)
+                                            .eq(ProductCarousel::getSkuId, sku.getSkuId()))
+                                    .stream()
+                                    .map(productCarousel -> {
+                                        ProductEditResponse.SkuDetailDTO.Carousel carousel = new ProductEditResponse.SkuDetailDTO.Carousel();
+                                        carousel.setId(productCarousel.getId());
+                                        carousel.setUrl(awsUtils.generateAccessUrl(productCarousel.getUrl()));
+                                        return carousel;
+                                    })
+                                    .toList(),
                             specMap.getOrDefault(sku.getSkuId(), emptyList()).stream()
                                     .map(skuSpecInfo -> new ProductEditResponse.SkuDetailDTO.SpecPair(skuSpecInfo.getSpecKey(), skuSpecInfo.getSpecValue(), skuSpecInfo.getSpecKeyId(), skuSpecInfo.getSpecValueId()))
                                     .toList()
@@ -172,6 +181,23 @@ public class MerchantServiceImpl implements MerchantService {
     }
 
     @Override
+    public void putSkuMain(Long productId, PutSkuMainRequest putSkuMainRequest) {
+        // 判断该 SKU 是否真的属于该 Product
+        ProductSku productSku = productSkuMapper.selectOne(new LambdaQueryWrapper<ProductSku>()
+                .eq(ProductSku::getSkuId, putSkuMainRequest.getSkuId())
+                .eq(ProductSku::getProductId, productId));
+        if (productSku == null) {
+            throw new YHClientException("该 SKU 不属于该 Product！");
+        }
+
+        // 执行修改
+        Product product = new Product();
+        product.setProductId(productId);
+        product.setDefaultSkuId(putSkuMainRequest.getSkuId());
+        productMapper.updateById(product);
+    }
+
+    @Override
     @Transactional
     public void deleteMerchantProduct(Long productId) {
         // 删除商品基本信息
@@ -235,33 +261,35 @@ public class MerchantServiceImpl implements MerchantService {
     }
 
     @Override
-    public Long postCarousel(Long userId, Long productId, PostCarouselRequest postCarouselRequest) throws IOException {
-        // 鉴权
-        if (!productMapper.selectMerchantIdByProductId(productId).equals(userId)) {
-            throw new BadRequestException("你没有权限！");
+    public void postSkuCarousel(Long skuId, PostSkuCarouselRequest postSkuCarouselRequest) throws IOException {
+        // 查询对应 ProductId
+        Long productId = productSkuMapper.selectProductIdBySkuId(skuId);
+        if (productId == null) {
+            throw new YHClientException("SKU不存在！");
         }
 
+        // 上传图片
+        String url = awsUtils.putObject(postSkuCarouselRequest.getFile());
+
+        // 插入数据库
         ProductCarousel productCarousel = new ProductCarousel();
-        productCarousel.setId(snowflakeUtils.nextId());
-        productCarousel.setUrl(awsUtils.putObject(postCarouselRequest.getCarouselFile()));
-        productCarousel.setProductId(productId);
-
+        productCarousel.setSkuId(skuId);
+        productCarousel.setUrl(url);
         productCarouselMapper.insert(productCarousel);
-
-        return productCarousel.getId();
     }
 
     @Override
-    public void deleteCarousel(Long userId, Long productId, Long carouselId) throws BadRequestException {
-        // 先检查是否该轮播图真的属于该商品（可以无需判断该轮播图是否真的属于该商品，只需用户有轮播图所属商品的操作权限即可，但这里为前端起到兜底作用）,
-        if (!productCarouselMapper.selectProductIdByCarouselId(carouselId).equals(productId)) {
-            throw new BadRequestException("你没有权限！");
-        }
-        // 鉴权
-        if (!productMapper.selectMerchantIdByProductId(productId).equals(userId)) {
-            throw new BadRequestException("你没有权限！");
-        }
+    public void deleteSkuCarousel(Long carouselId) {
+        productCarouselMapper.deleteById(carouselId);
+    }
 
-        productCarouselMapper.delete(carouselId);
+    @Override
+    public List<String> getSkuCarousels(Long skuId) {
+        return productCarouselMapper.selectList(new LambdaQueryWrapper<ProductCarousel>()
+                        .select(ProductCarousel::getUrl)
+                        .eq(ProductCarousel::getSkuId, skuId))
+                .stream()
+                .map(carousel -> awsUtils.generateAccessUrl(carousel.getUrl()))
+                .toList();
     }
 }

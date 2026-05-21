@@ -28,7 +28,7 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
         LambdaQueryWrapper<T> wrapper = selectByVo(voClass, getEntityClass());
 
         if (condition != null) {
-            wrapper = wrapper.nested(condition);
+           condition.accept(wrapper);
         }
 
         List<T> entityList = list(wrapper);

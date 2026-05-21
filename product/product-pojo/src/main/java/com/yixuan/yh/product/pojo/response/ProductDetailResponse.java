@@ -11,20 +11,22 @@ import java.util.List;
 public class ProductDetailResponse {
     @JsonSerialize(using = ToStringSerializer.class)
     private final Long productId;
+    @JsonSerialize(using = ToStringSerializer.class)
     private final Long merchantId;
+    @JsonSerialize(using = ToStringSerializer.class)
+    private final Long defaultSkuId;
     private final String title;
     private final String description;
     private final List<Sku> skus;
-    private final List<String> carousels;
 
     // 私有构造方法，只能通过建造者创建
     private ProductDetailResponse(Builder builder) {
         this.productId = builder.productId;
         this.merchantId = builder.merchantId;
+        this.defaultSkuId = builder.defaultSkuId;
         this.title = builder.title;
         this.description = builder.description;
         this.skus = builder.skus;
-        this.carousels = builder.carousels;
     }
 
     public static Builder builder() {
@@ -34,10 +36,10 @@ public class ProductDetailResponse {
     public static class Builder {
         private Long productId;
         private Long merchantId;
+        private Long defaultSkuId;
         private String title;
         private String description;
         private List<Sku> skus;
-        private List<String> carousels;
 
         public Builder productId(Long productId) {
             this.productId = productId;
@@ -46,6 +48,11 @@ public class ProductDetailResponse {
 
         public Builder merchantId(Long merchantId) {
             this.merchantId = merchantId;
+            return this;
+        }
+
+        public Builder defaultSkuId(Long defaultSkuId) {
+            this.defaultSkuId = defaultSkuId;
             return this;
         }
 
@@ -64,11 +71,6 @@ public class ProductDetailResponse {
             return this;
         }
 
-        public Builder carousels(List<String> carousels) {
-            this.carousels = carousels;
-            return this;
-        }
-
         public ProductDetailResponse build() {
             return new ProductDetailResponse(this);
         }
@@ -76,15 +78,18 @@ public class ProductDetailResponse {
 
     @Getter
     public static class Sku {
+        @JsonSerialize(using = ToStringSerializer.class)
         private final Long skuId;
         private final BigDecimal price;
         private final Integer stock;
+        private final List<String> carousels;
         private final List<Spec> specs;
 
         private Sku(SkuBuilder builder) {
             this.skuId = builder.skuId;
             this.price = builder.price;
             this.stock = builder.stock;
+            this.carousels = builder.carousels;
             this.specs = builder.specs;
         }
 
@@ -96,6 +101,7 @@ public class ProductDetailResponse {
             private Long skuId;
             private BigDecimal price;
             private Integer stock;
+            private List<String> carousels;
             private List<Spec> specs;
 
             public SkuBuilder skuId(Long skuId) {
@@ -110,6 +116,11 @@ public class ProductDetailResponse {
 
             public SkuBuilder stock(Integer stock) {
                 this.stock = stock;
+                return this;
+            }
+
+            public SkuBuilder carousels(List<String> carousels) {
+                this.carousels = carousels;
                 return this;
             }
 

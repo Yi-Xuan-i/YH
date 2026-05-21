@@ -29,6 +29,7 @@ public class UserIdentifierWebFilter implements WebFilter {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
+        System.out.println(exchange.getRequest().getPath().value());
         if (    antPathMatcher.match("/ai/api/public/ws/**", exchange.getRequest().getPath().value()) ||
                 antPathMatcher.match("/ai/api/public/llm/chat/*", exchange.getRequest().getPath().value())) {
             String token = exchange.getRequest().getQueryParams().getFirst("token");

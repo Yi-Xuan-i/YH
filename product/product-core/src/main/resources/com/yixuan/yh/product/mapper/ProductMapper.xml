@@ -13,9 +13,6 @@
             <if test="description != null and description != ''">
                 description = #{description},
             </if>
-            <if test="price != null">
-                price = #{price},
-            </if>
             <if test="coverUrl != null and coverUrl != ''">
                 cover_url = #{coverUrl}
             </if>

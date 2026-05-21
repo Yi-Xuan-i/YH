@@ -1,5 +1,6 @@
 package com.yixuan.yh.chat.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.yixuan.yh.chat.entity.ChatConversation;
 import com.yixuan.yh.chat.entity.multi.RecentContact;
 import org.apache.ibatis.annotations.Mapper;
@@ -9,7 +10,7 @@ import org.apache.ibatis.annotations.Update;
 import java.util.List;
 
 @Mapper
-public interface ChatConversationMapper {
+public interface ChatConversationMapper extends BaseMapper<ChatConversation> {
 
     @Update("update chat_conversation set user1_unread_count = user1_unread_count + 1 where id = #{conversationId} and user1_id = #{userId}")
     void updateUser1UnreadCount(Long conversationId, Long userId);

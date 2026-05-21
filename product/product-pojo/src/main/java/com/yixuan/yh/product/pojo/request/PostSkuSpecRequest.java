@@ -1,15 +1,19 @@
 package com.yixuan.yh.product.pojo.request;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class PostSkuSpecRequest {
-    Long productId;
-    String type; // old、new
-    Spec spec;
-    List<List<SpecId>> skus;
+    private Long productId;
+    private String type; // old、new
+    private Spec spec;
+    private List<List<SpecId>> skus;
 
     @Data
     public static class Spec {

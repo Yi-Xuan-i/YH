@@ -1,12 +1,18 @@
 package com.yixuan.yh.user.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.yixuan.yh.common.utils.SnowflakeUtils;
+import com.yixuan.yh.user.mapper.ChatConversationMapper;
 import com.yixuan.yh.user.mapper.FollowMapper;
 import com.yixuan.yh.user.mapper.FriendMapper;
+import com.yixuan.yh.user.pojo.entity.ChatConversation;
 import com.yixuan.yh.user.pojo.entity.UserFollow;
 import com.yixuan.yh.user.pojo.entity.UserFriend;
+import com.yixuan.yh.user.pojo.entity.UserNewFriendMessage;
 import com.yixuan.yh.user.pojo.response.UserFriendResponse;
 import com.yixuan.yh.user.service.FollowService;
+import com.yixuan.yh.user.service.FriendService;
+import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,14 +22,15 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class FollowServiceImpl implements FollowService {
 
-    @Autowired
-    private FollowMapper followMapper;
-    @Autowired
-    private SnowflakeUtils snowflakeUtils;
-    @Autowired
-    private FriendMapper friendMapper;
+    private final FollowMapper followMapper;
+    private final SnowflakeUtils snowflakeUtils;
+    private final FriendMapper friendMapper;
+    private final FriendService friendService;
+    private final ChatConversationMapper chatConversationMapper;
+
 
     @Override
     @Transactional
@@ -50,20 +57,25 @@ public class FollowServiceImpl implements FollowService {
         }
 
         // 插入好友记录
-        UserFriend userFriend = new UserFriend();
-        userFriend.setId(snowflakeUtils.nextId());
-        userFriend.setUserId(followerId);
-        userFriend.setFriendId(followeeId);
-        userFriend.setCreatedTime(LocalDateTime.now());
-        friendMapper.insertEach(userFriend);
+        UserFriend userFriend1 = new UserFriend();
+        userFriend1.setUserId(followerId);
+        userFriend1.setFriendId(followeeId);
+        UserFriend userFriend2 = new UserFriend();
+        userFriend2.setUserId(followeeId);
+        userFriend2.setFriendId(followerId);
 
-//        // 保存异步消息
-//        UserNewFriendMessage userNewFriendMessage = new UserNewFriendMessage();
-//        userNewFriendMessage.setId(snowflakeUtils.nextId());
-//        userNewFriendMessage.setUserId(followerId);
-//        userNewFriendMessage.setFriendId(followeeId);
-//
-//        userNewFriendMessageMapper.insert(userNewFriendMessage);
+        friendService.saveBatch(List.of(userFriend1, userFriend2));
+
+        // 插入会话记录（临时做法）
+        ChatConversation chatConversation = new ChatConversation();
+        chatConversation.setUser1Id(followerId);
+        chatConversation.setUser2Id(followeeId);
+        chatConversation.setUser1UnreadCount(0);
+        chatConversation.setUser2UnreadCount(0);
+        chatConversation.setUpdatedTime(LocalDateTime.now());
+        chatConversation.setCreatedTime(LocalDateTime.now());
+
+        chatConversationMapper.insert(chatConversation);
     }
 
     @Override
@@ -80,7 +92,27 @@ public class FollowServiceImpl implements FollowService {
         }
 
         // 有反向关系，删除好友记录
-        friendMapper.deleteByFollowerIdAndFolloweeId(followerId, followeeId);
+        friendMapper.delete(new LambdaQueryWrapper<UserFriend>()
+                .and(wrapper -> wrapper
+                        .eq(UserFriend::getUserId, followerId)
+                        .eq(UserFriend::getFriendId, followeeId)
+                )
+                .or(wrapper -> wrapper
+                        .eq(UserFriend::getUserId, followeeId)
+                        .eq(UserFriend::getFriendId, followerId)
+                )
+        );
+
+        // 删除会话记录（临时做法）
+        chatConversationMapper.delete(new LambdaQueryWrapper<ChatConversation>()
+                .and(wrapper -> wrapper
+                        .eq(ChatConversation::getUser1Id, followerId)
+                        .eq(ChatConversation::getUser2Id, followeeId)
+                )
+                .or(wrapper -> wrapper.eq(ChatConversation::getUser1Id, followeeId)
+                        .eq(ChatConversation::getUser2Id, followerId)
+                )
+        );
     }
 
     @Override

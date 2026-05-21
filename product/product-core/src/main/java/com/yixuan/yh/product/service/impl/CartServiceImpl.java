@@ -1,5 +1,8 @@
 package com.yixuan.yh.product.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.yixuan.yh.common.exception.YHClientException;
+import com.yixuan.yh.common.utils.AWSUtils;
 import com.yixuan.yh.common.utils.SnowflakeUtils;
 import com.yixuan.yh.product.mapper.CartItemMapper;
 import com.yixuan.yh.product.mapper.ProductMapper;
@@ -10,6 +13,7 @@ import com.yixuan.yh.product.pojo.model.entity.CartItem;
 import com.yixuan.yh.product.pojo.model.entity.ProductSku;
 import com.yixuan.yh.product.pojo.model.multi.ProductPartOfCartItem;
 import com.yixuan.yh.product.pojo.request.PostCartItemRequest;
+import com.yixuan.yh.product.pojo.request.PutCartItemQuantityRequest;
 import com.yixuan.yh.product.pojo.response.CartItemResponse;
 import com.yixuan.yh.product.service.CartService;
 import org.apache.coyote.BadRequestException;
@@ -33,6 +37,8 @@ public class CartServiceImpl implements CartService {
     private SnowflakeUtils snowflakeUtils;
     @Autowired
     private ProductMultiMapper productMultiMapper;
+    @Autowired
+    private AWSUtils awsUtils;
 
     @Override
     public void postCartItem(Long userId, PostCartItemRequest postCartItemRequest) throws BadRequestException {
@@ -87,7 +93,7 @@ public class CartServiceImpl implements CartService {
                 response.setMerchantId(product.getMerchantId());
                 response.setMerchantName(product.getMerchantName());
                 response.setProductTitle(product.getTitle());
-                response.setCoverUrl(product.getCoverUrl());
+                response.setCoverUrl(awsUtils.generateAccessUrl(product.getCoverUrl()));
             }
 
             // 关联SKU信息
@@ -99,5 +105,19 @@ public class CartServiceImpl implements CartService {
         }
 
         return cartItemResponseList;
+    }
+
+    @Override
+    public void putCartItemQuantity(Long userId, Long cartItemId, PutCartItemQuantityRequest putCartItemQuantityRequest) {
+        CartItem cartItem = cartItemMapper.selectOne(new LambdaQueryWrapper<CartItem>()
+                .select(CartItem::getCartItemId)
+                .eq(CartItem::getCartItemId, cartItemId)
+                .eq(CartItem::getUserId, userId));
+        if (cartItem == null) {
+            throw new YHClientException("购物车项不存在！");
+        }
+
+        cartItem.setQuantity(putCartItemQuantityRequest.getQuantity());
+        cartItemMapper.updateById(cartItem);
     }
 }

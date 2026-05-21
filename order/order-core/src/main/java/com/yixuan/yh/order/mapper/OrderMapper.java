@@ -20,6 +20,9 @@ public interface OrderMapper extends BaseMapper<Order> {
     @Update("update `order` set order_status = #{orderStatus} where order_id = #{orderId}")
     void updateStatusByOrderId(String orderId, Order.OrderStatus orderStatus);
 
+    @Update("update `order` set order_status = 'PAID' where order_id = #{orderId} and order_status = 'UNPAID'")
+    int updateStatusToPaidIfUnPaid(Long orderId);
+
     @Update("update `order` set order_status = 'CANCELLED' where order_id = #{orderId} and order_status = 'UNPAID'")
     Boolean updateStatusToCancelIfUnPaid(Long orderId);
 }

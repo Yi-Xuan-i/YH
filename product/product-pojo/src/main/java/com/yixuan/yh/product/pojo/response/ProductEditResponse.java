@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.yixuan.yh.product.pojo.model.entity.ProductCarousel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -14,8 +15,8 @@ public class ProductEditResponse {
     private String title;
     private String coverUrl;
     private String description;
-    private BigDecimal price;
-    private List<ProductCarousel> carouselFileList;
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long defaultSkuId;
     private List<SkuDetailDTO> productSkuList;
 
 //    @Data
@@ -33,11 +34,13 @@ public class ProductEditResponse {
         private Long skuId;
         private BigDecimal price;
         private Integer stock;
+        private List<Carousel> carouselList;
         private List<SpecPair> specs;
 
         // 规格键值对
         @Data
         @AllArgsConstructor
+        @NoArgsConstructor
         public static class SpecPair {
             private String key;
             private String value;
@@ -45,6 +48,15 @@ public class ProductEditResponse {
             private Long keyId;
             @JsonSerialize(using = ToStringSerializer.class)
             private Long valueId;
+        }
+
+        @Data
+        @AllArgsConstructor
+        @NoArgsConstructor
+        public static class Carousel {
+            @JsonSerialize(using = ToStringSerializer.class)
+            private Long id;
+            private String url;
         }
     }
 }

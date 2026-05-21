@@ -1,5 +1,6 @@
 package com.yixuan.yh.product.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.yixuan.yh.product.pojo.model.entity.ProductCarousel;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
@@ -9,10 +10,7 @@ import org.apache.ibatis.annotations.Select;
 import java.util.List;
 
 @Mapper
-public interface ProductCarouselMapper {
-    @Insert("insert into product_carousel (id, url, product_id) values(#{id}, #{url}, #{productId})")
-    void insert(ProductCarousel productCarousel);
-
+public interface ProductCarouselMapper extends BaseMapper<ProductCarousel> {
     @Select("select id, url from product_carousel where product_id = #{productId}")
     List<ProductCarousel> selectByProductId(Long productId);
 

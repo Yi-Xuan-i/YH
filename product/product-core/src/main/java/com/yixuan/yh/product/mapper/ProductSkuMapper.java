@@ -1,5 +1,6 @@
 package com.yixuan.yh.product.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.yixuan.yh.product.pojo.model.entity.ProductSku;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
@@ -9,7 +10,7 @@ import org.apache.ibatis.annotations.Update;
 import java.util.List;
 
 @Mapper
-public interface ProductSkuMapper {
+public interface ProductSkuMapper extends BaseMapper<ProductSku> {
 
     @Select("select sku_id from product_sku where product_id = #{productId}")
     List<Long> selectSkuIdByProductId(Long productId);

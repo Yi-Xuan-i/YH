@@ -41,6 +41,16 @@ public interface UserMapper {
 
     List<User> selectUserInfoInList(List<Long> idList);
 
-    @Select("select user.id, name, avatar_url, bio, CASE WHEN f.id IS NOT NULL THEN true ELSE false END AS is_followed from user left join user_follow f on follower_id = #{userId} and followee_id = user.id  where name like CONCAT(#{query}, '%')")
+    @Select("""
+            select u.id,
+                   u.name,
+                   u.avatar_url,
+                   u.bio,
+                   (select count(*) from user_follow uf where uf.followee_id = u.id) AS follower_count,
+                   CASE WHEN f.id IS NOT NULL THEN true ELSE false END AS is_followed
+            from user u
+            left join user_follow f on f.follower_id = #{userId} and f.followee_id = u.id
+            where u.name like CONCAT(#{query}, '%')
+            """)
     List<UserSearchResponse> selectUserByNamePrefix(Long userId, String query);
 }

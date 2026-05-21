@@ -13,7 +13,7 @@ public interface FollowMapper {
     @Insert("insert ignore user_follow (id, follower_id, followee_id, created_time) values(#{id}, #{followerId}, #{followeeId}, #{createdTime})")
     boolean insertIgnore(UserFollow userFollow);
 
-    @Select("select count(*) from user_follow where follower_id = #{followerId} and followee_id = #{followerId}")
+    @Select("select count(*) from user_follow where follower_id = #{followerId} and followee_id = #{followeeId}")
     boolean selectIsRelationExist(Long followerId, Long followeeId);
 
     @Delete("delete from user_follow where follower_id = #{followerId} and followee_id = #{followeeId}")

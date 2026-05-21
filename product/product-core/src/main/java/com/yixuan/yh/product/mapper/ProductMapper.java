@@ -7,31 +7,24 @@ import com.yixuan.yh.product.pojo.response.ProductSummaryResponse;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
 @Mapper
 public interface ProductMapper extends BaseMapper<Product> {
-    @Select("SELECT product_id, title, cover_url, price, sales_volume \n" +
-            "FROM product \n" +
-            "WHERE product_id >= (\n" +
-            "    SELECT MIN(product_id) + FLOOR(RAND() * (MAX(product_id) - MIN(product_id))) \n" +
-            "    FROM product\n" +
-            ") \n" +
-            "LIMIT 5;")
-    List<Product> selectList();
-
-    @Select("select product_id, title, description, price, stock, status, sales_volume, rating, created_at, updated_at from product where merchant_id = #{userId}")
+    @Select("select product_id, title, description, status, sales_volume, rating, created_at, updated_at from product where merchant_id = #{userId}")
     List<ProductManageItemResponse> selectMerchantProducts(Long userId);
 
-    @Select("select title, cover_url, description, price from product where product_id = #{productId}")
+    @Select("select title, cover_url, description, default_sku_id from product where product_id = #{productId}")
     Product selectEditBasicData(Long productId);
 
     @Delete("delete from product where product_id = #{productId}")
     void deleteByProductId(Long productId);
 
-    @Select("select product_id, merchant_id, title, description from product where product_id = #{productId}")
+    @Select("select product_id, merchant_id, title, description, default_sku_id from product where product_id = #{productId}")
     Product selectPartOfDetail(Long productId);
 
     void updateBasicInfo(Product product);
@@ -44,4 +37,7 @@ public interface ProductMapper extends BaseMapper<Product> {
 
     @Select("select merchant_id, title from product where product_id = #{productId}")
     Product selectPartOfOrder(Long productId);
+
+    @Update("update product set sales_volume = coalesce(sales_volume, 0) + #{quantity} where product_id = #{productId}")
+    int increaseSalesVolume(@Param("productId") Long productId, @Param("quantity") Integer quantity);
 }
