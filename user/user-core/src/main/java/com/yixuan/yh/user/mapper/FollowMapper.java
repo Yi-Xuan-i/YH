@@ -20,5 +20,11 @@ public interface FollowMapper extends BaseMapper<UserFollow> {
     @Delete("delete from user_follow where follower_id = #{followerId} and followee_id = #{followeeId}")
     boolean deleteByFollowerIdAndFolloweeId(Long followerId, Long followeeId);
 
+    @Select("select count(*) from user_follow where follower_id = #{userId}")
+    Integer countFollowingByUserId(Long userId);
+
+    @Select("select count(*) from user_follow where followee_id = #{userId}")
+    Integer countFollowersByUserId(Long userId);
+
     List<Boolean> selectFollowStatusBatch(Long followerId, List<Long> followeeIdList);
 }

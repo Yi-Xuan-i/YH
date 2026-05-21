@@ -1,6 +1,7 @@
 package com.yixuan.yh.user.service.impl;
 
 import com.yixuan.yh.common.utils.AWSUtils;
+import com.yixuan.yh.user.mapper.FollowMapper;
 import com.yixuan.yh.user.mapper.UserMapper;
 import com.yixuan.yh.user.mapstruct.ProfileMapStruct;
 import com.yixuan.yh.user.mapstruct.UserMapStruct;
@@ -11,9 +12,7 @@ import com.yixuan.yh.user.pojo.response.ProfileResponse;
 import com.yixuan.yh.user.pojo.response.ProfileStatsResponse;
 import com.yixuan.yh.user.service.ProfileService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -26,6 +25,7 @@ import java.io.IOException;
 public class ProfileServiceImpl implements ProfileService {
 
     private final UserMapper userMapper;
+    private final FollowMapper followMapper;
     private final RestTemplate restTemplate;
     private final AWSUtils awsUtils;
 
@@ -45,8 +45,11 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public ProfileStatsResponse getProfileStats(Long user) {
-        return null;
+    public ProfileStatsResponse getProfileStats(Long userId) {
+        ProfileStatsResponse response = new ProfileStatsResponse();
+        response.setFollowingCount(followMapper.countFollowingByUserId(userId));
+        response.setFollowerCount(followMapper.countFollowersByUserId(userId));
+        return response;
     }
 
     @Override
