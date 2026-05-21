@@ -17,6 +17,7 @@ public class ProductDetailResponse {
     private final Long defaultSkuId;
     private final String title;
     private final String description;
+    private final Integer salesVolume;
     private final List<Sku> skus;
 
     // 私有构造方法，只能通过建造者创建
@@ -26,6 +27,7 @@ public class ProductDetailResponse {
         this.defaultSkuId = builder.defaultSkuId;
         this.title = builder.title;
         this.description = builder.description;
+        this.salesVolume = builder.salesVolume;
         this.skus = builder.skus;
     }
 
@@ -39,6 +41,7 @@ public class ProductDetailResponse {
         private Long defaultSkuId;
         private String title;
         private String description;
+        private Integer salesVolume;
         private List<Sku> skus;
 
         public Builder productId(Long productId) {
@@ -63,6 +66,11 @@ public class ProductDetailResponse {
 
         public Builder description(String description) {
             this.description = description;
+            return this;
+        }
+
+        public Builder salesVolume(Integer salesVolume) {
+            this.salesVolume = salesVolume;
             return this;
         }
 

@@ -27,7 +27,7 @@ public interface ProductMapper extends BaseMapper<Product> {
     @Delete("delete from product where product_id = #{productId}")
     void deleteByProductId(Long productId);
 
-    @Select("select product_id, merchant_id, title, description, default_sku_id from product where product_id = #{productId}")
+    @Select("select product_id, merchant_id, title, description, default_sku_id, sales_volume from product where product_id = #{productId}")
     Product selectPartOfDetail(Long productId);
 
     void updateBasicInfo(Product product);

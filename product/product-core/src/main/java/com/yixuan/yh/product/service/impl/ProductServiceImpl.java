@@ -144,6 +144,7 @@ public class ProductServiceImpl extends BaseServiceImpl<ProductMapper, Product> 
                 .defaultSkuId(product.getDefaultSkuId())
                 .title(product.getTitle())
                 .description(product.getDescription())
+                .salesVolume(product.getSalesVolume())
                 .skus(skuList)
                 .build();
     }
