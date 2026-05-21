@@ -41,6 +41,13 @@ public class MerchantServiceImpl implements MerchantService {
 
     @Override
     public MerchantBasicDataResponse getBasicMerchant(Long userId) {
-        return MerchantMapStruct.INSTANCE.merchantToMerchantBasicDataResponse(merchantMapper.selectBasic(userId));
+        Merchant merchant = merchantMapper.selectBasic(userId);
+        if (merchant == null) {
+            return null;
+        }
+
+        MerchantBasicDataResponse response = MerchantMapStruct.INSTANCE.toMerchantBasicDataResponse(merchant);
+        response.setAvatarUrl(awsUtils.generateAccessUrl(response.getAvatarUrl()));
+        return response;
     }
 }

@@ -9,5 +9,5 @@ import org.mapstruct.factory.Mappers;
 public interface MerchantMapStruct {
     MerchantMapStruct INSTANCE = Mappers.getMapper(MerchantMapStruct.class);
 
-    MerchantBasicDataResponse merchantToMerchantBasicDataResponse(Merchant merchant);
+    MerchantBasicDataResponse toMerchantBasicDataResponse(Merchant merchant);
 }
