@@ -2,6 +2,7 @@ package com.yixuan.yh.user.controller;
 
 import com.yixuan.yh.common.response.Result;
 import com.yixuan.yh.common.utils.UserContext;
+import com.yixuan.yh.user.pojo.response.FollowListResponse;
 import com.yixuan.yh.user.pojo.response.UserFriendResponse;
 import com.yixuan.yh.user.service.FollowService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,6 +39,18 @@ public class FollowController {
     @GetMapping("/friends")
     public Result<List<UserFriendResponse>> getFriends() {
        return Result.success(followService.getFriends(UserContext.getUser()));
+    }
+
+    @Operation(summary = "获取关注列表")
+    @GetMapping("/following")
+    public Result<FollowListResponse> getFollowingList(@RequestParam(required = false) Long lastId) {
+        return Result.success(followService.getFollowingList(UserContext.getUser(), lastId));
+    }
+
+    @Operation(summary = "获取粉丝列表")
+    @GetMapping("/followers")
+    public Result<FollowListResponse> getFollowerList(@RequestParam(required = false) Long lastId) {
+        return Result.success(followService.getFollowerList(UserContext.getUser(), lastId));
     }
 
 }

@@ -89,9 +89,6 @@ public class OrderServiceImpl implements OrderService {
         AlipayTradePrecreateRequest request = new AlipayTradePrecreateRequest();
         request.setNotifyUrl(aliPayProperties.getNotifyUrl() + "/order/api/public/pay/notify");
 
-        System.out.println("-----------------");
-        System.out.println(request.getNotifyUrl());
-        System.out.println("-----------------------");
         // 构建订单参数（必须与本地订单一致）
         AlipayTradePrecreateModel model = new AlipayTradePrecreateModel();
         model.setOutTradeNo(String.valueOf(orderId));

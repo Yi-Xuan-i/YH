@@ -1,6 +1,7 @@
 package com.yixuan.yh.user.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.yixuan.yh.common.utils.AWSUtils;
 import com.yixuan.yh.common.utils.SnowflakeUtils;
 import com.yixuan.yh.user.mapper.ChatConversationMapper;
 import com.yixuan.yh.user.mapper.FollowMapper;
@@ -9,6 +10,8 @@ import com.yixuan.yh.user.pojo.entity.ChatConversation;
 import com.yixuan.yh.user.pojo.entity.UserFollow;
 import com.yixuan.yh.user.pojo.entity.UserFriend;
 import com.yixuan.yh.user.pojo.entity.UserNewFriendMessage;
+import com.yixuan.yh.user.pojo.response.FollowListResponse;
+import com.yixuan.yh.user.pojo.response.FollowUserResponse;
 import com.yixuan.yh.user.pojo.response.UserFriendResponse;
 import com.yixuan.yh.user.service.FollowService;
 import com.yixuan.yh.user.service.FriendService;
@@ -30,6 +33,7 @@ public class FollowServiceImpl implements FollowService {
     private final FriendMapper friendMapper;
     private final FriendService friendService;
     private final ChatConversationMapper chatConversationMapper;
+    private final AWSUtils awsUtils;
 
 
     @Override
@@ -126,5 +130,22 @@ public class FollowServiceImpl implements FollowService {
         return null;
     }
 
+    @Override
+    public FollowListResponse getFollowingList(Long userId, Long lastId) {
+        return getFollowList(followMapper.selectFollowingPage(userId, lastId));
+    }
+
+    @Override
+    public FollowListResponse getFollowerList(Long userId, Long lastId) {
+        return getFollowList(followMapper.selectFollowerPage(userId, lastId));
+    }
+
+    private FollowListResponse getFollowList(List<FollowUserResponse> list) {
+        list.forEach(item -> item.setAvatarUrl(awsUtils.generateAccessUrl(item.getAvatarUrl())));
+
+        FollowListResponse response = new FollowListResponse();
+        response.setList(list);
+        return response;
+    }
 
 }
