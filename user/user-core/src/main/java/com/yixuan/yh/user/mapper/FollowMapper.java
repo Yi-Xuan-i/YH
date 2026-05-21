@@ -1,5 +1,6 @@
 package com.yixuan.yh.user.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.yixuan.yh.user.pojo.entity.UserFollow;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
@@ -9,7 +10,7 @@ import org.apache.ibatis.annotations.Select;
 import java.util.List;
 
 @Mapper
-public interface FollowMapper {
+public interface FollowMapper extends BaseMapper<UserFollow> {
     @Insert("insert ignore user_follow (id, follower_id, followee_id, created_time) values(#{id}, #{followerId}, #{followeeId}, #{createdTime})")
     boolean insertIgnore(UserFollow userFollow);
 
