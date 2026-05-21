@@ -18,6 +18,9 @@ public interface ProductMapper extends BaseMapper<Product> {
     @Select("select product_id, title, description, status, sales_volume, rating, created_at, updated_at from product where merchant_id = #{userId}")
     List<ProductManageItemResponse> selectMerchantProducts(Long userId);
 
+    @Select("select product_id from product where merchant_id = #{merchantId}")
+    List<Long> selectProductIdsByMerchantId(Long merchantId);
+
     @Select("select title, cover_url, description, default_sku_id from product where product_id = #{productId}")
     Product selectEditBasicData(Long productId);
 

@@ -19,6 +19,7 @@ import com.yixuan.yh.order.pojo.entity.Order;
 import com.yixuan.yh.order.pojo.entity.OrderItem;
 import com.yixuan.yh.order.pojo.request.PostCartOrderRequest;
 import com.yixuan.yh.order.pojo.request.PostOrderRequest;
+import com.yixuan.yh.order.pojo.response.MerchantDailySalesResponse;
 import com.yixuan.yh.order.pojo.response.PendingPaymentOrderResponse;
 import com.yixuan.yh.order.pojo.response.PostOrderResponse;
 import com.yixuan.yh.order.properties.AliPayProperties;
@@ -32,6 +33,8 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -209,5 +212,29 @@ public class OrderServiceImpl implements OrderService {
         }
         // 交易不存在（发起了订单但实际上没有发送请求进行支付）
         return "ACQ.TRADE_NOT_EXIST".equals(response.getSubCode());
+    }
+
+    @Override
+    public MerchantDailySalesResponse getMerchantDailySales(List<Long> productIdList) {
+        MerchantDailySalesResponse emptyResponse = new MerchantDailySalesResponse();
+        emptyResponse.setDailySalesVolume(0);
+        emptyResponse.setDailySalesAmount(BigDecimal.ZERO);
+        if (productIdList == null || productIdList.isEmpty()) {
+            return emptyResponse;
+        }
+
+        LocalDateTime startTime = LocalDate.now().atStartOfDay();
+        LocalDateTime endTime = startTime.plusDays(1);
+        MerchantDailySalesResponse response = orderItemMapper.selectMerchantDailySales(productIdList, startTime, endTime);
+        if (response == null) {
+            return emptyResponse;
+        }
+        if (response.getDailySalesVolume() == null) {
+            response.setDailySalesVolume(0);
+        }
+        if (response.getDailySalesAmount() == null) {
+            response.setDailySalesAmount(BigDecimal.ZERO);
+        }
+        return response;
     }
 }

@@ -2,14 +2,18 @@ package com.yixuan.yh.product.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.yixuan.yh.common.exception.YHClientException;
+import com.yixuan.yh.common.response.Result;
 import com.yixuan.yh.common.utils.AWSUtils;
 import com.yixuan.yh.common.utils.SnowflakeUtils;
+import com.yixuan.yh.order.feign.OrderPrivateClient;
+import com.yixuan.yh.order.pojo.response.MerchantDailySalesResponse;
 import com.yixuan.yh.product.mapper.*;
 import com.yixuan.yh.product.mapper.multi.SkuMapper;
 import com.yixuan.yh.product.mapstruct.MerchantMapStruct;
 import com.yixuan.yh.product.pojo.model.entity.*;
 import com.yixuan.yh.product.pojo.model.multi.SkuSpecInfo;
 import com.yixuan.yh.product.pojo.request.*;
+import com.yixuan.yh.product.pojo.response.MerchantProductStatsResponse;
 import com.yixuan.yh.product.pojo.response.ProductEditResponse;
 import com.yixuan.yh.product.pojo.response.ProductManageItemResponse;
 import com.yixuan.yh.product.service.MerchantService;
@@ -21,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +55,8 @@ public class MerchantServiceImpl implements MerchantService {
     private SnowflakeUtils snowflakeUtils;
     @Autowired
     private ProductCarouselMapper productCarouselMapper;
+    @Autowired
+    private OrderPrivateClient orderPrivateClient;
 
     @Override
     public void putMerchantProductStatus(Long productId, PutProductStatusRequest putProductStatusRequest) {
@@ -62,6 +69,27 @@ public class MerchantServiceImpl implements MerchantService {
     @Override
     public List<ProductManageItemResponse> getMerchantProduct(Long user) {
         return productMapper.selectMerchantProducts(user);
+    }
+
+    @Override
+    public MerchantProductStatsResponse getMerchantProductStats(Long userId) {
+        List<Long> productIdList = productMapper.selectProductIdsByMerchantId(userId);
+
+        MerchantProductStatsResponse response = new MerchantProductStatsResponse();
+        response.setProductCount(productIdList.size());
+        response.setDailySalesVolume(0);
+        response.setDailySalesAmount(BigDecimal.ZERO);
+        if (productIdList.isEmpty()) {
+            return response;
+        }
+
+        Result<MerchantDailySalesResponse> result = orderPrivateClient.getMerchantDailySales(productIdList);
+        MerchantDailySalesResponse dailySales = result == null ? null : result.getData();
+        if (dailySales != null) {
+            response.setDailySalesVolume(dailySales.getDailySalesVolume());
+            response.setDailySalesAmount(dailySales.getDailySalesAmount());
+        }
+        return response;
     }
 
 

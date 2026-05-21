@@ -1,6 +1,7 @@
 package com.yixuan.yh.product.service;
 
 import com.yixuan.yh.product.pojo.request.*;
+import com.yixuan.yh.product.pojo.response.MerchantProductStatsResponse;
 import com.yixuan.yh.product.pojo.response.ProductEditResponse;
 import com.yixuan.yh.product.pojo.response.ProductManageItemResponse;
 import org.apache.coyote.BadRequestException;
@@ -12,6 +13,8 @@ public interface MerchantService {
     void putMerchantProductStatus(Long productId, PutProductStatusRequest putProductStatusRequest);
 
     List<ProductManageItemResponse> getMerchantProduct(Long user);
+
+    MerchantProductStatsResponse getMerchantProductStats(Long userId);
 
     List<ProductManageItemResponse> getMerchantOnSaleProduct(Long userId);
 

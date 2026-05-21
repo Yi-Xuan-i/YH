@@ -3,6 +3,7 @@ package com.yixuan.yh.product.controller;
 import com.yixuan.yh.common.response.Result;
 import com.yixuan.yh.common.utils.UserContext;
 import com.yixuan.yh.product.pojo.request.*;
+import com.yixuan.yh.product.pojo.response.MerchantProductStatsResponse;
 import com.yixuan.yh.product.pojo.response.ProductEditResponse;
 import com.yixuan.yh.product.pojo.response.ProductManageItemResponse;
 import com.yixuan.yh.product.service.MerchantService;
@@ -34,6 +35,12 @@ public class MerchantController {
     @GetMapping
     public Result<List<ProductManageItemResponse>> getMerchantProduct() {
         return Result.success(merchantService.getMerchantProduct(UserContext.getUser()));
+    }
+
+    @Operation(summary = "获取自己店铺的商品统计数据")
+    @GetMapping("/stats")
+    public Result<MerchantProductStatsResponse> getMerchantProductStats() {
+        return Result.success(merchantService.getMerchantProductStats(UserContext.getUser()));
     }
 
     @Operation(summary = "获取自己店铺的销售中商品（用于直播间展示商品列表能够让主播挑选上品上架到直播间）")
