@@ -43,12 +43,12 @@ public class LiveProductServiceImpl implements LiveProductService {
 
         LiveProduct liveProduct = LiveProductMapstruct.INSTANCE.postLiveProductRequestToLiveProduct(postLiveProductRequest);
         liveProduct.setId(snowflakeUtils.nextId());
-        liveProduct.setImageUrl(awsUtils.generateAccessUrl(awsUtils.putObject(postLiveProductRequest.getImage())));
+        liveProduct.setImageUrl(awsUtils.putObject(postLiveProductRequest.getImage()));
 
         liveProductMapper.insert(liveProduct);
         messagingTemplate.convertAndSend("/topic/room." + postLiveProductRequest.getRoomId(), new LiveMessage(LiveMessage.MessageType.PRODUCT, liveProduct.getId().toString()));
 
-        return new PostLiveProductResponse(liveProduct.getId(), liveProduct.getImageUrl());
+        return new PostLiveProductResponse(liveProduct.getId(), awsUtils.generateAccessUrl(liveProduct.getImageUrl()));
     }
 
     @Override
