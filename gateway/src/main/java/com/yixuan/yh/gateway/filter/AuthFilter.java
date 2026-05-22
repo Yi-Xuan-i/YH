@@ -58,7 +58,7 @@ public class AuthFilter implements GlobalFilter, Ordered {
         if (
                 (token == null ||
                         !token.startsWith("Bearer ") ||
-                        (claims = parseToken(token.substring(7))) == null)
+                        (claims = parseToken(token)) == null)
                         &&
                         !isExcludedPath(request.getPath().value())
         ) {
@@ -93,7 +93,7 @@ public class AuthFilter implements GlobalFilter, Ordered {
 
     private Claims parseToken(String token) {
         try {
-            return jwtUtils.parseJwt(token);
+            return jwtUtils.parseJwt(token.substring(7));
         } catch (Exception e) {
             return null;
         }

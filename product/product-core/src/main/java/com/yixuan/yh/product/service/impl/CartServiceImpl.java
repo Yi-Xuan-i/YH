@@ -120,4 +120,14 @@ public class CartServiceImpl implements CartService {
         cartItem.setQuantity(putCartItemQuantityRequest.getQuantity());
         cartItemMapper.updateById(cartItem);
     }
+
+    @Override
+    public void deleteCartItem(Long userId, Long cartItemId) {
+        int deleted = cartItemMapper.delete(new LambdaQueryWrapper<CartItem>()
+                .eq(CartItem::getCartItemId, cartItemId)
+                .eq(CartItem::getUserId, userId));
+        if (deleted == 0) {
+            throw new YHClientException("购物车项不存在！");
+        }
+    }
 }

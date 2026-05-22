@@ -103,6 +103,33 @@ public class ProductServiceImpl extends BaseServiceImpl<ProductMapper, Product> 
     }
 
     @Override
+    public List<ProductSummaryResponse> searchProducts(String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return Collections.emptyList();
+        }
+        return this.selectVoList(ProductSummaryResponse.class, w -> w
+                        .eq(Product::getStatus, Product.ProductStatus.ON_SALE)
+                        .likeRight(Product::getTitle, keyword.trim()))
+                .stream()
+                .map(response -> {
+                    Long defaultSkuId = productMapper.selectOne(new LambdaQueryWrapper<Product>()
+                                    .select(Product::getDefaultSkuId)
+                                    .eq(Product::getProductId, response.getProductId()))
+                            .getDefaultSkuId();
+
+                    BigDecimal price = productSkuMapper.selectOne(new LambdaQueryWrapper<ProductSku>()
+                                    .select(ProductSku::getPrice)
+                                    .eq(ProductSku::getSkuId, defaultSkuId))
+                            .getPrice();
+
+                    response.setCoverUrl(awsUtils.generateAccessUrl(response.getCoverUrl()));
+                    response.setPrice(price);
+
+                    return response;
+                }).toList();
+    }
+
+    @Override
     public ProductDetailResponse getDetailProducts(Long productId) {
         // 查询商品基础信息
         Product product = productMapper.selectPartOfDetail(productId);

@@ -14,6 +14,8 @@ import java.util.Map;
 public interface ProductService extends BaseIService<Product> {
     List<ProductSummaryResponse> getProducts();
 
+    List<ProductSummaryResponse> searchProducts(String keyword);
+
     ProductDetailResponse getDetailProducts(Long productId);
 
     PartOfOrderResponse getPartOfOrder(Long orderId, Long productId, Long skuId, Integer quantity) throws BadRequestException, InterruptedException;

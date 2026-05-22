@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -26,6 +27,12 @@ public class ProductPublicController {
     @GetMapping
     public Result<List<ProductSummaryResponse>> getProducts() {
         return Result.success(productService.getProducts());
+    }
+
+    @Operation(summary = "搜索商品")
+    @GetMapping("/search")
+    public Result<List<ProductSummaryResponse>> searchProducts(@RequestParam String keyword) {
+        return Result.success(productService.searchProducts(keyword));
     }
 
     @Operation(summary = "获取商品详情")

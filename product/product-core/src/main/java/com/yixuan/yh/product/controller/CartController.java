@@ -41,4 +41,11 @@ public class CartController {
         cartService.putCartItemQuantity(UserContext.getUser(), cartItemId, putCartItemQuantityRequest);
         return Result.success();
     }
+
+    @Operation(summary = "删除购物车项")
+    @DeleteMapping("/{cartItemId}")
+    public Result<Void> deleteCartItem(@PathVariable Long cartItemId) {
+        cartService.deleteCartItem(UserContext.getUser(), cartItemId);
+        return Result.success();
+    }
 }
