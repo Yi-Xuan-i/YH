@@ -14,5 +14,11 @@ public interface SkuSpecMapper {
 
     List<SkuSpec> selectKeyValueBatch(List<Long> skuIdList);
 
+    List<Long> selectSkuIdsByProductAndSpec(Long productId, Long keyId, Long valueId);
+
+    Integer countValuesByProductAndKey(Long productId, Long keyId);
+
     void deleteBatch(List<Long> skuIdList);
+
+    void deleteByProductAndSpec(Long productId, Long keyId, Long valueId);
 }

@@ -209,6 +209,45 @@ public class MerchantServiceImpl implements MerchantService {
     }
 
     @Override
+    @Transactional
+    public void deleteSkuSpec(Long productId, DeleteSkuSpecRequest deleteSkuSpecRequest) {
+        Long keyId = deleteSkuSpecRequest.getKeyId();
+        Long valueId = deleteSkuSpecRequest.getValueId();
+
+        Integer valueCount = skuSpecMapper.countValuesByProductAndKey(productId, keyId);
+        if (valueCount == null || valueCount == 0) {
+            throw new YHClientException("规格不存在！");
+        }
+
+        List<Long> skuIdList = skuSpecMapper.selectSkuIdsByProductAndSpec(productId, keyId, valueId);
+        if (skuIdList.isEmpty()) {
+            throw new YHClientException("规格值不存在！");
+        }
+
+        if (valueCount == 1) {
+            skuSpecMapper.deleteByProductAndSpec(productId, keyId, valueId);
+            specKeyMapper.deleteBatch(java.util.Collections.singletonList(keyId));
+        } else {
+            skuSpecMapper.deleteBatch(skuIdList);
+            productCarouselMapper.delete(new LambdaQueryWrapper<ProductCarousel>()
+                    .in(ProductCarousel::getSkuId, skuIdList));
+            productSkuMapper.deleteBatch(skuIdList);
+            resetDefaultSkuIfDeleted(productId, skuIdList);
+        }
+        specValueMapper.deleteBatch(java.util.Collections.singletonList(valueId));
+    }
+
+    private void resetDefaultSkuIfDeleted(Long productId, List<Long> deletedSkuIdList) {
+        Product product = productMapper.selectEditBasicData(productId);
+        if (product == null || product.getDefaultSkuId() == null || !deletedSkuIdList.contains(product.getDefaultSkuId())) {
+            return;
+        }
+
+        List<Long> remainSkuIdList = productSkuMapper.selectSkuIdByProductId(productId);
+        productMapper.updateDefaultSkuId(productId, remainSkuIdList.isEmpty() ? null : remainSkuIdList.get(0));
+    }
+
+    @Override
     public void putSkuMain(Long productId, PutSkuMainRequest putSkuMainRequest) {
         // 判断该 SKU 是否真的属于该 Product
         ProductSku productSku = productSkuMapper.selectOne(new LambdaQueryWrapper<ProductSku>()

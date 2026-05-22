@@ -19,7 +19,4 @@ public interface ProductCarouselMapper extends BaseMapper<ProductCarousel> {
 
     @Select("select product_id from product_carousel where id = #{carouselId}")
     Long selectProductIdByCarouselId(Long carouselId);
-
-    @Delete("delete from product_carousel where id = #{carouselId}")
-    void delete(Long carouselId);
 }

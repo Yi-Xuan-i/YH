@@ -95,6 +95,13 @@ public class MerchantController {
         return Result.success();
     }
 
+    @Operation(summary = "删除商品规格对")
+    @DeleteMapping("/sku/spec/{productId}")
+    public Result<Void> deleteSkuSpec(@PathVariable Long productId, @RequestBody DeleteSkuSpecRequest deleteSkuSpecRequest) {
+        merchantService.deleteSkuSpec(productId, deleteSkuSpecRequest);
+        return Result.success();
+    }
+
     @Operation(summary = "设置主规格")
     @PutMapping("/sku/main/{productId}")
     public Result<Void> putSkuMain(@PathVariable Long productId, @RequestBody PutSkuMainRequest putSkuMainRequest) {

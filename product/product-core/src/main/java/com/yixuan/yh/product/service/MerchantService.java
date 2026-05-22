@@ -26,6 +26,8 @@ public interface MerchantService {
 
     void postSkuSpec(PostSkuSpecRequest postSkuSpecRequest);
 
+    void deleteSkuSpec(Long productId, DeleteSkuSpecRequest deleteSkuSpecRequest);
+
     void putSkuMain(Long productId, PutSkuMainRequest putSkuMainRequest);
 
     void deleteMerchantProduct(Long productId);

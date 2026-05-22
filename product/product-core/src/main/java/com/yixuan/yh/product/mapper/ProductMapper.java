@@ -43,4 +43,7 @@ public interface ProductMapper extends BaseMapper<Product> {
 
     @Update("update product set sales_volume = coalesce(sales_volume, 0) + #{quantity} where product_id = #{productId}")
     int increaseSalesVolume(@Param("productId") Long productId, @Param("quantity") Integer quantity);
+
+    @Update("update product set default_sku_id = #{skuId} where product_id = #{productId}")
+    void updateDefaultSkuId(@Param("productId") Long productId, @Param("skuId") Long skuId);
 }

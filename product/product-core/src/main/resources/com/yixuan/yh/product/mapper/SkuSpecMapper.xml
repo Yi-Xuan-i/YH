@@ -28,10 +28,36 @@
         </foreach>
     </select>
 
+    <select id="selectSkuIdsByProductAndSpec" resultType="java.lang.Long">
+        select ps.sku_id
+        from product_sku ps
+                 join sku_spec ss on ps.sku_id = ss.sku_id
+        where ps.product_id = #{productId}
+          and ss.key_id = #{keyId}
+          and ss.value_id = #{valueId}
+    </select>
+
+    <select id="countValuesByProductAndKey" resultType="java.lang.Integer">
+        select count(distinct ss.value_id)
+        from product_sku ps
+                 join sku_spec ss on ps.sku_id = ss.sku_id
+        where ps.product_id = #{productId}
+          and ss.key_id = #{keyId}
+    </select>
+
     <delete id="deleteBatch">
         delete from sku_spec where sku_id in
         <foreach collection="skuIdList" item="skuId" open="(" close=")" separator=",">
             #{skuId}
         </foreach>
+    </delete>
+
+    <delete id="deleteByProductAndSpec">
+        delete ss
+        from sku_spec ss
+                 join product_sku ps on ss.sku_id = ps.sku_id
+        where ps.product_id = #{productId}
+          and ss.key_id = #{keyId}
+          and ss.value_id = #{valueId}
     </delete>
 </mapper>
