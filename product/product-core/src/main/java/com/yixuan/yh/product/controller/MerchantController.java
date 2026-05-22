@@ -102,7 +102,7 @@ public class MerchantController {
         return Result.success();
     }
 
-    @Operation(summary = "删除商品规格对")
+    @Operation(summary = "修改SKU信息")
     @PutMapping("/sku")
     public Result<Void> putSku(@RequestBody PutSkuRequest putSkuRequest) throws BadRequestException {
         merchantService.putSku(UserContext.getUser(), putSkuRequest);
