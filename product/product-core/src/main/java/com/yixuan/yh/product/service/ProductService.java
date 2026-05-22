@@ -2,6 +2,7 @@ package com.yixuan.yh.product.service;
 
 import com.yixuan.yh.common.mybatis.BaseIService;
 import com.yixuan.yh.product.pojo.model.entity.Product;
+import com.yixuan.yh.product.pojo.response.GetOnSaleProductForLiveResponse;
 import com.yixuan.yh.product.pojo.response.PartOfCartOrderResponse;
 import com.yixuan.yh.product.pojo.response.PartOfOrderResponse;
 import com.yixuan.yh.product.pojo.response.ProductDetailResponse;
@@ -17,6 +18,10 @@ public interface ProductService extends BaseIService<Product> {
     List<ProductSummaryResponse> searchProducts(String keyword);
 
     ProductDetailResponse getDetailProducts(Long productId);
+
+    Boolean isMerchantOnSaleProduct(Long merchantId, Long productId);
+
+    Map<Long, GetOnSaleProductForLiveResponse> getProductsForLive(List<Long> productIdList);
 
     PartOfOrderResponse getPartOfOrder(Long orderId, Long productId, Long skuId, Integer quantity) throws BadRequestException, InterruptedException;
 

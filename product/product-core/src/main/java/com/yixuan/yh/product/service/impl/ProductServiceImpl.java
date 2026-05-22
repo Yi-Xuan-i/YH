@@ -18,6 +18,7 @@ import com.yixuan.yh.product.pojo.model.entity.Product;
 import com.yixuan.yh.product.pojo.model.entity.ProductCarousel;
 import com.yixuan.yh.product.pojo.model.entity.ProductSku;
 import com.yixuan.yh.product.pojo.model.multi.SkuSpecInfo;
+import com.yixuan.yh.product.pojo.response.GetOnSaleProductForLiveResponse;
 import com.yixuan.yh.product.pojo.response.PartOfCartOrderResponse;
 import com.yixuan.yh.product.pojo.response.PartOfOrderResponse;
 import com.yixuan.yh.product.pojo.response.ProductDetailResponse;
@@ -174,6 +175,24 @@ public class ProductServiceImpl extends BaseServiceImpl<ProductMapper, Product> 
                 .salesVolume(product.getSalesVolume())
                 .skus(skuList)
                 .build();
+    }
+
+    @Override
+    public Boolean isMerchantOnSaleProduct(Long merchantId, Long productId) {
+        return productMapper.existsMerchantOnSaleProduct(merchantId, productId);
+    }
+
+    @Override
+    public Map<Long, GetOnSaleProductForLiveResponse> getProductsForLive(List<Long> productIdList) {
+        if (productIdList == null || productIdList.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        return productMapper.selectProductsForLive(productIdList).stream()
+                .collect(Collectors.toMap(GetOnSaleProductForLiveResponse::getProductId, response -> {
+                    response.setImageUrl(awsUtils.generateAccessUrl(response.getImageUrl()));
+                    return response;
+                }));
     }
 
     @Override

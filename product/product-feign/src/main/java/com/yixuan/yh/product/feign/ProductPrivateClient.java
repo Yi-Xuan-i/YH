@@ -1,9 +1,9 @@
 package com.yixuan.yh.product.feign;
 
 import com.yixuan.yh.common.response.Result;
+import com.yixuan.yh.product.pojo.response.GetOnSaleProductForLiveResponse;
 import com.yixuan.yh.product.pojo.response.PartOfCartOrderResponse;
 import com.yixuan.yh.product.pojo.response.PartOfOrderResponse;
-import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,6 +12,12 @@ import java.util.Map;
 
 @FeignClient(value = "productService", contextId = "ProductPrivateClient")
 public interface ProductPrivateClient {
+    @GetMapping("/product/api/private/live/merchant-on-sale")
+    Result<Boolean> isMerchantOnSaleProduct(@RequestParam Long merchantId, @RequestParam Long productId);
+
+    @GetMapping("/product/api/private/live/products")
+    Result<Map<Long, GetOnSaleProductForLiveResponse>> getProductsForLive(@RequestParam List<Long> productIdList);
+
     @GetMapping("/product/api/private/order-part")
     Result<PartOfOrderResponse> getPartOfOrder(@RequestParam Long orderId, @RequestParam Long productId, @RequestParam Long skuId, @RequestParam Integer quantity);
 

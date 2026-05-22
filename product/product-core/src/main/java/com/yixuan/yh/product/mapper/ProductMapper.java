@@ -22,6 +22,21 @@ public interface ProductMapper extends BaseMapper<Product> {
     @Select("select product_id as productId, title, cover_url as imageUrl, sales_volume as salesVolume from product where merchant_id = #{userId} and status = 4")
     List<GetOnSaleProductForLiveResponse> selectMerchantOnSaleProductsForLive(Long userId);
 
+    @Select("select count(1) > 0 from product where merchant_id = #{merchantId} and product_id = #{productId} and status = 4")
+    Boolean existsMerchantOnSaleProduct(@Param("merchantId") Long merchantId, @Param("productId") Long productId);
+
+    @Select("""
+            <script>
+            select product_id as productId, title, cover_url as imageUrl, sales_volume as salesVolume
+            from product
+            where product_id in
+            <foreach collection="productIdList" item="productId" open="(" separator="," close=")">
+                #{productId}
+            </foreach>
+            </script>
+            """)
+    List<GetOnSaleProductForLiveResponse> selectProductsForLive(@Param("productIdList") List<Long> productIdList);
+
     @Select("select product_id from product where merchant_id = #{merchantId}")
     List<Long> selectProductIdsByMerchantId(Long merchantId);
 

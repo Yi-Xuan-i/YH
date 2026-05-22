@@ -1,6 +1,7 @@
 package com.yixuan.yh.product.controller._private;
 
 import com.yixuan.yh.common.response.Result;
+import com.yixuan.yh.product.pojo.response.GetOnSaleProductForLiveResponse;
 import com.yixuan.yh.product.pojo.response.PartOfCartOrderResponse;
 import com.yixuan.yh.product.pojo.response.PartOfOrderResponse;
 import com.yixuan.yh.product.service.ProductService;
@@ -21,6 +22,18 @@ public class ProductPrivateController {
     @Autowired
     private ProductService productService;
 
+    @Operation(summary = "校验商家直播上架商品")
+    @GetMapping("/live/merchant-on-sale")
+    public Result<Boolean> isMerchantOnSaleProduct(@RequestParam Long merchantId, @RequestParam Long productId) {
+        return Result.success(productService.isMerchantOnSaleProduct(merchantId, productId));
+    }
+
+    @Operation(summary = "获取直播商品数据")
+    @GetMapping("/live/products")
+    public Result<Map<Long, GetOnSaleProductForLiveResponse>> getProductsForLive(@RequestParam List<Long> productIdList) {
+        return Result.success(productService.getProductsForLive(productIdList));
+    }
+
     @Operation(summary = "获取商品数据（用于生成订单）")
     @GetMapping("/order-part")
     public Result<PartOfOrderResponse> getPartOfOrder(@RequestParam Long orderId, @RequestParam Long productId, @RequestParam Long skuId, @RequestParam Integer quantity) throws BadRequestException, InterruptedException {
@@ -40,7 +53,7 @@ public class ProductPrivateController {
         return Result.success();
     }
 
-    @Operation(summary = "increase product sales volume")
+    @Operation(summary = "增加销量")
     @PutMapping("/sales-volume")
     public Result<Void> increaseSalesVolume(@RequestBody Map<Long, Integer> productQuantityMap) {
         productService.increaseSalesVolume(productQuantityMap);

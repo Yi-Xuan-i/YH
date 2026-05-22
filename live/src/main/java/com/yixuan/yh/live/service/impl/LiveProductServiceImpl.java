@@ -10,11 +10,15 @@ import com.yixuan.yh.live.request.PostLiveProductRequest;
 import com.yixuan.yh.live.response.LiveProductItemResponse;
 import com.yixuan.yh.live.service.LiveProductService;
 import com.yixuan.yh.live.websocket.pojo.LiveMessage;
+import com.yixuan.yh.product.feign.ProductPrivateClient;
+import com.yixuan.yh.product.pojo.response.GetOnSaleProductForLiveResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Service
@@ -30,6 +34,8 @@ public class LiveProductServiceImpl implements LiveProductService {
     private SimpMessagingTemplate messagingTemplate;
     @Autowired
     private LiveCache liveCache;
+    @Autowired
+    private ProductPrivateClient productPrivateClient;
 
     @Override
     public void postMerchantProduct(Long userId, PostLiveProductRequest postLiveProductRequest) {
@@ -37,31 +43,54 @@ public class LiveProductServiceImpl implements LiveProductService {
             throw new YHClientException("你没有权限！");
         }
 
-        LiveProduct liveProduct = liveProductMapper.selectMerchantOnSaleProduct(userId, postLiveProductRequest.getProductId());
-        if (liveProduct == null) {
+        Long productId = postLiveProductRequest.getProductId();
+        Boolean isMerchantOnSaleProduct = productPrivateClient.isMerchantOnSaleProduct(userId, productId).getData();
+        if (!Boolean.TRUE.equals(isMerchantOnSaleProduct)) {
             throw new YHClientException("商品不存在或未上架！");
         }
 
+        LiveProduct liveProduct = new LiveProduct();
         liveProduct.setId(snowflakeUtils.nextId());
         liveProduct.setRoomId(postLiveProductRequest.getRoomId());
+        liveProduct.setProductId(productId);
 
         liveProductMapper.insert(liveProduct);
-        messagingTemplate.convertAndSend("/topic/room." + postLiveProductRequest.getRoomId(), new LiveMessage(LiveMessage.MessageType.PRODUCT, liveProduct.getProductId().toString()));
+        messagingTemplate.convertAndSend("/topic/room." + postLiveProductRequest.getRoomId(), new LiveMessage(LiveMessage.MessageType.PRODUCT, productId.toString()));
     }
 
     @Override
     public List<LiveProductItemResponse> getRoomLiveProduct(Long roomId) {
-        List<LiveProductItemResponse> responseList = liveProductMapper.selectByRoomId(roomId);
-        responseList.forEach(response -> response.setImageUrl(awsUtils.generateAccessUrl(response.getImageUrl())));
+        List<Long> productIdList = liveProductMapper.selectProductIdsByRoomId(roomId);
+        if (productIdList.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        Map<Long, GetOnSaleProductForLiveResponse> productMap = productPrivateClient.getProductsForLive(productIdList).getData();
+        List<LiveProductItemResponse> responseList = productIdList.stream()
+                .map(productMap::get)
+                .filter(Objects::nonNull)
+                .map(this::toLiveProductItemResponse)
+                .toList();
+        responseList.forEach(response -> response.setImageUrl(response.getImageUrl()));
         return responseList;
     }
 
     @Override
     public LiveProductItemResponse getLiveProduct(Long productId) {
-        LiveProductItemResponse response = liveProductMapper.selectByProductId(productId);
+        if (liveProductMapper.selectProductId(productId) == null) {
+            return null;
+        }
+
+        Map<Long, GetOnSaleProductForLiveResponse> productMap = productPrivateClient.getProductsForLive(List.of(productId)).getData();
+        GetOnSaleProductForLiveResponse product = productMap.get(productId);
+        LiveProductItemResponse response = product == null ? null : toLiveProductItemResponse(product);
         if (response != null) {
-            response.setImageUrl(awsUtils.generateAccessUrl(response.getImageUrl()));
+            response.setImageUrl(response.getImageUrl());
         }
         return response;
+    }
+
+    private LiveProductItemResponse toLiveProductItemResponse(GetOnSaleProductForLiveResponse product) {
+        return new LiveProductItemResponse(product.getProductId(), product.getTitle(), product.getImageUrl(), product.getSalesVolume());
     }
 }
