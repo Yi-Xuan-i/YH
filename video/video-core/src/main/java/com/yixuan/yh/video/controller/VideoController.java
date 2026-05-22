@@ -2,6 +2,7 @@ package com.yixuan.yh.video.controller;
 
 import com.yixuan.yh.common.response.Result;
 import com.yixuan.yh.common.utils.UserContext;
+import com.yixuan.yh.video.pojo.request.DeletePublishedVideoRequest;
 import com.yixuan.yh.video.pojo.request.GetPresignUrlRequest;
 import com.yixuan.yh.video.pojo.response.*;
 import com.yixuan.yh.video.pojo.request.PostVideoMessageRequest;
@@ -57,6 +58,13 @@ public class VideoController {
     @GetMapping("/published")
     public Result<List<GetPublishedVideoResponse>> getPublishedVideo(@RequestParam(required = false) Long lastMinId) {
         return Result.success(videoService.getPublishedVideo(UserContext.getUser(), lastMinId));
+    }
+
+    @Operation(summary = "批量删除已发布的视频")
+    @DeleteMapping("/published")
+    public Result<Void> deletePublishedVideoBatch(@RequestBody DeletePublishedVideoRequest deletePublishedVideoRequest) {
+        videoService.deletePublishedVideoBatch(UserContext.getUser(), deletePublishedVideoRequest);
+        return Result.success();
     }
 
     @Operation(summary = "获取自己审核中的视频")

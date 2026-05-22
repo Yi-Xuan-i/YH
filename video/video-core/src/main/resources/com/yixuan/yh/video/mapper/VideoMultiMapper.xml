@@ -42,9 +42,11 @@
             )
         </if>
 
-        WHERE v.id >= (
+        WHERE v.status = 5
+        AND v.id >= (
         SELECT MIN(id) + FLOOR(RAND() * (MAX(id) - MIN(id)))
         FROM video
+        WHERE status = 5
         )
         LIMIT 10
     </select>

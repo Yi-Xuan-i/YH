@@ -1,6 +1,7 @@
 package com.yixuan.yh.video.service;
 
 import com.yixuan.yh.video.pojo.request.GetPresignUrlRequest;
+import com.yixuan.yh.video.pojo.request.DeletePublishedVideoRequest;
 import com.yixuan.yh.video.pojo.response.*;
 import com.yixuan.yh.video.pojo.request.PostVideoMessageRequest;
 
@@ -29,6 +30,8 @@ public interface VideoService {
     List<GetUploadedVideoResponse> getUploadedVideo(Long userId);
 
     List<GetPublishedVideoResponse> getPublishedVideo(Long userId, Long lastMinId);
+
+    void deletePublishedVideoBatch(Long userId, DeletePublishedVideoRequest deletePublishedVideoRequest);
 
     List<GetProcessingVideoResponse> getProcessingVideo(Long userId, Long lastMinId);
 

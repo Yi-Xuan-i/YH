@@ -33,7 +33,7 @@
         created_at
         from video
         where creator_id = #{userId}
-        and status = 'PUBLISHED'
+        and status = 5
         <if test="lastMinId != null">
             and id &lt; #{lastMinId}
         </if>

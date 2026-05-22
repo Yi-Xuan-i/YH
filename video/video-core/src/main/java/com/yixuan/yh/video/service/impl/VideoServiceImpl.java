@@ -21,11 +21,13 @@ import com.yixuan.yh.video.pojo.entity.MessageOutbox;
 import com.yixuan.yh.video.pojo.entity.Video;
 import com.yixuan.yh.video.pojo.entity.VideoTag;
 import com.yixuan.yh.video.mapper.multi.VideoMultiMapper;
+import com.yixuan.yh.video.pojo.entity.multi.VideoTagMp;
 import com.yixuan.yh.video.pojo.entity.multi.VideoWithFavorite;
 import com.yixuan.yh.video.pojo.entity.multi.VideoWithInteractionStatus;
 import com.yixuan.yh.video.pojo.entity.multi.VideoWithLike;
 import com.yixuan.yh.video.pojo.mq.VideoReviewMessage;
 import com.yixuan.yh.video.pojo.entity.VideoUploadTask;
+import com.yixuan.yh.video.pojo.request.DeletePublishedVideoRequest;
 import com.yixuan.yh.video.pojo.request.GetPresignUrlRequest;
 import com.yixuan.yh.video.pojo.response.*;
 import com.yixuan.yh.video.pojo.request.PostVideoMessageRequest;
@@ -357,7 +359,7 @@ public class VideoServiceImpl implements VideoService {
         /* 乐观锁 */
         String coverObjectKey = "cover/" + postVideoMessageRequest.getVideoId().toString();
         int result = videoMapper.update(null, new LambdaUpdateWrapper<Video>()
-                .set(Video::getStatus, Video.VideoStatus.PENDING_REVIEW)
+                .set(Video::getStatus, Video.VideoStatus.PUBLISHED) // 临时跳过审核，直接发布
                 .set(Video::getCoverUrl, coverObjectKey)
                 .set(Video::getDescription, postVideoMessageRequest.getDescription())
                 .eq(Video::getId, postVideoMessageRequest.getVideoId())
@@ -369,12 +371,6 @@ public class VideoServiceImpl implements VideoService {
         /* 上传封面（使用固定key解决文件上传幂等问题 ） */
         /* 优化可改为直传或者拆分出当前数据库事务 */
         awsUtils.putObject(coverObjectKey, postVideoMessageRequest.getCover());
-
-        /* 补充视频数据 */
-        video.setId(postVideoMessageRequest.getVideoId());
-        video.setCoverUrl(coverObjectKey);
-        video.setDescription(postVideoMessageRequest.getDescription());
-        videoMapper.updateById(video);
 
         /* 视频标签 */
         handleTag(postVideoMessageRequest);
@@ -486,6 +482,44 @@ public class VideoServiceImpl implements VideoService {
                     return response;
                 })
                 .toList();
+    }
+
+    @Override
+    @Transactional
+    public void deletePublishedVideoBatch(Long userId, DeletePublishedVideoRequest deletePublishedVideoRequest) {
+        if (deletePublishedVideoRequest == null) {
+            throw new YHClientException("请选择要删除的视频！");
+        }
+        List<Long> videoIdList = deletePublishedVideoRequest.getIds();
+        if (videoIdList == null || videoIdList.isEmpty()) {
+            throw new YHClientException("请选择要删除的视频！");
+        }
+
+        List<Long> distinctVideoIdList = videoIdList.stream().distinct().toList();
+        List<Video> videoList = videoMapper.selectList(new LambdaQueryWrapper<Video>()
+                .select(Video::getId, Video::getCreatorId, Video::getStatus)
+                .in(Video::getId, distinctVideoIdList));
+
+        if (videoList.size() != distinctVideoIdList.size()) {
+            throw new YHClientException("存在视频不存在或无权限删除！");
+        }
+        boolean hasInvalidVideo = videoList.stream()
+                .anyMatch(video -> !video.getCreatorId().equals(userId)
+                        || video.getStatus() != Video.VideoStatus.PUBLISHED);
+        if (hasInvalidVideo) {
+            throw new YHClientException("只能删除已发布的视频！");
+        }
+
+        videoTagMpMapper.delete(new LambdaQueryWrapper<VideoTagMp>()
+                .in(VideoTagMp::getVideoId, distinctVideoIdList));
+
+        int deleted = videoMapper.delete(new LambdaQueryWrapper<Video>()
+                .in(Video::getId, distinctVideoIdList)
+                .eq(Video::getCreatorId, userId)
+                .eq(Video::getStatus, Video.VideoStatus.PUBLISHED));
+        if (deleted != distinctVideoIdList.size()) {
+            throw new YHClientException("视频状态已变更，请刷新后重试！");
+        }
     }
 
     @Override

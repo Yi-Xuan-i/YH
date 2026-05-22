@@ -8,7 +8,6 @@ import com.yixuan.yh.video.pojo.mq.VideoCommentIncrMessage;
 import com.yixuan.yh.video.pojo.request.VideoInteractionBatchRequest;
 import com.yixuan.yh.video.pojo.response.VideoSearchResponse;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
