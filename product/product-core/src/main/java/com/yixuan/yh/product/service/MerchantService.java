@@ -1,6 +1,7 @@
 package com.yixuan.yh.product.service;
 
 import com.yixuan.yh.product.pojo.request.*;
+import com.yixuan.yh.product.pojo.response.GetOnSaleProductForLiveResponse;
 import com.yixuan.yh.product.pojo.response.MerchantProductStatsResponse;
 import com.yixuan.yh.product.pojo.response.ProductEditResponse;
 import com.yixuan.yh.product.pojo.response.ProductManageItemResponse;
@@ -16,7 +17,7 @@ public interface MerchantService {
 
     MerchantProductStatsResponse getMerchantProductStats(Long userId);
 
-    List<ProductManageItemResponse> getMerchantOnSaleProduct(Long userId);
+    List<GetOnSaleProductForLiveResponse> getMerchantOnSaleProductForLive(Long userId);
 
     ProductEditResponse getMerchantProductEditData(Long productId);
 

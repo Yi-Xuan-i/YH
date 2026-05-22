@@ -2,6 +2,7 @@ package com.yixuan.yh.product.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.yixuan.yh.product.pojo.model.entity.Product;
+import com.yixuan.yh.product.pojo.response.GetOnSaleProductForLiveResponse;
 import com.yixuan.yh.product.pojo.response.ProductManageItemResponse;
 import com.yixuan.yh.product.pojo.response.ProductSummaryResponse;
 import org.apache.ibatis.annotations.Delete;
@@ -17,6 +18,9 @@ import java.util.List;
 public interface ProductMapper extends BaseMapper<Product> {
     @Select("select product_id, title, description, status, sales_volume, rating, created_at, updated_at from product where merchant_id = #{userId}")
     List<ProductManageItemResponse> selectMerchantProducts(Long userId);
+
+    @Select("select product_id as productId, title, cover_url as imageUrl, sales_volume as salesVolume from product where merchant_id = #{userId} and status = 4")
+    List<GetOnSaleProductForLiveResponse> selectMerchantOnSaleProductsForLive(Long userId);
 
     @Select("select product_id from product where merchant_id = #{merchantId}")
     List<Long> selectProductIdsByMerchantId(Long merchantId);

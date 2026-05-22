@@ -9,8 +9,10 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostLiveProductResponse {
+public class LiveProductItemResponse {
     @JsonSerialize(using = ToStringSerializer.class)
-    private Long id;
+    private Long productId;
+    private String title;
     private String imageUrl;
+    private Integer salesVolume;
 }

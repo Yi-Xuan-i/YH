@@ -1,23 +1,21 @@
 package com.yixuan.yh.live.service.impl;
 
+import com.yixuan.yh.common.exception.YHClientException;
 import com.yixuan.yh.common.utils.AWSUtils;
 import com.yixuan.yh.common.utils.SnowflakeUtils;
 import com.yixuan.yh.live.cache.LiveCache;
 import com.yixuan.yh.live.entity.LiveProduct;
 import com.yixuan.yh.live.mapper.LiveProductMapper;
-import com.yixuan.yh.live.mapstruct.LiveProductMapstruct;
 import com.yixuan.yh.live.request.PostLiveProductRequest;
-import com.yixuan.yh.live.response.GetLiveProductResponse;
-import com.yixuan.yh.live.response.PostLiveProductResponse;
+import com.yixuan.yh.live.response.LiveProductItemResponse;
 import com.yixuan.yh.live.service.LiveProductService;
 import com.yixuan.yh.live.websocket.pojo.LiveMessage;
-import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class LiveProductServiceImpl implements LiveProductService {
@@ -34,34 +32,36 @@ public class LiveProductServiceImpl implements LiveProductService {
     private LiveCache liveCache;
 
     @Override
-    public PostLiveProductResponse postLiveProduct(Long userId, PostLiveProductRequest postLiveProductRequest) throws IOException {
-
-        // 鉴权
-        if (!liveCache.getAnchorId(postLiveProductRequest.getRoomId()).equals(userId)) {
-            throw new BadRequestException("你没有权限！");
+    public void postMerchantProduct(Long userId, PostLiveProductRequest postLiveProductRequest) {
+        if (!Objects.equals(liveCache.getAnchorId(postLiveProductRequest.getRoomId()), userId)) {
+            throw new YHClientException("你没有权限！");
         }
 
-        LiveProduct liveProduct = LiveProductMapstruct.INSTANCE.postLiveProductRequestToLiveProduct(postLiveProductRequest);
+        LiveProduct liveProduct = liveProductMapper.selectMerchantOnSaleProduct(userId, postLiveProductRequest.getProductId());
+        if (liveProduct == null) {
+            throw new YHClientException("商品不存在或未上架！");
+        }
+
         liveProduct.setId(snowflakeUtils.nextId());
-        liveProduct.setImageUrl(awsUtils.putObject(postLiveProductRequest.getImage()));
+        liveProduct.setRoomId(postLiveProductRequest.getRoomId());
 
         liveProductMapper.insert(liveProduct);
-        messagingTemplate.convertAndSend("/topic/room." + postLiveProductRequest.getRoomId(), new LiveMessage(LiveMessage.MessageType.PRODUCT, liveProduct.getId().toString()));
-
-        return new PostLiveProductResponse(liveProduct.getId(), awsUtils.generateAccessUrl(liveProduct.getImageUrl()));
+        messagingTemplate.convertAndSend("/topic/room." + postLiveProductRequest.getRoomId(), new LiveMessage(LiveMessage.MessageType.PRODUCT, liveProduct.getProductId().toString()));
     }
 
     @Override
-    public List<GetLiveProductResponse> getRoomLiveProduct(Long roomId) {
-        List<GetLiveProductResponse> responseList = liveProductMapper.selectByRoomId(roomId);
-        responseList.forEach(response -> {
-            response.setImageUrl(awsUtils.generateAccessUrl(response.getImageUrl()));
-        });
+    public List<LiveProductItemResponse> getRoomLiveProduct(Long roomId) {
+        List<LiveProductItemResponse> responseList = liveProductMapper.selectByRoomId(roomId);
+        responseList.forEach(response -> response.setImageUrl(awsUtils.generateAccessUrl(response.getImageUrl())));
         return responseList;
     }
 
     @Override
-    public GetLiveProductResponse getLiveProduct(Long id) {
-        return liveProductMapper.selectById(id);
+    public LiveProductItemResponse getLiveProduct(Long productId) {
+        LiveProductItemResponse response = liveProductMapper.selectByProductId(productId);
+        if (response != null) {
+            response.setImageUrl(awsUtils.generateAccessUrl(response.getImageUrl()));
+        }
+        return response;
     }
 }

@@ -13,6 +13,7 @@ import com.yixuan.yh.product.mapstruct.MerchantMapStruct;
 import com.yixuan.yh.product.pojo.model.entity.*;
 import com.yixuan.yh.product.pojo.model.multi.SkuSpecInfo;
 import com.yixuan.yh.product.pojo.request.*;
+import com.yixuan.yh.product.pojo.response.GetOnSaleProductForLiveResponse;
 import com.yixuan.yh.product.pojo.response.MerchantProductStatsResponse;
 import com.yixuan.yh.product.pojo.response.ProductEditResponse;
 import com.yixuan.yh.product.pojo.response.ProductManageItemResponse;
@@ -94,12 +95,10 @@ public class MerchantServiceImpl implements MerchantService {
 
 
     @Override
-    public List<ProductManageItemResponse> getMerchantOnSaleProduct(Long userId) {
-//        productMapper.selectList(new LambdaQueryWrapper<Product>()
-//                .select(Product::getProductId, Product::getTitle, Product::getCoverUrl, Product::getPrice, Product::getSalesVolume)
-//                .eq(Product::getMerchantId, userId)
-//                .eq(Product::getStatus, Product.ProductStatus.ON_SALE));
-        return null;
+    public List<GetOnSaleProductForLiveResponse> getMerchantOnSaleProductForLive(Long userId) {
+        List<GetOnSaleProductForLiveResponse> responseList = productMapper.selectMerchantOnSaleProductsForLive(userId);
+        responseList.forEach(response -> response.setImageUrl(awsUtils.generateAccessUrl(response.getImageUrl())));
+        return responseList;
     }
 
     @Override
