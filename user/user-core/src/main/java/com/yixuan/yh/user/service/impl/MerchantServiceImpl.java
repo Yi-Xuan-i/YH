@@ -5,11 +5,13 @@ import com.yixuan.yh.user.mapper.MerchantMapper;
 import com.yixuan.yh.user.mapstruct.MerchantMapStruct;
 import com.yixuan.yh.user.pojo.entity.Merchant;
 import com.yixuan.yh.user.pojo.request.PostMerchantRequest;
+import com.yixuan.yh.user.pojo.request.PutMerchantRequest;
 import com.yixuan.yh.user.pojo.response.MerchantBasicDataResponse;
 import com.yixuan.yh.user.service.MerchantService;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
@@ -35,6 +37,7 @@ public class MerchantServiceImpl implements MerchantService {
         merchant.setName(postMerchantRequest.getName());
         merchant.setContactPhone(postMerchantRequest.getContactPhone());
         merchant.setAvatarUrl(awsUtils.putObject(postMerchantRequest.getAvatar()));
+        merchant.setCertificationStatus(Merchant.CertificationStatus.CERTIFIED); // 先默认认证通过，后续可以加一个人工审核的流程
 
         merchantMapper.insert(merchant);
     }
@@ -49,5 +52,25 @@ public class MerchantServiceImpl implements MerchantService {
         MerchantBasicDataResponse response = MerchantMapStruct.INSTANCE.toMerchantBasicDataResponse(merchant);
         response.setAvatarUrl(awsUtils.generateAccessUrl(response.getAvatarUrl()));
         return response;
+    }
+
+    @Override
+    public void putMerchant(Long userId, PutMerchantRequest putMerchantRequest) throws IOException {
+        checkMerchantExist(userId);
+        merchantMapper.updateBasic(userId, putMerchantRequest);
+    }
+
+    @Override
+    public String postAvatar(Long userId, MultipartFile avatar) throws IOException {
+        checkMerchantExist(userId);
+        String newAvatarKey = awsUtils.putObject(avatar);
+        merchantMapper.updateAvatarUrl(userId, newAvatarKey);
+        return awsUtils.generateAccessUrl(newAvatarKey);
+    }
+
+    private void checkMerchantExist(Long userId) throws BadRequestException {
+        if (!merchantMapper.selectIsMerchant(userId)) {
+            throw new BadRequestException("店铺不存在！");
+        }
     }
 }
