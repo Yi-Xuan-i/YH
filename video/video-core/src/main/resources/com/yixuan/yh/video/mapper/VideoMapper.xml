@@ -87,6 +87,7 @@
         select id, video_id
         from video_user_like
         where user_id = #{userId}
+          and status = 'FRONT'
         <if test="lastMinId != null">
             and id &lt; #{lastMinId}
         </if>

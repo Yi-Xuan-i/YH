@@ -50,7 +50,11 @@ public class VideoUserFavoriteCache {
             Long result = stringRedisTemplate.execute(interactionScript, Collections.singletonList(key), videoId.toString(), "0");
             assert result != null;
             if (result.equals(RedisConstant.InteractionLua.NOT_EXIST.getValue())) {
-                result = videoUserFavoriteMapper.isFavorite(userId, videoId) ? 1L : 0L;
+                result = videoUserCollectionsItemMapper.selectCount(new LambdaQueryWrapper<VideoUserCollectionsItem>()
+                        .eq(VideoUserCollectionsItem::getUserId, userId)
+                        .eq(VideoUserCollectionsItem::getVideoId, videoId)
+                        .last("LIMIT 1")
+                ) > 0 ? 1L : 0L;
                 stringRedisTemplate.opsForHash().put(key, videoId.toString(), String.valueOf(result));
             } else return !result.equals(RedisConstant.InteractionLua.ERROR.getValue());
         }
