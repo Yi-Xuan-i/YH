@@ -11,7 +11,7 @@ import java.util.Map;
 public interface VideoService {
     List<VideoMainResponse> getVideos(Long userId);
 
-    VideoMainResponse getVideo(Long videoId);
+    VideoMainResponse getVideo(Long userId, Long videoId);
 
     List<VideoSearchResponse> searchVideos(String keyword);
 

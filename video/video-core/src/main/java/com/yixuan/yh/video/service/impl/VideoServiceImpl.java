@@ -191,10 +191,30 @@ public class VideoServiceImpl implements VideoService {
     }
 
     @Override
-    public VideoMainResponse getVideo(Long videoId) {
-        VideoMainResponse videoMainResponse = videoMultiMapper.selectMainOne(videoId);
-        videoMainResponse.setCreatorAvatar(awsUtils.generateAccessUrl(videoMainResponse.getCreatorAvatar()));
+    public VideoMainResponse getVideo(Long userId, Long videoId) {
+        VideoWithInteractionStatus videoWithInteractionStatus = videoMultiMapper.selectMainOne(videoId, userId);
+        if (videoWithInteractionStatus == null) {
+            return null;
+        }
+
+        VideoMainResponse videoMainResponse = VideoMapStruct.INSTANCE.toVideoMainResponse(videoWithInteractionStatus);
         videoMainResponse.setUrl(awsUtils.generateAccessUrl(videoMainResponse.getUrl()));
+
+        UserInfoInListResponse userInfo = fetchAndCacheUserInfo(List.of(videoMainResponse.getCreatorId()))
+                .get(videoMainResponse.getCreatorId());
+        if (userInfo != null) {
+            videoMainResponse.setCreatorName(userInfo.getName());
+            videoMainResponse.setCreatorAvatar(userInfo.getAvatarUrl());
+        }
+
+        if (userId != null) {
+            Boolean followStatus = fetchAndCacheFollowStatus(userId, List.of(videoMainResponse.getCreatorId()))
+                    .get(videoMainResponse.getCreatorId());
+            videoMainResponse.setIsFollowed(Boolean.TRUE.equals(followStatus));
+        } else {
+            videoMainResponse.setIsFollowed(false);
+        }
+
         return videoMainResponse;
     }
 

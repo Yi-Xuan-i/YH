@@ -30,7 +30,7 @@ public class VideoPublicController {
     @Operation(summary = "获取指定视频数据")
     @GetMapping
     public Result<VideoMainResponse> getVideo(@RequestParam Long videoId) {
-        return Result.success(videoService.getVideo(videoId));
+        return Result.success(videoService.getVideo(UserContext.getUser(), videoId));
     }
 
     @Operation(summary = "获取他人已发布的作品")

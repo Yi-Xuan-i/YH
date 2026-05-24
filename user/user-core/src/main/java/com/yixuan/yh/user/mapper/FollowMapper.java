@@ -28,7 +28,8 @@ public interface FollowMapper extends BaseMapper<UserFollow> {
     @Select("select count(*) from user_follow where followee_id = #{userId}")
     Integer countFollowersByUserId(Long userId);
 
-    List<Boolean> selectFollowStatusBatch(Long followerId, List<Long> followeeIdList);
+    List<Boolean> selectFollowStatusBatch(@Param("followerId") Long followerId,
+                                          @Param("followeeIdList") List<Long> followeeIdList);
 
     @Select("""
             select uf.id,

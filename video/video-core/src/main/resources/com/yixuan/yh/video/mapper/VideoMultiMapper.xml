@@ -50,4 +50,46 @@
         )
         LIMIT 10
     </select>
+
+    <select id="selectMainOne"
+            resultType="com.yixuan.yh.video.pojo.entity.multi.VideoWithInteractionStatus">
+        SELECT
+        v.id,
+        v.creator_id,
+        v.url,
+        v.description,
+        v.likes,
+        v.comments,
+        v.favorites,
+        <choose>
+            <when test="userId != null">
+                IF(vul.user_id IS NOT NULL, 1, 0)
+            </when>
+            <otherwise>0</otherwise>
+        </choose>
+        AS is_like,
+        <choose>
+            <when test="userId != null">
+                IF(vuf.user_id IS NOT NULL, 1, 0)
+            </when>
+            <otherwise>0</otherwise>
+        </choose>
+        AS is_favorite
+        FROM video v
+
+        <if test="userId != null">
+            LEFT JOIN video_user_like vul ON (
+            v.id = vul.video_id
+            AND vul.user_id = #{userId}
+            AND vul.status = 'FRONT'
+            )
+            LEFT JOIN video_user_collections_item vuf ON (
+            v.id = vuf.video_id
+            AND vuf.user_id = #{userId}
+            )
+        </if>
+
+        WHERE v.id = #{videoId}
+        AND v.status = 5
+    </select>
 </mapper>
