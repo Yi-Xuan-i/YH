@@ -11,6 +11,8 @@ import java.io.IOException;
 public interface ProfileService {
     ProfileResponse getProfile(Long userId);
 
+    ProfileResponse getProfile(Long userId, Long currentUserId);
+
     ProfileBasicResponse getProfileBasic(Long userId);
 
     ProfileStatsResponse getProfileStats(Long user);

@@ -1,6 +1,7 @@
 package com.yixuan.yh.user.controller._public;
 
 import com.yixuan.yh.common.response.Result;
+import com.yixuan.yh.common.utils.UserContext;
 import com.yixuan.yh.user.pojo.response.ProfileResponse;
 import com.yixuan.yh.user.pojo.response.ProfileStatsResponse;
 import com.yixuan.yh.user.service.ProfileService;
@@ -23,7 +24,7 @@ public class ProfilePublicController {
     @Operation(summary = "获取用户简介")
     @GetMapping("/{userId}")
     public Result<ProfileResponse> getProfile(@PathVariable Long userId) {
-        return Result.success(profileService.getProfile(userId));
+        return Result.success(profileService.getProfile(userId, UserContext.getUser()));
     }
 
     @Operation(summary = "获取用户简介统计数据")

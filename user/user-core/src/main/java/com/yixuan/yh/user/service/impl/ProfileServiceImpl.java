@@ -31,8 +31,15 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public ProfileResponse getProfile(Long userId) {
+        return getProfile(userId, null);
+    }
+
+    @Override
+    public ProfileResponse getProfile(Long userId, Long currentUserId) {
         ProfileResponse profileResponse = UserMapStruct.INSTANCE.toProfileResponse(userMapper.selectProfile(userId));
         profileResponse.setAvatarUrl(awsUtils.generateAccessUrl(profileResponse.getAvatarUrl()));
+        profileResponse.setIsFollowed(currentUserId != null && !currentUserId.equals(userId)
+                && followMapper.selectIsRelationExist(currentUserId, userId));
         return profileResponse;
     }
 
@@ -40,6 +47,7 @@ public class ProfileServiceImpl implements ProfileService {
     public ProfileBasicResponse getProfileBasic(Long userId) {
         User user = userMapper.selectProfileBasic(userId);
         ProfileBasicResponse profileBasicResponse = ProfileMapStruct.INSTANCE.userToBasicProfileResponse(user);
+        profileBasicResponse.setId(userId);
         profileBasicResponse.setAvatarUrl(awsUtils.generateAccessUrl(profileBasicResponse.getAvatarUrl()));
         return profileBasicResponse;
     }

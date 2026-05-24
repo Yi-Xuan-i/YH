@@ -7,4 +7,5 @@ public class ProfileResponse {
     String avatarUrl;
     String name;
     String bio;
+    Boolean isFollowed;
 }
