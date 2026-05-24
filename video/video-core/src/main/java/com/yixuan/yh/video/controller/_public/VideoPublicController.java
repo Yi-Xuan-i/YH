@@ -2,6 +2,7 @@ package com.yixuan.yh.video.controller._public;
 
 import com.yixuan.yh.common.response.Result;
 import com.yixuan.yh.common.utils.UserContext;
+import com.yixuan.yh.video.pojo.response.GetPublishedVideoResponse;
 import com.yixuan.yh.video.pojo.response.VideoMainResponse;
 import com.yixuan.yh.video.pojo.response.VideoSearchResponse;
 import com.yixuan.yh.video.service.VideoService;
@@ -30,6 +31,14 @@ public class VideoPublicController {
     @GetMapping
     public Result<VideoMainResponse> getVideo(@RequestParam Long videoId) {
         return Result.success(videoService.getVideo(videoId));
+    }
+
+    @Operation(summary = "获取他人已发布的作品")
+    @GetMapping("/published")
+    public Result<List<GetPublishedVideoResponse>> getPublishedVideo(
+            @RequestParam Long creatorId,
+            @RequestParam(required = false) Long lastMinId) {
+        return Result.success(videoService.getPublishedVideo(creatorId, lastMinId));
     }
 
     @Operation(summary = "搜索视频")

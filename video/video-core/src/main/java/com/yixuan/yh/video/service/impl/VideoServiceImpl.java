@@ -193,6 +193,7 @@ public class VideoServiceImpl implements VideoService {
     @Override
     public VideoMainResponse getVideo(Long videoId) {
         VideoMainResponse videoMainResponse = videoMultiMapper.selectMainOne(videoId);
+        videoMainResponse.setCreatorAvatar(awsUtils.generateAccessUrl(videoMainResponse.getCreatorAvatar()));
         videoMainResponse.setUrl(awsUtils.generateAccessUrl(videoMainResponse.getUrl()));
         return videoMainResponse;
     }
