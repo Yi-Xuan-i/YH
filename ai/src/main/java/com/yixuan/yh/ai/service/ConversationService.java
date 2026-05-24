@@ -14,5 +14,7 @@ public interface ConversationService {
 
     Mono<List<ConversationMsgResponse>> getConversationMsg(Long id, Long conversationId);
 
+    Mono<String> deleteConversation(Long id, Long conversationId);
+
     Mono<String> generateConversationTitle(Long id, Long conversationId);
 }

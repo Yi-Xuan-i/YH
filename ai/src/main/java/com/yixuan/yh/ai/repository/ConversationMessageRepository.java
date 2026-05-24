@@ -8,4 +8,5 @@ import reactor.core.publisher.Mono;
 public interface ConversationMessageRepository extends R2dbcRepository<ConversationMessage, Long> {
     Flux<ConversationMessage> findByConversationIdOrderByMessageIdDesc(Long conversationId);
     Mono<ConversationMessage> findFirstByConversationIdOrderByMessageIdAsc(Long conversationId);
+    Mono<Void> deleteByConversationId(Long conversationId);
 }

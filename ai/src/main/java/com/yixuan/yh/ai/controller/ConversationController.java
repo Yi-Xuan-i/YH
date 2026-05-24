@@ -42,6 +42,13 @@ public class ConversationController {
                 .map(Result::success));
     }
 
+    @Operation(summary = "删除会话")
+    @DeleteMapping("/{conversationId}")
+    Mono<Result<String>> deleteConversation(@PathVariable Long conversationId) {
+        return ReactiveUserContext.getUserId().flatMap(id -> conversationService.deleteConversation(id, conversationId)
+                .map(Result::success));
+    }
+
     @Operation(summary = "生成会话标题")
     @PostMapping("/title/{conversationId}")
     Mono<Result<String>> generateConversationTitle(@PathVariable Long conversationId) {

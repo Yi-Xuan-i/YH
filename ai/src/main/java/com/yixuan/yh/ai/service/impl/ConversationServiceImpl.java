@@ -79,6 +79,19 @@ public class ConversationServiceImpl implements ConversationService {
     }
 
     @Override
+    public Mono<String> deleteConversation(Long id, Long conversationId) {
+        return conversationRepository.existsByConversationIdAndUserId(conversationId, id)
+                .flatMap(exist -> {
+                    if (!exist) {
+                        return Mono.error(new HttpException("会话异常！"));
+                    }
+                    return conversationMessageRepository.deleteByConversationId(conversationId)
+                            .then(conversationRepository.deleteById(conversationId))
+                            .thenReturn("删除成功");
+                });
+    }
+
+    @Override
     public Mono<String> generateConversationTitle(Long id, Long conversationId) {
         return conversationMessageRepository.findFirstByConversationIdOrderByMessageIdAsc(conversationId)
                 .map(ConversationMessage::getContent)
