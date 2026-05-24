@@ -5,6 +5,7 @@ import com.yixuan.yh.chat.entity.ChatMessage;
 import com.yixuan.yh.chat.entity.ChatConversation;
 import com.yixuan.yh.chat.mapper.ChatConversationMapper;
 import com.yixuan.yh.chat.mapper.ChatMessageMapper;
+import com.yixuan.yh.chat.websocket.pojo.ChatACKMessage;
 import com.yixuan.yh.chat.websocket.pojo.ChatReceiveMessage;
 import com.yixuan.yh.chat.websocket.pojo.ChatSendMessage;
 import com.yixuan.yh.common.utils.SnowflakeUtils;
@@ -57,7 +58,13 @@ public class GlobalController {
 
         chatMessageMapper.insert(chatMessage);
 
-        // 更新未读数
+        // 发送ACK消息
+        ChatACKMessage ackMessage = new ChatACKMessage();
+        ackMessage.setConversationId(sendMessage.getConversationId());
+        ackMessage.setClientMsgId(sendMessage.getClientMsgId());
+        simpMessagingTemplate.convertAndSendToUser(senderId.toString(), "/queue/chat", ackMessage);
+
+        // 更新未读数（不与消息入库放到同一个事务中，允许丢失情况发生）
         Long receiverId = senderNumber.equals(ConversationUserNumber.USER1) ? conversation.getUser2Id() : conversation.getUser1Id();
         if (senderNumber.equals(ConversationUserNumber.USER1)) {
             chatConversationMapper.updateUser2UnreadCount(sendMessage.getConversationId(), receiverId);

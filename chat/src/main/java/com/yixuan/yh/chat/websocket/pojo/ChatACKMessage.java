@@ -3,17 +3,16 @@ package com.yixuan.yh.chat.websocket.pojo;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.yixuan.yh.chat.websocket._enum.ChatReceiveMessageType;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-
-import java.time.LocalDateTime;
+import lombok.NoArgsConstructor;
 
 @Data
-public class ChatReceiveMessage {
-    private final ChatReceiveMessageType type = ChatReceiveMessageType.NORMAL;
+@AllArgsConstructor
+@NoArgsConstructor
+public class ChatACKMessage {
+    private final ChatReceiveMessageType type = ChatReceiveMessageType.ACK;
     @JsonSerialize(using = ToStringSerializer.class)
     private Long conversationId;
-    @JsonSerialize(using = ToStringSerializer.class)
-    private Long senderId;
-    private String content;
-    private LocalDateTime sentTime;
+    private String clientMsgId;
 }
