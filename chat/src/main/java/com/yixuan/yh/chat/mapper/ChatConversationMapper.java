@@ -18,7 +18,7 @@ public interface ChatConversationMapper extends BaseMapper<ChatConversation> {
     @Update("update chat_conversation set user2_unread_count = user2_unread_count + 1 where id = #{conversationId} and user2_id = #{userId}")
     void updateUser2UnreadCount(Long conversationId, Long userId);
 
-    @Select("select user1_id, user2_id from chat_conversation")
+    @Select("select user1_id, user2_id from chat_conversation where id = #{conversationId}")
     ChatConversation selectBothIdById(Long conversationId);
 
     @Select("SELECT * FROM (\n" +
