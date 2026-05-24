@@ -22,14 +22,18 @@ public interface ChatConversationMapper extends BaseMapper<ChatConversation> {
     ChatConversation selectBothIdById(Long conversationId);
 
     @Select("SELECT * FROM (\n" +
-            "  (SELECT id as conversation_id, user2_id as contact_id, user1_unread_count as unread_count, updated_time \n" +
+            "  (SELECT id as conversation_id, user2_id as contact_id, \n" +
+            "          (SELECT content FROM chat_message WHERE conversation_id = chat_conversation.id ORDER BY id DESC LIMIT 1) as last_message, \n" +
+            "          user1_unread_count as unread_count, updated_time \n" +
             "   FROM chat_conversation \n" +
             "   WHERE user1_id = #{userId} \n" +
 //            "     AND updated_time < #{last_seen_time}\n" +
             "   ORDER BY updated_time DESC)\n" +
             "  UNION ALL\n" +
             "  \n" +
-            "  (SELECT id as conversation_id, user1_id as contact_id, user2_unread_count as unread_count, updated_time  \n" +
+            "  (SELECT id as conversation_id, user1_id as contact_id, \n" +
+            "          (SELECT content FROM chat_message WHERE conversation_id = chat_conversation.id ORDER BY id DESC LIMIT 1) as last_message, \n" +
+            "          user2_unread_count as unread_count, updated_time  \n" +
             "   FROM chat_conversation \n" +
             "   WHERE user2_id = #{userId} \n" +
 //            "     AND updated_time < #{last_seen_time}\n" +

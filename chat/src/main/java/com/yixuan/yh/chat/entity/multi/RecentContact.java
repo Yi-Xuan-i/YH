@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 public class RecentContact {
     Long conversationId;
     Long contactId;
+    String lastMessage;
     Integer unreadCount;
     LocalDateTime updatedTime;
 }
