@@ -18,5 +18,5 @@ public class RecentContactResponse {
     private String contactName;
     private String contactAvatar;
     private Integer unreadCount;
-    private LocalDateTime updateTime;
+    private LocalDateTime updatedTime;
 }

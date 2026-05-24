@@ -9,5 +9,5 @@ public class RecentContact {
     Long conversationId;
     Long contactId;
     Integer unreadCount;
-    LocalDateTime updateTime;
+    LocalDateTime updatedTime;
 }

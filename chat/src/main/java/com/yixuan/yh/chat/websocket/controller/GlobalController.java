@@ -77,7 +77,7 @@ public class GlobalController {
         receiveMessage.setConversationId(sendMessage.getConversationId());
         receiveMessage.setSenderId(senderId);
         receiveMessage.setContent(sendMessage.getContent());
-        receiveMessage.setSentTime(LocalDateTime.now());
+        receiveMessage.setSentTime(chatMessage.getCreatedTime());
 
         simpMessagingTemplate.convertAndSendToUser(receiverId.toString(), "/queue/chat", receiveMessage);
     }

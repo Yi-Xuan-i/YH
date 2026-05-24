@@ -12,10 +12,10 @@ import java.util.List;
 @Mapper
 public interface ChatConversationMapper extends BaseMapper<ChatConversation> {
 
-    @Update("update chat_conversation set user1_unread_count = user1_unread_count + 1 where id = #{conversationId} and user1_id = #{userId}")
+    @Update("update chat_conversation set user1_unread_count = user1_unread_count + 1, updated_time = now() where id = #{conversationId} and user1_id = #{userId}")
     void updateUser1UnreadCount(Long conversationId, Long userId);
 
-    @Update("update chat_conversation set user2_unread_count = user2_unread_count + 1 where id = #{conversationId} and user2_id = #{userId}")
+    @Update("update chat_conversation set user2_unread_count = user2_unread_count + 1, updated_time = now() where id = #{conversationId} and user2_id = #{userId}")
     void updateUser2UnreadCount(Long conversationId, Long userId);
 
     @Select("select user1_id, user2_id from chat_conversation where id = #{conversationId}")
