@@ -5,6 +5,7 @@ import com.yixuan.yh.user.mapper.FollowMapper;
 import com.yixuan.yh.user.mapper.UserMapper;
 import com.yixuan.yh.user.mapstruct.ProfileMapStruct;
 import com.yixuan.yh.user.mapstruct.UserMapStruct;
+import com.yixuan.yh.user.pojo._enum.FollowStatus;
 import com.yixuan.yh.user.pojo.entity.User;
 import com.yixuan.yh.user.pojo.request.ProfileRequest;
 import com.yixuan.yh.user.pojo.response.ProfileBasicResponse;
@@ -38,9 +39,30 @@ public class ProfileServiceImpl implements ProfileService {
     public ProfileResponse getProfile(Long userId, Long currentUserId) {
         ProfileResponse profileResponse = UserMapStruct.INSTANCE.toProfileResponse(userMapper.selectProfile(userId));
         profileResponse.setAvatarUrl(awsUtils.generateAccessUrl(profileResponse.getAvatarUrl()));
-        profileResponse.setIsFollowed(currentUserId != null && !currentUserId.equals(userId)
-                && followMapper.selectIsRelationExist(currentUserId, userId));
+        profileResponse.setFollowStatus(getFollowStatus(userId, currentUserId));
         return profileResponse;
+    }
+
+    private FollowStatus getFollowStatus(Long userId, Long currentUserId) {
+        if (currentUserId == null || currentUserId.equals(userId)) {
+            return FollowStatus.NOT_FOLLOWED;
+        }
+
+        boolean isFollowing = followMapper.selectIsRelationExist(currentUserId, userId);
+        boolean isFollowedBy = followMapper.selectIsRelationExist(userId, currentUserId);
+        if (isFollowing && isFollowedBy) {
+            return FollowStatus.MUTUAL_FOLLOWED;
+        }
+
+        if (isFollowing) {
+            return FollowStatus.FOLLOWED;
+        }
+
+        if (isFollowedBy) {
+            return FollowStatus.FOLLOWED_BY;
+        }
+
+        return FollowStatus.NOT_FOLLOWED;
     }
 
     @Override
