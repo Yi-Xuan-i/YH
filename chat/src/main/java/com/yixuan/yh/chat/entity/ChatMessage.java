@@ -13,11 +13,11 @@ public class ChatMessage {
     Long conversationId;
     Long senderId;
     String content;
-    ContentType contentType;
+    MessageType messageType;
     LocalDateTime createdTime;
 
     @AllArgsConstructor
-    public enum ContentType {
+    public enum MessageType {
         TEXT(0, "普通文本"),
         IMAGE(1, "图片"),
         VIDEO(2, "视频");

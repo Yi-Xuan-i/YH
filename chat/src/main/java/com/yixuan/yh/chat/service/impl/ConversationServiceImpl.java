@@ -1,24 +1,32 @@
 package com.yixuan.yh.chat.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.yixuan.yh.chat.entity.ChatConversation;
 import com.yixuan.yh.chat.entity.ChatMessage;
+import com.yixuan.yh.chat.entity.ChatMessageMedia;
 import com.yixuan.yh.chat.entity.multi.RecentContact;
 import com.yixuan.yh.chat.mapper.ChatConversationMapper;
+import com.yixuan.yh.chat.mapper.ChatMessageMediaMapper;
 import com.yixuan.yh.chat.mapper.ChatMessageMapper;
 import com.yixuan.yh.chat.mapstruct.ConversationMapStruct;
+import com.yixuan.yh.chat.response.ChatMessageMediaResponse;
 import com.yixuan.yh.chat.response.ConversationMessageResponse;
 import com.yixuan.yh.chat.response.RecentContactResponse;
 import com.yixuan.yh.chat.service.ConversationService;
+import com.yixuan.yh.common.utils.AWSUtils;
 import com.yixuan.yh.user.feign.UserPrivateClient;
 import com.yixuan.yh.user.pojo.response.UserInfoInListResponse;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Service
@@ -30,6 +38,10 @@ public class ConversationServiceImpl implements ConversationService {
     private UserPrivateClient userPrivateClient;
     @Autowired
     private ChatMessageMapper chatMessageMapper;
+    @Autowired
+    private ChatMessageMediaMapper chatMessageMediaMapper;
+    @Autowired
+    private AWSUtils awsUtils;
 
     @Override
     public List<RecentContactResponse> getRecentContacts(Long userId) {
@@ -75,11 +87,13 @@ public class ConversationServiceImpl implements ConversationService {
         }
 
         List<ChatMessage> chatMessageList = chatMessageMapper.selectByConversationId(conversationId, lastMinId);
+        Map<Long, ChatMessageMediaResponse> mediaMap = getMessageMediaMap(chatMessageList);
 
         List<ConversationMessageResponse> conversationMessageResponseList = new ArrayList<>(chatMessageList.size());
         for (ChatMessage chatMessage : chatMessageList) {
             ConversationMessageResponse conversationMessage = ConversationMapStruct.INSTANCE.toConversationMessageResponse(chatMessage);
             conversationMessage.setIsUser(userId.equals(chatMessage.getSenderId()));
+            conversationMessage.setMedia(mediaMap.get(chatMessage.getId()));
 
             conversationMessageResponseList.add(conversationMessage);
         }
@@ -98,5 +112,35 @@ public class ConversationServiceImpl implements ConversationService {
         }
 
         return conversationMessageResponseList;
+    }
+
+    private Map<Long, ChatMessageMediaResponse> getMessageMediaMap(List<ChatMessage> chatMessageList) {
+        List<Long> messageIdList = chatMessageList.stream()
+                .filter(chatMessage -> chatMessage.getMessageType() == ChatMessage.MessageType.IMAGE
+                        || chatMessage.getMessageType() == ChatMessage.MessageType.VIDEO)
+                .map(ChatMessage::getId)
+                .toList();
+        if (messageIdList.isEmpty()) {
+            return Map.of();
+        }
+
+        List<ChatMessageMedia> mediaList = chatMessageMediaMapper.selectList(new LambdaQueryWrapper<ChatMessageMedia>()
+                .in(ChatMessageMedia::getMessageId, messageIdList));
+
+        return mediaList.stream()
+                .collect(Collectors.toMap(
+                        ChatMessageMedia::getMessageId,
+                        this::toMediaResponse,
+                        (first, ignored) -> first
+                ));
+    }
+
+    private ChatMessageMediaResponse toMediaResponse(ChatMessageMedia media) {
+        return new ChatMessageMediaResponse(
+                media.getId(),
+                media.getMediaType(),
+                awsUtils.generateAccessUrl(media.getUrl()),
+                StringUtils.hasText(media.getCoverUrl()) ? awsUtils.generateAccessUrl(media.getCoverUrl()) : null
+        );
     }
 }

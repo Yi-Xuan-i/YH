@@ -11,6 +11,7 @@ public class ConversationMessageResponse {
     Long conversationId;
     Boolean isUser;
     String content;
-    ChatMessage.ContentType contentType;
+    ChatMessage.MessageType messageType;
+    ChatMessageMediaResponse media;
     LocalDateTime createdTime;
 }
