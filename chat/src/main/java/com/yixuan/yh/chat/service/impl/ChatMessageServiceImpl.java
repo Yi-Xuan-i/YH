@@ -58,7 +58,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
         ChatMessage.MessageType messageType = resolveContentType(sendMessage);
         ChatMessageMedia media = null;
         String content = sendMessage.getContent();
-        if (messageType == ChatMessage.MessageType.IMAGE || messageType == ChatMessage.MessageType.VIDEO) {
+        if (isMediaMessage(messageType)) {
             media = resolveUploadedMedia(sendMessage.getMediaId(), messageType);
             content = getMediaMessageLabel(messageType);
         }
@@ -101,6 +101,12 @@ public class ChatMessageServiceImpl implements ChatMessageService {
         return ChatMessage.MessageType.TEXT;
     }
 
+    private boolean isMediaMessage(ChatMessage.MessageType messageType) {
+        return messageType == ChatMessage.MessageType.IMAGE
+                || messageType == ChatMessage.MessageType.VIDEO
+                || messageType == ChatMessage.MessageType.VOICE;
+    }
+
     private ChatMessageMedia resolveUploadedMedia(Long mediaId, ChatMessage.MessageType messageType) {
         if (mediaId == null) {
             throw new YHClientException("mediaId cannot be empty");
@@ -125,6 +131,9 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     private String getMediaMessageLabel(ChatMessage.MessageType messageType) {
         if (messageType == ChatMessage.MessageType.IMAGE) {
             return "[图片]";
+        }
+        if (messageType == ChatMessage.MessageType.VOICE) {
+            return "[语音]";
         }
         return "[视频]";
     }

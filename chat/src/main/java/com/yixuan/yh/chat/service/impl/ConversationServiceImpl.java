@@ -117,7 +117,8 @@ public class ConversationServiceImpl implements ConversationService {
     private Map<Long, ChatMessageMediaResponse> getMessageMediaMap(List<ChatMessage> chatMessageList) {
         List<Long> messageIdList = chatMessageList.stream()
                 .filter(chatMessage -> chatMessage.getMessageType() == ChatMessage.MessageType.IMAGE
-                        || chatMessage.getMessageType() == ChatMessage.MessageType.VIDEO)
+                        || chatMessage.getMessageType() == ChatMessage.MessageType.VIDEO
+                        || chatMessage.getMessageType() == ChatMessage.MessageType.VOICE)
                 .map(ChatMessage::getId)
                 .toList();
         if (messageIdList.isEmpty()) {

@@ -20,7 +20,8 @@ public class ChatMessage {
     public enum MessageType {
         TEXT(0, "普通文本"),
         IMAGE(1, "图片"),
-        VIDEO(2, "视频");
+        VIDEO(2, "视频"),
+        VOICE(3, "语音");
 
         @EnumValue
         private final int code;

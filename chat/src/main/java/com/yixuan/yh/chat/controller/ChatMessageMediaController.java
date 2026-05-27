@@ -1,7 +1,6 @@
 package com.yixuan.yh.chat.controller;
 
 import com.yixuan.yh.chat.request.ChatMediaPresignRequest;
-import com.yixuan.yh.chat.request.ChatMediaUploadCallbackRequest;
 import com.yixuan.yh.chat.response.ChatMediaPresignResponse;
 import com.yixuan.yh.chat.response.ChatMessageMediaResponse;
 import com.yixuan.yh.chat.service.ChatMessageMediaService;
@@ -19,13 +18,13 @@ public class ChatMessageMediaController {
     @Autowired
     private ChatMessageMediaService chatMessageMediaService;
 
-    @Operation(summary = "Get direct upload url for chat image or video")
+    @Operation(summary = "Get direct upload url for chat image, video or voice")
     @PostMapping("/presign-put-object")
     public Result<ChatMediaPresignResponse> presignPutObject(@RequestBody ChatMediaPresignRequest request) {
         return Result.success(chatMessageMediaService.presignPutObject(request));
     }
 
-    @Operation(summary = "Chat image or video upload callback")
+    @Operation(summary = "Chat image, video or voice upload callback")
     @PostMapping("/upload-callback")
     public Result<ChatMessageMediaResponse> uploadCallback(@RequestParam Long mediaId) {
         return Result.success(chatMessageMediaService.uploadCallback(mediaId));

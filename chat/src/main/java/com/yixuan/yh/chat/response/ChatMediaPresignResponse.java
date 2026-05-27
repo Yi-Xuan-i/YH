@@ -8,11 +8,6 @@ import lombok.Data;
 public class ChatMediaPresignResponse {
     @JsonSerialize(using = ToStringSerializer.class)
     private Long mediaId;
-    private Integer mediaType;
-    private String objectKey;
     private String uploadUrl;
-    private String accessUrl;
-    private String coverObjectKey;
     private String coverUploadUrl;
-    private String coverAccessUrl;
 }

@@ -23,6 +23,7 @@ public class ChatMessageMediaServiceImpl implements ChatMessageMediaService {
     private static final Duration UPLOAD_URL_EXPIRE = Duration.ofMinutes(10);
     private static final String DEFAULT_IMAGE_CONTENT_TYPE = "image/png";
     private static final String DEFAULT_VIDEO_CONTENT_TYPE = "video/mp4";
+    private static final String DEFAULT_VOICE_CONTENT_TYPE = "audio/mpeg";
 
     @Autowired
     private AWSUtils awsUtils;
@@ -48,17 +49,12 @@ public class ChatMessageMediaServiceImpl implements ChatMessageMediaService {
 
         ChatMediaPresignResponse response = new ChatMediaPresignResponse();
         response.setMediaId(media.getId());
-        response.setMediaType(media.getMediaType());
-        response.setObjectKey(objectKey);
         response.setUploadUrl(awsUtils.presignPutObject(objectKey, uploadContentType, UPLOAD_URL_EXPIRE));
-        response.setAccessUrl(awsUtils.generateAccessUrl(objectKey));
 
         if (messageType == ChatMessage.MessageType.VIDEO && StringUtils.hasText(request.getCoverContentType())) {
             String coverKey = awsUtils.generateKey();
             media.setCoverUrl(coverKey);
-            response.setCoverObjectKey(coverKey);
             response.setCoverUploadUrl(awsUtils.presignPutObject(coverKey, request.getCoverContentType(), UPLOAD_URL_EXPIRE));
-            response.setCoverAccessUrl(awsUtils.generateAccessUrl(coverKey));
         }
 
         chatMessageMediaMapper.insert(media);
@@ -98,6 +94,9 @@ public class ChatMessageMediaServiceImpl implements ChatMessageMediaService {
         if (mediaType != null && mediaType == ChatMessage.MessageType.VIDEO.getCode()) {
             return ChatMessage.MessageType.VIDEO;
         }
+        if (mediaType != null && mediaType == ChatMessage.MessageType.VOICE.getCode()) {
+            return ChatMessage.MessageType.VOICE;
+        }
         throw new YHClientException("unsupported media type");
     }
 
@@ -105,6 +104,12 @@ public class ChatMessageMediaServiceImpl implements ChatMessageMediaService {
         if (StringUtils.hasText(requestedContentType)) {
             return requestedContentType;
         }
-        return messageType == ChatMessage.MessageType.IMAGE ? DEFAULT_IMAGE_CONTENT_TYPE : DEFAULT_VIDEO_CONTENT_TYPE;
+        if (messageType == ChatMessage.MessageType.IMAGE) {
+            return DEFAULT_IMAGE_CONTENT_TYPE;
+        }
+        if (messageType == ChatMessage.MessageType.VOICE) {
+            return DEFAULT_VOICE_CONTENT_TYPE;
+        }
+        return DEFAULT_VIDEO_CONTENT_TYPE;
     }
 }
