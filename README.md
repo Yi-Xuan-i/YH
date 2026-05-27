@@ -93,7 +93,7 @@
   <img src="https://gitee.com/YXXHYH/yh-be/raw/master/.file/index.png" alt="首页" width="700" />
   
   <!-- 个人主页 -->
-  <img src="https://gitee.com/YXXHYH/yh-be/raw/master/.file/index.png" alt="个人主页" width="700">
+  <img src="https://gitee.com/YXXHYH/yh-be/raw/master/.file/self.png" alt="个人主页" width="700">
 
   <!-- 店铺管理 -->
   <img src="https://gitee.com/YXXHYH/yh-be/raw/master/.file/merchant-self.png" alt="店铺管理" width="700">
