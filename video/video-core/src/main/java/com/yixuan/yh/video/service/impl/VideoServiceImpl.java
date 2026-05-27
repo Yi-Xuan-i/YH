@@ -53,6 +53,8 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
 
 @Service
@@ -94,13 +96,15 @@ public class VideoServiceImpl implements VideoService {
     private ObjectMapper objectMapper;
     @Autowired
     private MessageOutBoxMapper messageOutBoxMapper;
+    @Autowired
+    private ThreadPoolExecutor videoExecutor;
 
     @Override
     public List<VideoMainResponse> getVideos(Long userId) {
-        List<VideoWithInteractionStatus> videoWithInteractionStatusList = videoMultiMapper.selectMainRandom(userId);
+        List<VideoWithInteractionStatus> statusList =
+                videoMultiMapper.selectMainRandom(userId);
 
-        /* 转换 */
-        List<VideoMainResponse> videoMainResponseList = videoWithInteractionStatusList.stream()
+        List<VideoMainResponse> responses = statusList.stream()
                 .map(status -> {
                     VideoMainResponse response = VideoMapStruct.INSTANCE.toVideoMainResponse(status);
                     response.setUrl(awsUtils.generateAccessUrl(response.getUrl()));
@@ -108,31 +112,43 @@ public class VideoServiceImpl implements VideoService {
                 })
                 .toList();
 
-        /* 获取 creatorId List */
-        List<Long> creatorIdList = videoMainResponseList.stream().map(VideoMainResponse::getCreatorId).distinct().toList();
+        List<Long> creatorIdList = responses.stream()
+                .map(VideoMainResponse::getCreatorId)
+                .distinct()
+                .toList();
 
-        /* 根据 creatorId 获取对应 creatorName 和 creatorAvatar */
-        // 获取用户信息（先从缓存中获取，缓存没有再批量请求用户服务）
-        Map<Long, UserInfoInListResponse> idToUserInfoMap = fetchAndCacheUserInfo(creatorIdList);
-        // 完善数据
-        videoMainResponseList.forEach(response -> {
+        CompletableFuture<Map<Long, UserInfoInListResponse>> userInfoFuture =
+                CompletableFuture.supplyAsync(
+                        () -> fetchAndCacheUserInfo(creatorIdList),
+                        videoExecutor
+                );
+
+        CompletableFuture<Map<Long, Boolean>> followStatusFuture =
+                userId == null
+                        ? CompletableFuture.completedFuture(Map.of())
+                        : CompletableFuture.supplyAsync(
+                        () -> fetchAndCacheFollowStatus(userId, creatorIdList),
+                        videoExecutor
+                );
+
+        Map<Long, UserInfoInListResponse> idToUserInfoMap = userInfoFuture.join();
+        Map<Long, Boolean> idToFollowStatusMap = followStatusFuture.join();
+
+        responses.forEach(response -> {
             UserInfoInListResponse userInfo = idToUserInfoMap.get(response.getCreatorId());
-            response.setCreatorAvatar(userInfo.getAvatarUrl());
-            response.setCreatorName(userInfo.getName());
+            if (userInfo != null) {
+                response.setCreatorAvatar(userInfo.getAvatarUrl());
+                response.setCreatorName(userInfo.getName());
+            }
+
+            if (userId != null) {
+                response.setIsFollowed(
+                        idToFollowStatusMap.getOrDefault(response.getCreatorId(), false)
+                );
+            }
         });
 
-        /* 获取关注状态 */
-        if (userId != null) {
-            // 获取关注状态（先从缓存中获取，缓存没有再批量请求用户服务）
-            Map<Long, Boolean> idToFollowStatusMap = fetchAndCacheFollowStatus(userId, creatorIdList);
-            // 完善数据
-            videoMainResponseList.forEach(response -> {
-                Boolean followStatus = idToFollowStatusMap.get(response.getCreatorId());
-                response.setIsFollowed(followStatus);
-            });
-        }
-
-        return videoMainResponseList;
+        return responses;
     }
 
     private Map<Long, UserInfoInListResponse> fetchAndCacheUserInfo(List<Long> creatorIdList) {
