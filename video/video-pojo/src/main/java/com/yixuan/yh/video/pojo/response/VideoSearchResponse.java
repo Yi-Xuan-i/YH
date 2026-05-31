@@ -16,6 +16,6 @@ public class VideoSearchResponse {
     private Long creatorId;
     private String creatorName;
     private String description;
-    private String url;
+    private String coverUrl;
     private Long likes;
 }

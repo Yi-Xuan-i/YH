@@ -47,7 +47,7 @@ public class VideoUserFavoriteCache {
         String key = RedisConstant.VIDEO_USER_FAVORITE_KEY_PREFIX + userId;
 
         while (true) {
-            Long result = stringRedisTemplate.execute(interactionScript, Collections.singletonList(key), videoId.toString(), "0");
+            Long result = stringRedisTemplate.execute(interactionScript, Collections.singletonList(key), videoId.toString(), "0", "600");
             assert result != null;
             if (result.equals(RedisConstant.InteractionLua.NOT_EXIST.getValue())) {
                 result = videoUserCollectionsItemMapper.selectCount(new LambdaQueryWrapper<VideoUserCollectionsItem>()

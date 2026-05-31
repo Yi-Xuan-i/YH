@@ -3,8 +3,6 @@ package com.yixuan.yh.video.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import com.yixuan.yh.common.exception.YHClientException;
 import com.yixuan.yh.common.exception.YHServerException;
 import com.yixuan.yh.common.response.Result;
@@ -60,14 +58,6 @@ import java.util.stream.Collectors;
 @Service
 public class VideoServiceImpl implements VideoService {
 
-    private final Cache<Long, UserInfoInListResponse> userInfoCache = Caffeine.newBuilder()
-            .expireAfterWrite(Duration.ofMinutes(5))
-            .maximumSize(100)
-            .build();
-    private final Cache<String, Boolean> followStatusCache = Caffeine.newBuilder()
-            .expireAfterWrite(Duration.ofMinutes(5))
-            .maximumSize(1000)
-            .build();
     @Autowired
     private VideoMapper videoMapper;
     @Autowired
@@ -152,55 +142,26 @@ public class VideoServiceImpl implements VideoService {
     }
 
     private Map<Long, UserInfoInListResponse> fetchAndCacheUserInfo(List<Long> creatorIdList) {
-        // 没有缓存的id
-        List<Long> noCacheIdList = new ArrayList<>();
         Map<Long, UserInfoInListResponse> idToUserInfoMap = new HashMap<>();
-        for (Long creatorId : creatorIdList) {
-            UserInfoInListResponse userInfo = userInfoCache.getIfPresent(creatorId);
-            if (userInfo != null) {
-                idToUserInfoMap.put(creatorId, userInfo);
-            } else {
-                noCacheIdList.add(creatorId);
-            }
-        }
-        // 批量获取没有缓存的id对应的用户信息
-        if (!noCacheIdList.isEmpty()) {
-            Result<List<UserInfoInListResponse>> result = userPrivateClient.getUserInfoInList(noCacheIdList);
+        if (!creatorIdList.isEmpty()) {
+            Result<List<UserInfoInListResponse>> result = userPrivateClient.getUserInfoInList(creatorIdList);
             List<UserInfoInListResponse> userInfoList = result.getData();
             for (UserInfoInListResponse userInfo : userInfoList) {
                 idToUserInfoMap.put(userInfo.getId(), userInfo);
-                userInfoCache.put(userInfo.getId(), userInfo);
             }
         }
         return idToUserInfoMap;
     }
 
     private Map<Long, Boolean> fetchAndCacheFollowStatus(Long userId, List<Long> creatorIdList) {
-        /* 不推荐使用本地缓存，一致性要求还是高一点的（后续修改） */
-
-        // 没有缓存的id
-        List<Long> noCacheIdList = new ArrayList<>();
         Map<Long, Boolean> idToFollowStatusMap = new HashMap<>();
-        for (Long creatorId : creatorIdList) {
-            String key = userId + ":" + creatorId;
-            Boolean followStatus = followStatusCache.getIfPresent(key);
-            if (followStatus != null) {
-                idToFollowStatusMap.put(creatorId, followStatus);
-            } else {
-                noCacheIdList.add(creatorId);
-
-            }
-        }
-        // 批量获取没有缓存的id对应的关注状态
-        if (!noCacheIdList.isEmpty()) {
-            Result<List<Boolean>> result = userFollowPrivateClient.getFollowStatus(userId, noCacheIdList);
+        if (!creatorIdList.isEmpty()) {
+            Result<List<Boolean>> result = userFollowPrivateClient.getFollowStatus(userId, creatorIdList);
             List<Boolean> followStatusList = result.getData();
-            for (int i = 0; i < noCacheIdList.size(); i++) {
-                Long creatorId = noCacheIdList.get(i);
+            for (int i = 0; i < creatorIdList.size(); i++) {
+                Long creatorId = creatorIdList.get(i);
                 Boolean followStatus = followStatusList.get(i);
                 idToFollowStatusMap.put(creatorId, followStatus);
-                String key = userId + ":" + creatorId;
-                followStatusCache.put(key, followStatus);
             }
         }
         return idToFollowStatusMap;
@@ -258,7 +219,7 @@ public class VideoServiceImpl implements VideoService {
 
         videoSearchResponseList.forEach(response -> {
             response.setCreatorName(idToNameMap.get(response.getCreatorId()));
-            response.setUrl(awsUtils.generateAccessUrl(response.getUrl()));
+            response.setCoverUrl(awsUtils.generateAccessUrl(response.getCoverUrl()));
         });
 
         return videoSearchResponseList;

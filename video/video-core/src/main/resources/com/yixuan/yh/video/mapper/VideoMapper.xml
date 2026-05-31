@@ -118,13 +118,13 @@
 
     <select id="searchPublishedVideoByDescriptionPrefix" resultType="com.yixuan.yh.video.pojo.response.VideoSearchResponse">
         select id as video_id,
-        creator_id,
-        description,
-        url,
-        likes
+               creator_id,
+               description,
+               cover_url,
+               likes
         from video
-        where status = 'PUBLISHED'
-        and description like concat(#{keyword}, '%')
+        where status = 5
+          and description like concat(#{keyword}, '%')
         order by id desc
     </select>
 
