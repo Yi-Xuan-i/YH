@@ -140,6 +140,6 @@ YH/
 
 ## 📚 相关链接
 
-- 前台页面：<https://gitee.com/YXXHYH/yh-fe>
-- 后台页面：<https://gitee.com/YXXHYH/yh-admin-fe>
+- web：<https://gitee.com/YXXHYH/yh-fe>
+- app：<https://gitee.com/YXXHYH/yh-app>
 
