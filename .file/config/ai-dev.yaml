@@ -1,8 +1,8 @@
 spring:
   r2dbc:
     url: r2dbc:mysql://mysql:3306/yh
-    username: yh
-    password: Qq2434462503.
+    username: ${MYSQL_USERNAME}
+    password: ${MYSQL_PASSWORD}
     pool:
       enabled: true
       initial-size: 1
@@ -11,19 +11,14 @@ spring:
       max-idle-time: 30000
   ai:
     openai:
-      api-key: ${api-key}
-      base-url: https://ark.cn-beijing.volces.com/api/v3/
-      # base-url: http://localhost:11434/v1
+      api-key: ${OPENAI_API_KEY}
+      base-url: https://dashscope.aliyuncs.com/compatible-mode/
       chat:
         options:
-          model: deepseek-r1-250528
-          # model: qwen3:4b
+          model: deepseek-v3.2-exp
           temperature: 0.8
         completions-path: /chat/completions
       embedding:
-        api-key: ${api-key}
-        base-url: https://dashscope.aliyuncs.com/compatible-mode/
-        # base-url: http://localhost:11434
         options:
           model: text-embedding-v4
           # model: qwen3-embedding:4b

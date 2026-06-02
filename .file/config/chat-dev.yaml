@@ -1,14 +1,8 @@
-spring:
-  elasticsearch:
-    uris: http://es7:9200
-    socket-keep-alive: true
-
-mt:
-  console-url: http://mt:19998
-  core-url: http://mt:19999
-  bucket-name: chat
-  username: mt
-  password: mt
+aws:
+  url: http://minio:9000
+  secret-key: ${MINIO_SECRET_KEY}
+  access-key: ${MINIO_ACCESS_KEY}
+  bucket: chat
 
 mybatis-plus:
   type-aliases-package: com.yixuan.yh.chat.pojo

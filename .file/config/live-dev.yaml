@@ -1,14 +1,19 @@
-spring:
-  elasticsearch:
-    uris: http://es7:9200
-    socket-keep-alive: true
+aws:
+  url: http://minio:9000
+  secret-key: ${MINIO_SECRET_KEY}
+  access-key: ${MINIO_ACCESS_KEY}
+  bucket: live
 
-mt:
-  console-url: http://mt:19998
-  core-url: http://mt:19999
-  bucket-name: product
-  username: mt
-  password: mt
+srs:
+  url: http://srs:1985
+
+xxl:
+  job:
+    admin:
+      addresses: http://xxljob:12001/xxl-job-admin
+    executor:
+      appname: live
+    access-token: ${XXL_JOB_ACCESS_TOKEN}
 
 mybatis-plus:
   type-aliases-package: com.yixuan.yh.live.pojo
@@ -21,3 +26,12 @@ mybatis-plus:
     db-config:
       id-type: assign_id # id 为雪花算法生成
       update-strategy: not_null
+
+redisson:
+  address: redis://redis:6379
+  password: ${REDIS_PASSWORD}
+  connectionPoolSize: 6
+  connectionMinimumIdleSize: 2
+  pingConnectionInterval: 30000
+  timeout: 5000
+  idleConnectionTimeout: 60000
