@@ -3,10 +3,7 @@ package com.yixuan.yh.video.cache;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.yixuan.yh.video.constant.RedisConstant;
 import com.yixuan.yh.video.mapper.VideoUserCollectionsItemMapper;
-import com.yixuan.yh.video.mapper.VideoUserFavoriteMapper;
-import com.yixuan.yh.video.pojo._enum.InteractionStatus;
 import com.yixuan.yh.video.pojo.entity.VideoUserCollectionsItem;
-import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.RedisScript;
@@ -19,8 +16,6 @@ public class VideoUserFavoriteCache {
 
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
-    @Autowired
-    private VideoUserFavoriteMapper videoUserFavoriteMapper;
     @Autowired
     private RedisScript<Long> interactionScript;
     @Autowired
