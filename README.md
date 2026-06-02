@@ -133,8 +133,10 @@ YH/
 
 ## 🔧 项目部署
 
-- **数据库脚本**：位于 `.file/sql` 目录
-- **Nacos配置**：位于 `.file/config` 目录
+- **部署中间件**：启动项目前需先自行部署项目依赖的相关中间件，如 MySQL、Redis、RabbitMQ、Nacos、Elasticsearch、XXL-Job、Seata、SRS 等。
+- **初始化数据库**：数据库脚本位于 `.file/sql` 目录，请在 MySQL 中运行对应 SQL 脚本，完成数据库与基础表结构初始化。
+- **导入 Nacos 配置**：Nacos 配置文件位于 `.file/config` 目录，请将配置文件导入到自己部署的 Nacos 中。
+- **修改配置参数**：导入配置后，需要将配置文件中的 MySQL、Redis、RabbitMQ、Elasticsearch、XXL-Job、Seata、SRS 等中间件连接信息修改为自己部署环境的地址、端口、账号和密码。
 
 ***
 
