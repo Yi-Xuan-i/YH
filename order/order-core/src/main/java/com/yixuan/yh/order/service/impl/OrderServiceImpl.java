@@ -1,18 +1,15 @@
 package com.yixuan.yh.order.service.impl;
 
-import com.alibaba.fastjson.JSONObject;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
 import com.alipay.api.domain.AlipayTradePrecreateModel;
-import com.alipay.api.request.AlipayTradeCloseRequest;
 import com.alipay.api.request.AlipayTradePrecreateRequest;
 import com.alipay.api.request.AlipayTradeQueryRequest;
-import com.alipay.api.response.AlipayTradeCloseResponse;
 import com.alipay.api.response.AlipayTradePrecreateResponse;
 import com.alipay.api.response.AlipayTradeQueryResponse;
+import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.yixuan.yh.common.exception.YHServerException;
 import com.yixuan.yh.common.response.Result;
-import com.yixuan.yh.common.utils.SnowflakeUtils;
 import com.yixuan.yh.order.mapper.OrderItemMapper;
 import com.yixuan.yh.order.mapper.OrderMapper;
 import com.yixuan.yh.order.pojo.entity.Order;
@@ -46,8 +43,6 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private ProductPrivateClient productPrivateClient;
     @Autowired
-    private SnowflakeUtils snowflakeUtils;
-    @Autowired
     private OrderMapper orderMapper;
     @Autowired
     private OrderItemMapper orderItemMapper;
@@ -58,7 +53,7 @@ public class OrderServiceImpl implements OrderService {
     @GlobalTransactional
     public PostOrderResponse postOrder(Long userId, PostOrderRequest postOrderRequest) throws AlipayApiException {
 
-        Long orderId = snowflakeUtils.nextId();
+        Long orderId = IdWorker.getId();
         // 获取订单需要用到商品数据（并预占库存）
         Result<PartOfOrderResponse> result = productPrivateClient.getPartOfOrder(orderId, postOrderRequest.getProductId(), postOrderRequest.getSkuId(), postOrderRequest.getQuantity());
         PartOfOrderResponse partOfOrderResponse = result.getData();
@@ -95,6 +90,7 @@ public class OrderServiceImpl implements OrderService {
         model.setTotalAmount(String.valueOf(order.getPaymentAmount()));
         model.setSubject("YH");
         model.setTimeoutExpress("1m");
+        model.setQrCodeTimeoutExpress("1m");
 
         request.setBizModel(model);
 
@@ -109,7 +105,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public PostOrderResponse postCartOrder(Long userId, PostCartOrderRequest postCartOrderRequest) throws AlipayApiException {
-        Long orderId = snowflakeUtils.nextId();
+        Long orderId = IdWorker.getId();
         // 获取订单需要用到商品数据（并预占库存）
         Result<Map<Long, PartOfCartOrderResponse>> result = productPrivateClient.getPartOfCartOrder(orderId, postCartOrderRequest.getCartItemIdList());
         Map<Long, PartOfCartOrderResponse> partOfCartOrderResponseMap = result.getData();
@@ -127,7 +123,7 @@ public class OrderServiceImpl implements OrderService {
         // order-item
         partOfCartOrderResponseMap.forEach((cartItemId, partOfCartOrderResponse) -> {
             OrderItem orderItem = new OrderItem();
-            orderItem.setOrderItemId(snowflakeUtils.nextId());
+            orderItem.setOrderItemId(IdWorker.getId());
             orderItem.setOrderId(order.getOrderId());
             orderItem.setProductId(partOfCartOrderResponse.getProductId());
             orderItem.setSkuId(partOfCartOrderResponse.getSkuId());
@@ -190,25 +186,33 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Boolean putToCancelIfUnpaid(Long orderId) throws AlipayApiException {
-        System.out.println("cancel");
-        AlipayTradeCloseRequest request = new AlipayTradeCloseRequest();
-        JSONObject bizContent = new JSONObject();
-        bizContent.put("out_trade_no", orderId);
-        request.setBizContent(bizContent.toString());
-        AlipayTradeCloseResponse response = alipayClient.execute(request);
-        if (response.isSuccess()) {
-            return orderMapper.updateStatusToCancelIfUnPaid(orderId);
-        }
-        // 订单已支付或处于无法关闭的状态
-        if ("ACQ.TRADE_STATUS_ERROR".equals(response.getSubCode())) {
-            AlipayTradeQueryRequest queryRequest = new AlipayTradeQueryRequest();
-            queryRequest.setBizContent("{\"out_trade_no\":\"" + orderId + "\"}");
-            AlipayTradeQueryResponse queryResponse = alipayClient.execute(queryRequest);
-            // 确认是因为已支付导致的关闭失败
-            return !"TRADE_SUCCESS".equals(queryResponse.getTradeStatus());
-        }
-        // 交易不存在（发起了订单但实际上没有发送请求进行支付）
-        return "ACQ.TRADE_NOT_EXIST".equals(response.getSubCode());
+       // 查询交易状态
+        AlipayTradeQueryRequest queryRequest = new AlipayTradeQueryRequest();
+        queryRequest.setBizContent("{\"out_trade_no\":\"" + orderId + "\"}");
+        AlipayTradeQueryResponse queryResponse = alipayClient.execute(queryRequest);
+        String tradeStatus = queryResponse.getTradeStatus();
+        System.out.println(tradeStatus);
+
+        return true;
+//        AlipayTradeCloseRequest request = new AlipayTradeCloseRequest();
+//        JSONObject bizContent = new JSONObject();
+//        bizContent.put("out_trade_no", orderId);
+//        request.setBizContent(bizContent.toString());
+//        AlipayTradeCloseResponse response = alipayClient.execute(request);
+//        if (response.isSuccess()) {
+//            return orderMapper.updateStatusToCancelIfUnPaid(orderId);
+//        }
+//        // 订单已支付或处于无法关闭的状态
+//        if ("ACQ.TRADE_STATUS_ERROR".equals(response.getSubCode())) {
+//            AlipayTradeQueryRequest queryRequest = new AlipayTradeQueryRequest();
+//            queryRequest.setBizContent("{\"out_trade_no\":\"" + orderId + "\"}");
+//            AlipayTradeQueryResponse queryResponse = alipayClient.execute(queryRequest);
+//            System.out.println(queryResponse.getTradeStatus());
+//            // 确认是因为已支付导致的关闭失败
+//            return !"TRADE_SUCCESS".equals(queryResponse.getTradeStatus());
+//        }
+//        // 交易不存在（发起了订单但实际上没有发送请求进行支付）
+//        return "ACQ.TRADE_NOT_EXIST".equals(response.getSubCode());
     }
 
     @Override

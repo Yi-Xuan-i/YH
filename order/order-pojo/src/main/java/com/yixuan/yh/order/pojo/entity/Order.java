@@ -1,8 +1,6 @@
 package com.yixuan.yh.order.pojo.entity;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -11,6 +9,7 @@ import java.time.LocalDateTime;
 @TableName("`order`")
 @Data
 public class Order {
+    @TableId(type = IdType.ASSIGN_ID)
     private Long orderId;
     private Long userId;
     private Long merchantId;

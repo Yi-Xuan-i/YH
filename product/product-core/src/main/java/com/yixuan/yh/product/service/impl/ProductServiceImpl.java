@@ -242,7 +242,7 @@ public class ProductServiceImpl extends BaseServiceImpl<ProductMapper, Product> 
         try {
             Message message = MessageBuilder
                     .withBody(objectMapper.writeValueAsBytes(new OrderExpirationMessage(orderId, skuId, quantity)))
-                    .setHeader("x-delay", 1000 * 60 * 2)
+                    .setHeader("x-delay", 1000 * 60 * 1.5)
                     .build();
             rabbitTemplate.convertAndSend(RabbitMQConstant.ORDER_DELAY_EXCHANGE, RabbitMQConstant.ORDER_DELAY_QUEUE_KEY, message);
         } catch (Exception e) {
