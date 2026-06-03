@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.yixuan.yh.video.constant.RedisConstant;
 import com.yixuan.yh.video.mapper.VideoUserCollectionsItemMapper;
 import com.yixuan.yh.video.pojo.entity.VideoUserCollectionsItem;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.RedisScript;
@@ -20,41 +22,60 @@ public class VideoUserFavoriteCache {
     private RedisScript<Long> interactionScript;
     @Autowired
     private VideoUserCollectionsItemMapper videoUserCollectionsItemMapper;
+    @Autowired
+    private RedissonClient redissonClient;
 
     public boolean tryFavorite(Long userId, Long videoId) {
         String key = RedisConstant.VIDEO_USER_FAVORITE_KEY_PREFIX + userId;
 
-        while (true) {
-            Long result = stringRedisTemplate.execute(interactionScript, Collections.singletonList(key), videoId.toString(), "1", "600");
-            assert result != null;
-            if (result.equals(RedisConstant.InteractionLua.NOT_EXIST.getValue())) {
+        Long result = stringRedisTemplate.execute(interactionScript, Collections.singletonList(key), videoId.toString(), "1", "600");
+        if (result != null && result.equals(RedisConstant.InteractionLua.NOT_EXIST.getValue())) {
+            RLock rLock = redissonClient.getLock(RedisConstant.VIDEO_USER_FAVORITE_LOCK_PREFIX + userId + ":" + videoId);
+            rLock.lock();
+            try {
+                result = stringRedisTemplate.execute(interactionScript, Collections.singletonList(key), videoId.toString(), "1", "600");
+                if (result != null && !result.equals(RedisConstant.InteractionLua.NOT_EXIST.getValue())) {
+                    return !result.equals(RedisConstant.InteractionLua.ERROR.getValue());
+                }
                 result = videoUserCollectionsItemMapper.selectCount(new LambdaQueryWrapper<VideoUserCollectionsItem>()
                         .eq(VideoUserCollectionsItem::getUserId, userId)
                         .eq(VideoUserCollectionsItem::getVideoId, videoId)
                         .last("LIMIT 1")
                 ) > 0 ? 1L : 0L;
                 stringRedisTemplate.opsForHash().put(key, videoId.toString(), String.valueOf(result));
-            } else return !result.equals(RedisConstant.InteractionLua.ERROR.getValue());
-        }
+
+                return result > 0;
+            } finally {
+                rLock.unlock();
+            }
+        } else return result != null && !result.equals(RedisConstant.InteractionLua.ERROR.getValue());
     }
 
     public boolean tryUnFavorite(Long userId, Long videoId) {
         String key = RedisConstant.VIDEO_USER_FAVORITE_KEY_PREFIX + userId;
 
-        while (true) {
-            Long result = stringRedisTemplate.execute(interactionScript, Collections.singletonList(key), videoId.toString(), "0", "600");
-            assert result != null;
-            if (result.equals(RedisConstant.InteractionLua.NOT_EXIST.getValue())) {
+        Long result = stringRedisTemplate.execute(interactionScript, Collections.singletonList(key), videoId.toString(), "0", "600");
+        if (result != null && result.equals(RedisConstant.InteractionLua.NOT_EXIST.getValue())) {
+            RLock rLock = redissonClient.getLock(RedisConstant.VIDEO_USER_FAVORITE_LOCK_PREFIX + userId + ":" + videoId);
+            rLock.lock();
+            try {
+                result = stringRedisTemplate.execute(interactionScript, Collections.singletonList(key), videoId.toString(), "0", "600");
+                if (result != null && !result.equals(RedisConstant.InteractionLua.NOT_EXIST.getValue())) {
+                    return !result.equals(RedisConstant.InteractionLua.ERROR.getValue());
+                }
                 result = videoUserCollectionsItemMapper.selectCount(new LambdaQueryWrapper<VideoUserCollectionsItem>()
                         .eq(VideoUserCollectionsItem::getUserId, userId)
                         .eq(VideoUserCollectionsItem::getVideoId, videoId)
                         .last("LIMIT 1")
                 ) > 0 ? 1L : 0L;
                 stringRedisTemplate.opsForHash().put(key, videoId.toString(), String.valueOf(result));
-            } else return !result.equals(RedisConstant.InteractionLua.ERROR.getValue());
-        }
-    }
 
+                return result > 0;
+            } finally {
+                rLock.unlock();
+            }
+        } else return result != null && !result.equals(RedisConstant.InteractionLua.ERROR.getValue());
+    }
 
 
 }
