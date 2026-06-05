@@ -69,37 +69,4 @@ public class CustomerServiceImpl implements CustomerService {
                         }
                 );
     }
-
-    enum ChatStatus {
-        NORMAL(0),
-        RETURN_GOODS(1),
-        RETURN_GOODS_CONFIRM(2);
-
-        private final int value;
-
-        ChatStatus(int i) {
-            value = i;
-        }
-
-        public static ChatStatus fromValue(int value) {
-            for (ChatStatus status : ChatStatus.values()) {
-                if (status.value == value) {
-                    return status;
-                }
-            }
-            throw new IllegalArgumentException("无效的 ChatStatus value: " + value);
-        }
-
-        public static ChatStatus fromStringValue(String value) {
-            return fromValue(Integer.parseInt(value));
-        }
-
-        public int getValue() {
-            return value;
-        }
-
-        public String getStringValue() {
-            return Integer.toString(value);
-        }
-    }
 }
