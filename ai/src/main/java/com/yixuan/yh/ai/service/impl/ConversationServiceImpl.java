@@ -13,12 +13,10 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class ConversationServiceImpl implements ConversationService {
@@ -32,7 +30,7 @@ public class ConversationServiceImpl implements ConversationService {
     @Autowired
     private SnowflakeUtils snowflakeUtils;
     @Autowired
-    private ChatClient chatClient;
+    private ChatClient titleClient;
 
     @Override
     public Mono<String> postConversation(Long userId) {
@@ -97,7 +95,7 @@ public class ConversationServiceImpl implements ConversationService {
         return conversationMessageRepository.findFirstByConversationIdOrderByMessageIdAsc(conversationId)
                 .map(ConversationMessage::getContent)
                 .flatMap(content ->
-                        chatClient.prompt("""
+                        titleClient.prompt("""
                                         system:
                                         角色：你是一个精炼、高效的文本处理助手。
                                         任务：我接下来提供的一段对话/文本，并为其生成一个简短、精准、有辨识度的会话标题。

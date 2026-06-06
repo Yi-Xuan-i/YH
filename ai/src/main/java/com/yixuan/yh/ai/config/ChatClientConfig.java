@@ -26,6 +26,13 @@ public class ChatClientConfig {
     }
 
     @Bean
+    public ChatClient titleClient(ChatClient.Builder chatClientBuilder) {
+        return chatClientBuilder
+                .defaultAdvisors(new SimpleLoggerAdvisor())
+                .build();
+    }
+
+    @Bean
     public ChatClient memoryClient(
             ChatClient.Builder chatClientBuilder,
             ToolCallbackProvider toolCallbackProvider) {
