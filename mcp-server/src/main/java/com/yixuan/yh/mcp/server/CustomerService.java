@@ -19,13 +19,14 @@ public class CustomerService {
 
     private final VectorStore vectorStore;
 
-    @McpTool(name = "搜索商城相关内容", description = "可以根据用户问题搜索与商城相关的内容")
+    @McpTool(name = "customer_search_mall", description = "可以根据用户问题搜索与商城相关的内容")
     public Mono<String> searchKnowledge(@McpToolParam(description = "用户问题") String query) {
 
         return Mono.fromCallable(() -> {
             SearchRequest request = SearchRequest.builder()
                     .query(query)
                     .topK(3)
+                    .similarityThreshold(0.65)
                     .build();
 
             List<Document> docs = vectorStore.similaritySearch(request);
