@@ -3,6 +3,7 @@ package com.yixuan.yh.ai.service.impl;
 import com.yixuan.yh.ai.cache.ConversationMessageCache;
 import com.yixuan.yh.ai.cache.LlmSessionManager;
 import com.yixuan.yh.ai.entity.ConversationMessage;
+import com.yixuan.yh.ai.pool.MemoryThreadPool;
 import com.yixuan.yh.ai.repository.ConversationRepository;
 import com.yixuan.yh.common.exception.YHClientException;
 import org.springframework.ai.chat.client.ChatClient;
@@ -34,6 +35,8 @@ public abstract class AbstractConversationChatService {
     private ConversationRepository conversationRepository;
     @Autowired
     private LlmSessionManager llmSessionManager;
+    @Autowired
+    private MemoryThreadPool memoryThreadPool;
 
     protected Mono<List<ConversationMessage>> getHistoryMessages(Long userId, Long conversationId) {
         return conversationRepository.existsByConversationIdAndUserId(conversationId, userId)
@@ -51,12 +54,14 @@ public abstract class AbstractConversationChatService {
         if (!systemPrompt.endsWith("\n")) {
             contextBuilder.append("\n");
         }
-        for (int i = historyMessages.size() - 1; i >= 0; i--) {
-            ConversationMessage message = historyMessages.get(i);
-            contextBuilder.append(message.getRole())
-                    .append(": ")
-                    .append(message.getContent())
-                    .append("\n");
+        if (historyMessages != null) {
+            for (int i = historyMessages.size() - 1; i >= 0; i--) {
+                ConversationMessage message = historyMessages.get(i);
+                contextBuilder.append(message.getRole())
+                        .append(": ")
+                        .append(message.getContent())
+                        .append("\n");
+            }
         }
         contextBuilder.append("user: ").append(msg).append("\n");
         return contextBuilder.toString();
@@ -111,8 +116,9 @@ public abstract class AbstractConversationChatService {
                     }
                 })
                 .concatWith(Mono.defer(() ->
-                        saveAssistantMessageIfPresent(conversationId, fullResponse.toString())
-                                .then(Mono.<String>empty())
+                        Mono.fromRunnable(() -> memoryThreadPool.submit(userId, msg))
+                                .then(saveAssistantMessageIfPresent(conversationId, fullResponse.toString())
+                                        .then(Mono.<String>empty()))
                 ));
     }
 

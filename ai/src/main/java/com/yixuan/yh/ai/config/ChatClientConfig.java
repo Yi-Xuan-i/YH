@@ -13,19 +13,27 @@ import java.util.Arrays;
 public class ChatClientConfig {
 
     @Bean
-    public ToolCallbackProvider filteredToolProvider(
-            ToolCallbackProvider delegate) {
-        return () -> Arrays.stream(delegate.getToolCallbacks())
-                .filter(tool -> tool.getToolDefinition().name().contains("memory"))
+    public ChatClient chatClient(
+            ChatClient.Builder chatClientBuilder,
+            ToolCallbackProvider toolCallbackProvider) {
+        ToolCallback[] toolCallbacks = Arrays.stream(toolCallbackProvider.getToolCallbacks())
+                .filter(tool -> tool.getToolDefinition().name().equals("archival_memory_search"))
                 .toArray(ToolCallback[]::new);
+        return chatClientBuilder
+                .defaultToolCallbacks(toolCallbacks)
+                .defaultAdvisors(new SimpleLoggerAdvisor())
+                .build();
     }
 
     @Bean
-    public ChatClient chatClient(
+    public ChatClient memoryClient(
             ChatClient.Builder chatClientBuilder,
-            ToolCallbackProvider filteredToolProvider) {
+            ToolCallbackProvider toolCallbackProvider) {
+        ToolCallback[] toolCallbacks = Arrays.stream(toolCallbackProvider.getToolCallbacks())
+                .filter(tool -> tool.getToolDefinition().name().equals("archival_memory_insert"))
+                .toArray(ToolCallback[]::new);
         return chatClientBuilder
-                .defaultToolCallbacks(filteredToolProvider)
+                .defaultToolCallbacks(toolCallbacks)
                 .defaultAdvisors(new SimpleLoggerAdvisor())
                 .build();
     }
