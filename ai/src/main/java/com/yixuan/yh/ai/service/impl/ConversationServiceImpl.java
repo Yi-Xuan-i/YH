@@ -70,6 +70,7 @@ public class ConversationServiceImpl implements ConversationService {
                     return conversationMessageRepository.findByConversationIdOrderByMessageIdDesc(conversationId)
                             .map(conversationMessage -> {
                                 ConversationMsgResponse conversationMsgResponse = new ConversationMsgResponse();
+                                conversationMsgResponse.setMessageId(conversationMessage.getMessageId());
                                 conversationMsgResponse.setRole(conversationMessage.getRole());
                                 conversationMsgResponse.setContent(conversationMessage.getContent());
                                 return conversationMsgResponse;

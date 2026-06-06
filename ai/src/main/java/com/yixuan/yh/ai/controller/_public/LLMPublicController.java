@@ -20,9 +20,10 @@ public class LLMPublicController {
 
     @Operation(summary = "与LLM对话")
     @GetMapping("/chat/{conversationId}")
-    public Flux<String> getLLMResponse(@PathVariable Long conversationId,
-                                       @RequestParam @Size(max = LLMConstant.LLM_MSG_MAX_SIZE) String msg) {
+    public Flux<Object> getLLMResponse(@PathVariable Long conversationId,
+                                       @RequestParam @Size(max = LLMConstant.LLM_MSG_MAX_SIZE) String msg,
+                                       @RequestParam(defaultValue = "false") boolean enableThinking) {
         return ReactiveUserContext.getUserId()
-                .flatMapMany(userId -> llmService.getLLMResponse(userId, conversationId, msg));
+                .flatMapMany(userId -> llmService.getLLMResponse(userId, conversationId, msg, enableThinking));
     }
 }
