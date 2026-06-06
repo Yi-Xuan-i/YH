@@ -5,6 +5,7 @@ import com.yixuan.yh.ai.cache.LlmSessionManager;
 import com.yixuan.yh.ai.entity.ConversationMessage;
 import com.yixuan.yh.ai.pool.MemoryThreadPool;
 import com.yixuan.yh.ai.repository.ConversationRepository;
+import com.yixuan.yh.ai.service.ConversationService;
 import com.yixuan.yh.common.exception.YHClientException;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.openai.OpenAiChatOptions;
@@ -24,6 +25,8 @@ public abstract class AbstractConversationChatService {
 
     private static final String DONE_MESSAGE = "[DONE]";
     private static final String EMPTY_RESPONSE_MESSAGE = "[ERROR]EMPTY_LLM_RESPONSE";
+    private static final String TITLE_START_TAG = "<title>";
+    private static final String TITLE_END_TAG = "</title>";
     private static final String THINK_START_TAG = "<think>";
     private static final String THINK_END_TAG = "</think>";
 
@@ -37,6 +40,8 @@ public abstract class AbstractConversationChatService {
     private LlmSessionManager llmSessionManager;
     @Autowired
     private MemoryThreadPool memoryThreadPool;
+    @Autowired
+    private ConversationService conversationService;
 
     protected Mono<List<ConversationMessage>> getHistoryMessages(Long userId, Long conversationId) {
         return conversationRepository.existsByConversationIdAndUserId(conversationId, userId)
@@ -97,18 +102,27 @@ public abstract class AbstractConversationChatService {
         AtomicBoolean thinkingOpened = new AtomicBoolean(false);
 
         return saveUserMessage(conversationId, msg)
-                .thenMany(Flux.defer(() ->
-                                chatClient.prompt(prompt)
-                                        .toolContext(Map.of("userId", userId))
-                                        .options(OpenAiChatOptions.builder()
-                                                .extraBody(Map.of("enable_thinking", enableThinking))
-                                                .build())
-                                        .stream()
-                                        .chatResponse()
-                                        .concatMap(response -> parseResponse(response, hasOutput, thinkingOpened))
-                                        .concatWith(Flux.defer(() -> buildEndMessage(hasOutput, thinkingOpened)))
-                        )
-                )
+                .then(Mono.defer(() ->
+                        conversationService.generateConversationTitle(userId, conversationId)
+                ))
+                .flatMapMany(title -> {
+                    Flux<String> titleChunk = Flux.just(buildTitleMessage(title));
+
+                    Flux<Object> aiChunks = Flux.defer(() ->
+                            chatClient.prompt(prompt)
+                                    .toolContext(Map.of("userId", userId))
+                                    .options(OpenAiChatOptions.builder()
+                                            .extraBody(Map.of("enable_thinking", enableThinking))
+                                            .build())
+                                    .stream()
+                                    .chatResponse()
+                                    .concatMap(response -> parseResponse(response, hasOutput, thinkingOpened))
+                                    .concatWith(Flux.defer(() ->
+                                            buildEndMessage(hasOutput, thinkingOpened)
+                                    ))
+                    );
+                    return Flux.concat(titleChunk, aiChunks);
+                })
                 .subscribeOn(Schedulers.boundedElastic())
                 .doOnNext(chunk -> {
                     if (!DONE_MESSAGE.equals(chunk) && !EMPTY_RESPONSE_MESSAGE.equals(chunk)) {
@@ -156,6 +170,13 @@ public abstract class AbstractConversationChatService {
             chunks.add(text);
         }
         return Flux.fromIterable(chunks);
+    }
+
+    private String buildTitleMessage(String title) {
+        if (title == null || title.isBlank()) {
+            return  "";
+        }
+        return TITLE_START_TAG + title + TITLE_END_TAG;
     }
 
     private Flux<Object> buildEndMessage(AtomicBoolean hasOutput, AtomicBoolean thinkingOpened) {

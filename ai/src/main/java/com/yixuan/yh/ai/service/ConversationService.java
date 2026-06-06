@@ -1,6 +1,5 @@
 package com.yixuan.yh.ai.service;
 
-import com.jayway.jsonpath.JsonPath;
 import com.yixuan.yh.ai.response.ConversationMsgResponse;
 import com.yixuan.yh.ai.response.ConversationResponse;
 import reactor.core.publisher.Mono;
@@ -16,5 +15,5 @@ public interface ConversationService {
 
     Mono<String> deleteConversation(Long id, Long conversationId);
 
-    Mono<String> generateConversationTitle(Long id, Long conversationId);
+    Mono<String> generateConversationTitle(Long userId, Long conversationId);
 }
