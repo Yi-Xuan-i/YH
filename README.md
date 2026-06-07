@@ -103,6 +103,9 @@
 
   <!-- 创作者平台 -->
   <img src="https://gitee.com/YXXHYH/yh-be/raw/master/.file/creator.png" alt="创作者平台" width="700" />
+
+  <!-- AI聊天 -->
+  <img src="https://gitee.com/YXXHYH/yh-be/raw/master/.file/ai.png" alt="AI聊天" width="700" />
 </div>
 
 
