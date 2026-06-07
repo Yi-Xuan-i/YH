@@ -102,27 +102,10 @@ public abstract class AbstractConversationChatService {
         AtomicBoolean thinkingOpened = new AtomicBoolean(false);
 
         return saveUserMessage(conversationId, msg)
-                .then(Mono.defer(() ->
-                        conversationService.generateConversationTitle(userId, conversationId)
+                .thenMany(Flux.concat(
+                        buildTitleChunkIfFirstMessage(userId, conversationId),
+                        buildAiChunks(userId, prompt, enableThinking, hasOutput, thinkingOpened)
                 ))
-                .flatMapMany(title -> {
-                    Flux<String> titleChunk = Flux.just(buildTitleMessage(title));
-
-                    Flux<Object> aiChunks = Flux.defer(() ->
-                            chatClient.prompt(prompt)
-                                    .toolContext(Map.of("userId", userId))
-                                    .options(OpenAiChatOptions.builder()
-                                            .extraBody(Map.of("enable_thinking", enableThinking))
-                                            .build())
-                                    .stream()
-                                    .chatResponse()
-                                    .concatMap(response -> parseResponse(response, hasOutput, thinkingOpened))
-                                    .concatWith(Flux.defer(() ->
-                                            buildEndMessage(hasOutput, thinkingOpened)
-                                    ))
-                    );
-                    return Flux.concat(titleChunk, aiChunks);
-                })
                 .subscribeOn(Schedulers.boundedElastic())
                 .doOnNext(chunk -> {
                     if (!DONE_MESSAGE.equals(chunk) && !EMPTY_RESPONSE_MESSAGE.equals(chunk)) {
@@ -134,6 +117,35 @@ public abstract class AbstractConversationChatService {
                                 .then(saveAssistantMessageIfPresent(conversationId, fullResponse.toString())
                                         .then(Mono.<String>empty()))
                 ));
+    }
+
+    private Flux<Object> buildTitleChunkIfFirstMessage(Long userId, Long conversationId) {
+        return conversationMessageCache.countMessage(conversationId)
+                .flatMapMany(messageCount -> {
+                    if (messageCount != 1) {
+                        return Flux.empty();
+                    }
+                    return conversationService.generateConversationTitle(userId, conversationId)
+                            .map(this::buildTitleMessage)
+                            .flux();
+                });
+    }
+
+    private Flux<Object> buildAiChunks(Long userId, String prompt, boolean enableThinking,
+                                       AtomicBoolean hasOutput, AtomicBoolean thinkingOpened) {
+        return Flux.defer(() ->
+                chatClient.prompt(prompt)
+                        .toolContext(Map.of("userId", userId))
+                        .options(OpenAiChatOptions.builder()
+                                .extraBody(Map.of("enable_thinking", enableThinking))
+                                .build())
+                        .stream()
+                        .chatResponse()
+                        .concatMap(response -> parseResponse(response, hasOutput, thinkingOpened))
+                        .concatWith(Flux.defer(() ->
+                                buildEndMessage(hasOutput, thinkingOpened)
+                        ))
+        );
     }
 
     private Flux<Object> parseResponse(Object response, AtomicBoolean hasOutput,

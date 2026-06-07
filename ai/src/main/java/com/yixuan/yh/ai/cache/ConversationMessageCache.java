@@ -22,6 +22,10 @@ public class ConversationMessageCache {
         return conversationMessageRepository.findByConversationIdOrderByMessageIdDesc(conversationId);
     }
 
+    public Mono<Long> countMessage(Long conversationId) {
+        return conversationMessageRepository.countByConversationId(conversationId);
+    }
+
     public Flux<ConversationMessage> addMessage(Long conversationId, List<String> msg) {
         ConversationMessage userMessage = new ConversationMessage();
         userMessage.setMessageId(snowflakeUtils.nextId());
